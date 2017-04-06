@@ -28,8 +28,25 @@ class FeatureContext implements Context
      */
     public function someValidDescriptors()
     {
-        $this->descriptors[] = ["foo" => "bar"];
-        $this->descriptors[] = ["baz" => "bax"];
+        $this->descriptors[] = [
+            "fields" => [
+                ["name" => "id"],
+                ["name" => "height", "type" => "integer"]
+            ]
+        ];
+        $this->descriptors[] = [
+            "fields" => [
+                ["name" => "id", "type" => "string", "constraints" => ["required" => true]],
+                ["name" => "height", "type" => "number"],
+                ["name" => "age", "type" => "integer"],
+                ["name" => "name", "type" => "string"],
+                ["name" => "occupation", "type" => "string"],
+            ],
+            "primaryKey" => ["id"],
+            "foreignKeys" => [
+                ["fields" => ["name"], "reference" => ["resource" => "", "fields" => ["id"]]]
+            ],
+        ];
     }
 
     /**

@@ -14,4 +14,4 @@ before_script:
   # --prefer-dist causes composer to download zip files (as opposed to cloning git repos which is much slower)
   - composer install --prefer-dist
 script:
-  - vendor/bin/behat
+  - composer test
