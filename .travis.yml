@@ -1,12 +1,15 @@
 language: php
 php:
-  - '5.4'
-  - '5.5'
-  - '5.6'
   - '7.0'
   - '7.1'
-  - hhvm
   - nightly
+  # following php versions fail due to some phpunit / behat dependencies
+  # see the travis log here: https://travis-ci.org/OriHoch/tableschema-php/builds/219181522
+  # TODO: fix the dependencies to allow it to run on these versions as well
+  # - '5.4'
+  # - '5.5'
+  # - '5.6'
+  # - hhvm
 before_script:
   # --prefer-dist causes composer to download zip files (as opposed to cloning git repos which is much slower)
   - composer install --prefer-dist
