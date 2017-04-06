@@ -1,8 +1,6 @@
 <?php
 
 use Behat\Behat\Context\Context;
-use Behat\Gherkin\Node\PyStringNode;
-use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 
 /**
@@ -10,7 +8,7 @@ use PHPUnit\Framework\Assert;
  */
 class FeatureContext implements Context
 {
-    protected $descriptors = [];
+    protected $descriptors;
 
     /**
      * Initializes context.
@@ -26,15 +24,15 @@ class FeatureContext implements Context
     /**
      * @Given a list of valid descriptors
      */
-    public function someValidDescriptors()
+    public function givenValidDescriptors()
     {
-        $this->descriptors[] = [
+        $simpleDescriptor = [
             "fields" => [
                 ["name" => "id"],
                 ["name" => "height", "type" => "integer"]
             ]
         ];
-        $this->descriptors[] = [
+        $fullDescriptor = [
             "fields" => [
                 ["name" => "id", "type" => "string", "constraints" => ["required" => true]],
                 ["name" => "height", "type" => "number"],
@@ -47,6 +45,62 @@ class FeatureContext implements Context
                 ["fields" => ["name"], "reference" => ["resource" => "", "fields" => ["id"]]]
             ],
         ];
+        $simpleFile = tempnam(sys_get_temp_dir(), "tableschema-php-tests");
+        $fullFile = tempnam(sys_get_temp_dir(), "tableschema-php-tests");
+        file_put_contents($simpleFile, json_encode($simpleDescriptor));
+        file_put_contents($fullFile, json_encode($fullDescriptor));
+        $this->descriptors = [
+            ["descriptor" => $simpleDescriptor, "expected" => $simpleDescriptor],
+            ["descriptor" => $fullDescriptor, "expected" => $fullDescriptor],
+            ["descriptor" => json_encode($simpleDescriptor), "expected" => $simpleDescriptor],
+            ["descriptor" => json_encode($fullDescriptor), "expected" => $fullDescriptor],
+            ["descriptor" => $simpleFile, "expected" => $simpleDescriptor],
+            ["descriptor" => $fullFile, "expected" => $fullDescriptor],
+        ];
+    }
+
+    /**
+     * @Given a list of invalid descriptors
+     */
+    public function givenInvalidDescriptors()
+    {
+        $this->descriptors = [
+            [
+                "descriptor" => [],
+                "expected_errors" => ["Failed schema validation"]
+            ],
+            [
+                "descriptor" => "foobar",
+                "expected_errors" => ["Failed to load resource: Invalid resource: \"foobar\""]
+            ],
+            [
+                "descriptor" => [
+                    "fields" => [
+                        ["name" => "id", "title" => "Identifier", "type" => "magical_unicorn"],
+                        ["name" => "title", "title" => "Title", "type" => "string"]
+                    ],
+                    "primaryKey" => "identifier",
+                    "foreignKeys" => [
+                        [
+                            "fields" => ["id", "notafield"],
+                            "reference" => ["datapackage" => "http://data.okfn.org/data/mydatapackage/", "fields" => "no"]
+                        ]
+                    ]
+                ],
+                "expected_errors" => ["primaryKey must be an array"]
+            ],
+            [
+                "descriptor" => [
+                    "fields" => [1, 2, 3],
+                    "primaryKey" => ["foobar", "bazbax"],
+                ],
+                "expected_errors" => [
+                    "field 1 is not an array", "field 2 is not an array", "field 3 is not an array",
+                    "primaryKey foobar must relate to a field",
+                    "primaryKey bazbax must relate to a field"
+                ]
+            ]
+        ];
     }
 
     /**
@@ -54,24 +108,65 @@ class FeatureContext implements Context
      */
     public function initializingTheSchemaObject()
     {
-        foreach ($this->descriptors as &$descriptor) {
+        foreach ($this->descriptors as &$data) {
             try {
-                $descriptor["__schema"] = new \frictionlessdata\tableschema\Schema($descriptor);
+                $data["__schema"] = new \frictionlessdata\tableschema\Schema($data["descriptor"]);
             } catch (Exception $e) {
-                $descirptor["__exception"] = $e;
+                $data["__exception"] = $e;
             }
-
         }
     }
 
     /**
-     * @Then object should be initialized without exceptions
+     * @When validating the descriptors
+     */
+    public function validatingTheDescriptors()
+    {
+        foreach ($this->descriptors as &$data) {
+            try {
+                $data["__validation"] = \frictionlessdata\tableschema\Schema::validate($data["descriptor"]);
+            } catch (Exception $e) {
+                $data["__exception"] = $e;
+            }
+        }
+    }
+
+    /**
+     * @Then all schemas should be initialized without exceptions and return the expected descriptor
      */
     public function objectShouldBeInitializedWithoutExceptions()
     {
-        foreach ($this->descriptors as $descriptor) {
-            Assert::assertArrayHasKey("__schema", $descriptor);
-            Assert::assertArrayNotHasKey("__exception", $descriptor);
+        foreach ($this->descriptors as $data) {
+            if (array_key_exists("__exception", $data)) {
+                throw new Exception("unexpected exception: ".$data["__exception"]." for descriptor: ".json_encode($data["descriptor"]));
+            }
+            Assert::assertEquals($data["expected"], $data["__schema"]->descriptor);
+        }
+    }
+
+    /**
+     * @Then all schemas should raise an exception
+     */
+    public function allDescriptorSchemasShouldRaiseException()
+    {
+        foreach ($this->descriptors as $data) {
+            $msg = "create schema from the descriptor did not raise an exception: ".json_encode($data);
+            Assert::assertArrayNotHasKey("__schema", $data, $msg);
+            Assert::assertArrayHasKey("__exception", $data, $msg);
+        }
+    }
+
+    /**
+     * @Then validation results should be as expected
+     */
+    public function validationResultsShouldBeAsExpected()
+    {
+        foreach ($this->descriptors as $data) {
+            if (array_key_exists("__exception", $data)) {
+                throw new Exception("unexpected exception: ".$data["__exception"]." for descriptor: ".json_encode($data["descriptor"]));
+            }
+            $msg = "validation for descriptor is not as expected: ".json_encode($data);
+            Assert::assertEquals($data["expected_errors"], $data["__validation"], $msg);
         }
     }
 }

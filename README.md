@@ -17,6 +17,12 @@ A utility library for working with [Table Schema](https://specs.frictionlessdata
 
 A model of a schema with helpful methods for working with the schema and supported data.
 
+Schema objects can be constructed using any of the following:
+* php array
+* string containing json
+* string containg value supported by [file_get_contents](http://php.net/manual/en/function.file-get-contents.php)
+
+You can use the Schema::validate static function to load and validate a schema. It returns a list of loading or validation errors encountered.
 
 ## Important Notes
 
@@ -38,12 +44,24 @@ $ composer require frictionlessdata/tableschema
 ```php
 use frictionlessdata\tableschema;
 
-$schema = new Schema([
+// construct schema from json string
+$schema = new Schema('{
     "fields" => [
         ["name" => "id"],
         ["name" => "height", "type" => "integer"]
     ]
-]);
+}');
+
+// schema will be parsed and validated
+// will raise exception in case of validation error
+
+// access in php after validation
+$schema->descriptor["fields"][0]["name"] == "id"
+
+// validate a schema from a remote resource
+$validation_errors = Schema::validate("http://www.example.com/datapackage.json");
+
+// returns an array of error strings, if array is empty - means it passed validation
 ```
 
 
