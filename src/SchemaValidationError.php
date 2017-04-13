@@ -16,11 +16,11 @@ class SchemaValidationError {
     {
         switch ($this->code) {
             case self::LOAD_FAILED:
-                return "Failed to load from the given descriptor";
+                return "Failed to load from the given descriptor: {$this->extraDetails}";
             case self::SCHEMA_VIOLATION:
                 return $this->extraDetails;
             default:
-                return "code='{$this->code}', extraDetails='{$this->extraDetails}'";
+                throw new \Exception("Invalid schema validation code: {$this->code}");
         }
     }
 

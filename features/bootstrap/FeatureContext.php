@@ -74,11 +74,11 @@ class FeatureContext implements Context
         $this->descriptors = [
             [
                 "descriptor" => [],
-                "expected_errors" => ["Failed to load from the given descriptor"]
+                "expected_errors" => ["Failed to load from the given descriptor: Invalid resource: []"]
             ],
             [
                 "descriptor" => "foobar",
-                "expected_errors" => ["Failed to load from the given descriptor"]
+                "expected_errors" => ["Failed to load from the given descriptor: Invalid resource: \"foobar\""]
             ],
             [
                 "descriptor" => (object)[

@@ -3,17 +3,6 @@
 
 class Utils
 {
-    public static function array_map_with_keys($callback, $array)
-    {
-        $res = [];
-        foreach (array_map($callback, $array) as $tmp) {
-            if (!empty($tmp)) {
-                $res[$tmp[0]] = $tmp[1];
-            }
-        }
-        return $res;
-    }
-
 
     public static function load_json_resource($resource)
     {
@@ -29,13 +18,19 @@ class Utils
                 $resource = json_decode($resource);
             } catch (\Exception $e) {
                 $json_decode_exception = $e;
-                throw new \Exception("Failed to load resource " . json_encode($resource) . " " . $get_contents_exception . " \n\n " . $json_decode_exception);
+                throw new LoadException("Failed to load resource " . json_encode($resource) . " " . $get_contents_exception . " \n\n " . $json_decode_exception);
             }
         }
         if (is_object($resource)) {
             return $resource;
         } else {
-            throw new \Exception("Invalid resource: " . json_encode($original_resource));
+            throw new LoadException("Invalid resource: " . json_encode($original_resource));
         }
     }
+}
+
+
+class LoadException extends \Exception
+{
+
 }

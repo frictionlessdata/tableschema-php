@@ -18,7 +18,7 @@ class Schema {
         if (count($this->validationErrors) == 0) {
             $this->descriptor = $descriptor;
         } else {
-            throw new \Exception("descriptor failed validation: ".SchemaValidationError::getErrorMessages($this->validationErrors));
+            throw new SchemaException("descriptor failed validation: ".SchemaValidationError::getErrorMessages($this->validationErrors));
         };
     }
 
@@ -37,5 +37,11 @@ class Schema {
             return [new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage())];
         }
     }
+
+}
+
+
+class SchemaException extends \Exception
+{
 
 }
