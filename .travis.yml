@@ -15,3 +15,5 @@ before_script:
   - composer install --prefer-dist
 script:
   - composer test
+after_success:
+  - vendor/bin/coveralls

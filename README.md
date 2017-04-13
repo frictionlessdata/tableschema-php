@@ -11,14 +11,12 @@ A utility library for working with [Table Schema](https://specs.frictionlessdata
 
 ## Features
 
-**work in progress** - library is in active development and not ready for general use yet.
-
 ### Schema
 
 A model of a schema with helpful methods for working with the schema and supported data.
 
 Schema objects can be constructed using any of the following:
-* php array
+* php object
 * string containing json
 * string containg value supported by [file_get_contents](http://php.net/manual/en/function.file-get-contents.php)
 
