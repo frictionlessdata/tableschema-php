@@ -13,3 +13,5 @@ $ composer test
 ```
 
 **hint**: for nicer output and other options you can also run Behat directly: `vendor/bin/behat`
+**hint 2**: you can also run phpunit directlry: `vendor/bin/phpunit`
+
