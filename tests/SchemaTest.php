@@ -1,0 +1,101 @@
+<?php
+
+
+use PHPUnit\Framework\TestCase;
+
+use frictionlessdata\tableschema\Schema;
+use frictionlessdata\tableschema\SchemaValidationError;
+
+
+class SchemaTest extends TestCase
+{
+
+    public function testInitializeFromJsonString()
+    {
+        $schema = new Schema('{
+            "fields": [
+                {"name": "id"},
+                {"name": "height", "type": "integer"}
+            ]
+        }');
+        $this->assertEquals((object)[
+            "fields" => [
+                (object)["name" => "id"],
+                (object)["name" => "height", "type" => "integer"]
+            ]
+        ], $schema->descriptor);
+        $this->assertEquals("id", $schema->descriptor->fields[0]->name);
+    }
+
+    public function testInitializeFromPhpObject()
+    {
+        $schema = new Schema((object)[
+            "fields" => [
+                (object)["name" => "id"],
+                (object)["name" => "height", "type" => "integer"]
+            ]
+        ]);
+        $this->assertEquals((object)[
+            "fields" => [
+                (object)["name" => "id"],
+                (object)["name" => "height", "type" => "integer"]
+            ]
+        ], $schema->descriptor);
+    }
+
+    protected function _assertValidationErrors($descriptor, $expectedValidationErrors)
+    {
+        $this->assertEquals(
+            $expectedValidationErrors,
+            SchemaValidationError::getErrorMessages(
+                Schema::validate($descriptor)
+            )
+        );
+    }
+
+    public function testInitializeFromRemoteResource()
+    {
+        $this->_assertValidationErrors(
+            "https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json",
+            "[primaryKey] String value found, but an array is required"
+        );
+    }
+
+    public function testValidateInvalidResources()
+    {
+        $this->_assertValidationErrors(
+            "--invalid--",
+            "Failed to load from the given descriptor: Invalid resource: \"--invalid--\""
+        );
+        $this->_assertValidationErrors(
+            ["fields" => []],
+            'Failed to load from the given descriptor: Invalid resource: {"fields":[]}'
+        );
+    }
+
+    public function testConstructFromInvalidResource()
+    {
+        try {
+            new Schema("--invalid--");
+            $this->fail("constructing from invalid descriptor should throw exception");
+        } catch (\frictionlessdata\tableschema\LoadException $e) {
+            $this->assertEquals("Invalid resource: \"--invalid--\"", $e->getMessage());
+        }
+        try {
+            new Schema(["fields" => []]);
+            $this->fail("constructing from invalid descriptor should throw exception");
+        } catch (\frictionlessdata\tableschema\LoadException $e) {
+            $this->assertEquals("Invalid resource: {\"fields\":[]}", $e->getMessage());
+        }
+        try {
+            new Schema((object)["fields" => []]);
+            $this->fail("constructing from invalid descriptor should throw exception");
+        } catch (\frictionlessdata\tableschema\SchemaException $e) {
+            $this->assertEquals(
+                "descriptor failed validation: [fields] There must be a minimum of 1 items in the array",
+                $e->getMessage()
+            );
+        }
+    }
+
+}
