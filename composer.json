@@ -1,6 +1,7 @@
 {
     "name": "frictionlessdata/tableschema",
     "description": "A utility library for working with [Table Schema](https://specs.frictionlessdata.io/table-schema/)",
+    "license": "MIT",
     "--require-comments--": "we should be able to support older php versions, see comments on .travis.yml",
     "require": {
         "php": ">=7",
