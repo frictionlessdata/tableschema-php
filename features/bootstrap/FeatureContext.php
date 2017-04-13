@@ -2,6 +2,8 @@
 
 use Behat\Behat\Context\Context;
 use PHPUnit\Framework\Assert;
+use frictionlessdata\tableschema\SchemaValidationError;
+use frictionlessdata\tableschema\Schema;
 
 /**
  * Defines application features from the specific context.
@@ -67,11 +69,11 @@ class FeatureContext implements Context
         $this->descriptors = [
             [
                 "descriptor" => [],
-                "expected_errors" => ["Failed schema validation"]
+                "expected_errors" => ["Failed to load from the given descriptor"]
             ],
             [
                 "descriptor" => "foobar",
-                "expected_errors" => ["Failed to load resource: Invalid resource: \"foobar\""]
+                "expected_errors" => ["Failed to load from the given descriptor"]
             ],
             [
                 "descriptor" => [
@@ -80,14 +82,9 @@ class FeatureContext implements Context
                         ["name" => "title", "title" => "Title", "type" => "string"]
                     ],
                     "primaryKey" => "identifier",
-                    "foreignKeys" => [
-                        [
-                            "fields" => ["id", "notafield"],
-                            "reference" => ["datapackage" => "http://data.okfn.org/data/mydatapackage/", "fields" => "no"]
-                        ]
-                    ]
+                    "foreignKeys" => "foobar"
                 ],
-                "expected_errors" => ["primaryKey must be an array"]
+                "expected_errors" => ["primaryKey attribute must be an array of field names"]
             ],
             [
                 "descriptor" => [
@@ -95,9 +92,11 @@ class FeatureContext implements Context
                     "primaryKey" => ["foobar", "bazbax"],
                 ],
                 "expected_errors" => [
-                    "field 1 is not an array", "field 2 is not an array", "field 3 is not an array",
-                    "primaryKey foobar must relate to a field",
-                    "primaryKey bazbax must relate to a field"
+                    "Every field must be an array (field number 1)",
+                    "Every field must be an array (field number 2)",
+                    "Every field must be an array (field number 3)",
+                    "all field names in primaryKey attribute must relate to fields in the 'fields' attribute (key=foobar)",
+                    "all field names in primaryKey attribute must relate to fields in the 'fields' attribute (key=bazbax)"
                 ]
             ]
         ];
@@ -110,7 +109,7 @@ class FeatureContext implements Context
     {
         foreach ($this->descriptors as &$data) {
             try {
-                $data["__schema"] = new \frictionlessdata\tableschema\Schema($data["descriptor"]);
+                $data["__schema"] = new Schema($data["descriptor"]);
             } catch (Exception $e) {
                 $data["__exception"] = $e;
             }
@@ -124,7 +123,9 @@ class FeatureContext implements Context
     {
         foreach ($this->descriptors as &$data) {
             try {
-                $data["__validation"] = \frictionlessdata\tableschema\Schema::validate($data["descriptor"]);
+                $data["__validation_errors"] = array_map(function($validationError){
+                    return $validationError->getMessage();
+                }, Schema::validate($data["descriptor"]));
             } catch (Exception $e) {
                 $data["__exception"] = $e;
             }
@@ -166,7 +167,7 @@ class FeatureContext implements Context
                 throw new Exception("unexpected exception: ".$data["__exception"]." for descriptor: ".json_encode($data["descriptor"]));
             }
             $msg = "validation for descriptor is not as expected: ".json_encode($data);
-            Assert::assertEquals($data["expected_errors"], $data["__validation"], $msg);
+            Assert::assertEquals($data["expected_errors"], $data["__validation_errors"], $msg);
         }
     }
 }
