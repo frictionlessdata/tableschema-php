@@ -28,23 +28,28 @@ class FeatureContext implements Context
      */
     public function givenValidDescriptors()
     {
-        $simpleDescriptor = [
+        $simpleDescriptor = (object)[
             "fields" => [
-                ["name" => "id"],
-                ["name" => "height", "type" => "integer"]
+                (object)["name" => "id"],
+                (object)["name" => "height", "type" => "integer"]
             ]
         ];
-        $fullDescriptor = [
+        $fullDescriptor = (object)[
             "fields" => [
-                ["name" => "id", "type" => "string", "constraints" => ["required" => true]],
-                ["name" => "height", "type" => "number"],
-                ["name" => "age", "type" => "integer"],
-                ["name" => "name", "type" => "string"],
-                ["name" => "occupation", "type" => "string"],
+                (object)["name" => "id", "type" => "string", "constraints" => (object)["required" => true]],
+                (object)["name" => "height", "type" => "number"],
+                (object)["name" => "age", "type" => "integer"],
+                (object)["name" => "name", "type" => "string"],
+                (object)["name" => "occupation", "type" => "string"],
             ],
             "primaryKey" => ["id"],
             "foreignKeys" => [
-                ["fields" => ["name"], "reference" => ["resource" => "", "fields" => ["id"]]]
+                (object)[
+                    "fields" => ["name"],
+                    "reference" => (object)[
+                        "resource" => "related-resource-idntifier-or-url", "fields" => ["id"]
+                    ]
+                ]
             ],
         ];
         $simpleFile = tempnam(sys_get_temp_dir(), "tableschema-php-tests");
@@ -76,27 +81,47 @@ class FeatureContext implements Context
                 "expected_errors" => ["Failed to load from the given descriptor"]
             ],
             [
-                "descriptor" => [
+                "descriptor" => (object)[
                     "fields" => [
-                        ["name" => "id", "title" => "Identifier", "type" => "magical_unicorn"],
-                        ["name" => "title", "title" => "Title", "type" => "string"]
+                        (object)["name" => "id", "title" => "Identifier", "type" => "magical_unicorn"],
+                        (object)["name" => "title", "title" => "Title", "type" => "string"]
                     ],
                     "primaryKey" => "identifier",
                     "foreignKeys" => "foobar"
                 ],
-                "expected_errors" => ["primaryKey attribute must be an array of field names"]
+                "expected_errors" => [
+                    "[fields[0].type] Does not have a value in the enumeration [\"string\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"number\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"integer\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"date\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"time\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"datetime\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"year\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"yearmonth\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"boolean\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"object\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"geopoint\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"geojson\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"array\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"duration\"]",
+                    "[fields[0].type] Does not have a value in the enumeration [\"any\"]",
+                    "[fields[0]] Failed to match at least one schema",
+                    "[primaryKey] String value found, but an array is required",
+                    "[foreignKeys] String value found, but an array is required"
+                ]
             ],
             [
-                "descriptor" => [
+                "descriptor" => (object)[
                     "fields" => [1, 2, 3],
                     "primaryKey" => ["foobar", "bazbax"],
                 ],
                 "expected_errors" => [
-                    "Every field must be an array (field number 1)",
-                    "Every field must be an array (field number 2)",
-                    "Every field must be an array (field number 3)",
-                    "all field names in primaryKey attribute must relate to fields in the 'fields' attribute (key=foobar)",
-                    "all field names in primaryKey attribute must relate to fields in the 'fields' attribute (key=bazbax)"
+                    "[fields[0]] Integer value found, but an object is required",
+                    "[fields[0]] Failed to match at least one schema",
+                    "[fields[1]] Integer value found, but an object is required",
+                    "[fields[1]] Failed to match at least one schema",
+                    "[fields[2]] Integer value found, but an object is required",
+                    "[fields[2]] Failed to match at least one schema"
                 ]
             ]
         ];

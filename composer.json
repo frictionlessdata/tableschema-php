@@ -3,7 +3,8 @@
     "description": "A utility library for working with [Table Schema](https://specs.frictionlessdata.io/table-schema/)",
     "--require-comments--": "we should be able to support older php versions, see comments on .travis.yml",
     "require": {
-        "php": ">=7"
+        "php": ">=7",
+        "justinrainbow/json-schema": "^5.2"
     },
     "require-dev": {
         "behat/behat": "^3.3",
@@ -15,6 +16,6 @@
         }
     },
     "scripts": {
-        "test": "behat"
+        "test": "behat && phpunit --debug tests/"
     }
 }

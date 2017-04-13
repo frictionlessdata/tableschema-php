@@ -26,13 +26,13 @@ class Utils
                 $get_contents_exception = $e;
             };
             try {
-                $resource = json_decode($resource, $assoc = true);
+                $resource = json_decode($resource);
             } catch (\Exception $e) {
                 $json_decode_exception = $e;
                 throw new \Exception("Failed to load resource " . json_encode($resource) . " " . $get_contents_exception . " \n\n " . $json_decode_exception);
             }
         }
-        if (is_array($resource) && !empty($resource)) {
+        if (is_object($resource)) {
             return $resource;
         } else {
             throw new \Exception("Invalid resource: " . json_encode($original_resource));

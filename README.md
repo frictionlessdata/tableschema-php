@@ -46,22 +46,23 @@ use frictionlessdata\tableschema;
 
 // construct schema from json string
 $schema = new Schema('{
-    "fields" => [
-        ["name" => "id"],
-        ["name" => "height", "type" => "integer"]
+    "fields": [
+        {"name": "id"},
+        {"name": "height", "type": "integer"}
     ]
 }');
 
-// schema will be parsed and validated
+// schema will be parsed and validated against the json schema (under src/schemas/table-schema.json)
 // will raise exception in case of validation error
 
 // access in php after validation
-$schema->descriptor["fields"][0]["name"] == "id"
+$schema->descriptor->fields[0]->name == "id"
 
-// validate a schema from a remote resource
-$validation_errors = Schema::validate("http://www.example.com/datapackage.json");
-
-// returns an array of error strings, if array is empty - means it passed validation
+// validate a schema from a remote resource and getting list of validation errors back
+$validationErrors = Schema::validate("https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json");
+foreach ($validationErrors as $validationError) {
+    print(validationError->getMessage();
+};
 ```
 
 
