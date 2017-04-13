@@ -12,6 +12,18 @@ $ composer install
 $ composer test
 ```
 
-**hint**: for nicer output and other options you can also run Behat directly: `vendor/bin/behat`
-**hint 2**: you can also run phpunit directlry: `vendor/bin/phpunit`
+## Behat - for feature tests
 
+Behat is used for feature tests, you can find the features under features directory
+
+Running Behat directly: `vendor/bin/behat`
+
+## Phpunit - for unit tests
+
+Phpunit is used for unit tests, you can find the tests under tests directory
+
+Running Phpunit directly: `vendor/bin/phunit`
+
+## Coveralls - for coverage
+
+when running `composer test` phpunit generates coverage report in coverage-clover.xml - this is then sent to Coveralls via Travis.
