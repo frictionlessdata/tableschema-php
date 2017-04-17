@@ -18,6 +18,6 @@
         }
     },
     "scripts": {
-        "test": "behat && phpunit --debug tests/ --coverage-clover coverage-clover.xml --whitelist src/"
+        "test": "behat && phpunit --debug tests/ --coverage-clover coverage-clover.xml"
     }
 }
