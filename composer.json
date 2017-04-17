@@ -2,7 +2,6 @@
     "name": "frictionlessdata/tableschema",
     "description": "A utility library for working with Table Schema",
     "license": "MIT",
-    "--require-comments--": "we should be able to support older php versions, see comments on .travis.yml",
     "require": {
         "php": ">=5.4",
         "justinrainbow/json-schema": "^5.2"
