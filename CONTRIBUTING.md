@@ -27,3 +27,11 @@ Running Phpunit directly: `vendor/bin/phunit`
 ## Coveralls - for coverage
 
 when running `composer test` phpunit generates coverage report in coverage-clover.xml - this is then sent to Coveralls via Travis.
+
+## Publishing to Packagist
+
+* Publish a release on GitHub
+* go to https://packagist.org/packages/frictionlessdata/tableschema
+* Login with GitHub which has permissions
+* click "Update"
+* all releases from GitHub appear as releases on Packagist
