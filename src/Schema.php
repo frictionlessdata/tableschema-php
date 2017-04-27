@@ -1,47 +1,79 @@
-<?php namespace frictionlessdata\tableschema;
-
+<?php
+namespace frictionlessdata\tableschema;
 
 /**
- *  Table Schema schema representation.
- *
- *  Loads and validates a Table Schema descriptor from a descirptor / path to file / url containing the descriptor
+ *  Table Schema representation.
+ *  Loads and validates a Table Schema descriptor from a descriptor / path to file / url containing the descriptor
  */
-class Schema {
-
-    public $descriptor;
-    public $validationErrors;
-
+class Schema
+{
+    /**
+     * Schema constructor.
+     * @param mixed $descriptor
+     * @throws Exceptions\SchemaLoadException
+     * @throws Exceptions\SchemaValidationFailedException
+     */
     public function __construct($descriptor)
     {
-        $descriptor = Utils::load_json_resource($descriptor);
-        $this->validationErrors = SchemaValidator::validate($descriptor);
-        if (count($this->validationErrors) == 0) {
-            $this->descriptor = $descriptor;
+        if (Utils::isJsonString($descriptor)) {
+            // it's a json encoded string
+            try {
+                $this->descriptor = json_decode($descriptor);
+            } catch (\Exception $e) {
+                throw new Exceptions\SchemaLoadException($descriptor, null, $e->getMessage());
+            }
+        } elseif (is_string($descriptor)) {
+            // it's a url or file path
+            $descriptorSource = $descriptor;
+            try {
+                $descriptor = file_get_contents($descriptorSource);
+            } catch (\Exception $e) {
+                throw new Exceptions\SchemaLoadException(null, $descriptorSource, $e->getMessage());
+            }
+            try {
+                $this->descriptor = json_decode($descriptor);
+            } catch (\Exception $e) {
+                throw new Exceptions\SchemaLoadException($descriptor, $descriptorSource, $e->getMessage());
+            }
         } else {
-            throw new SchemaException("descriptor failed validation: ".SchemaValidationError::getErrorMessages($this->validationErrors));
+            $this->descriptor = $descriptor;
+        }
+        if (!is_object($this->descriptor())) {
+            throw new Exceptions\SchemaLoadException($descriptor, null, "descriptor must be an object");
+        }
+        $validationErrors = SchemaValidator::validate($this->descriptor());
+        if (count($validationErrors) > 0) {
+            throw new Exceptions\SchemaValidationFailedException($validationErrors);
         };
     }
 
     /**
-     * loads and validates the given descriptor (string / path to file / url)
-     * returns an array of validation error objects encountered or a Schema object if valid
-     * @param $descriptor
+     * loads and validates the given descriptor source (php object / string / path to file / url)
+     * returns an array of validation error objects
+     * @param mixed $descriptor
      * @return array
      */
     public static function validate($descriptor)
     {
         try {
-            $descriptor = Utils::load_json_resource($descriptor);
-            return SchemaValidator::validate($descriptor);
-        } catch (\Exception $e) {
-            return [new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage())];
+            new static($descriptor);
+            return [];
+        } catch (Exceptions\SchemaLoadException $e) {
+            return [
+                new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage())
+            ];
+        } catch (Exceptions\SchemaValidationFailedException $e) {
+            return $e->validationErrors;
         }
     }
 
-}
+    /**
+     * @return object
+     */
+    public function descriptor()
+    {
+        return $this->descriptor;
+    }
 
-
-class SchemaException extends \Exception
-{
-
+    protected $descriptor;
 }

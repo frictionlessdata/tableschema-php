@@ -21,7 +21,16 @@ Schema objects can be constructed using any of the following:
 * string containing json
 * string containg value supported by [file_get_contents](http://php.net/manual/en/function.file-get-contents.php)
 
-You can use the Schema::validate static function to load and validate a schema. It returns a list of loading or validation errors encountered.
+You can use the Schema::validate static function to load and validate a schema.
+It returns a list of loading or validation errors encountered.
+
+### Table
+
+Provides methods for loading any fopen compatible data source and iterating over the data.
+
+* Data is validated according to a given table schema
+* Data is converted to native types according to the schema
+
 
 ## Important Notes
 
@@ -44,7 +53,7 @@ $ composer require frictionlessdata/tableschema
 use frictionlessdata\tableschema;
 
 // construct schema from json string
-$schema = new Schema('{
+$schema = new tableschema\Schema('{
     "fields": [
         {"name": "id"},
         {"name": "height", "type": "integer"}
@@ -58,12 +67,24 @@ $schema = new Schema('{
 $schema->descriptor->fields[0]->name == "id"
 
 // validate a schema from a remote resource and getting list of validation errors back
-$validationErrors = Schema::validate("https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json");
+$validationErrors = tableschema\Schema::validate("https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json");
 foreach ($validationErrors as $validationError) {
     print(validationError->getMessage();
 };
-```
 
+// iterate over a remote data source conforming to a table schema
+$table = new tableschema\Table(
+    new tableschema\DataSources\CsvDataSource("http://www.example.com/data.csv"), 
+    new tableschema\Schema("http://www.example.com/data-schema.json")
+);
+foreach ($table as $person) {
+    print($person["first_name"]." ".$person["last_name"]);
+}
+
+// validate a remote data source
+$validationErrors = tableschema\Table::validate($dataSource, $schema);
+print(tableschema\SchemaValidationError::getErrorMessages($validationErrors));
+```
 
 ## Contributing
 
