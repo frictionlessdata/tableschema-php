@@ -68,7 +68,7 @@ class SchemaTest extends TestCase
     public function testValidateInvalidResources()
     {
         $this->assertValidationErrors(
-            'error loading descriptor from source "--invalid--": file_get_contents(--invalid--): failed to open stream: No such file or directory',
+            'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage("--invalid--"),
             "--invalid--"
 
         );
@@ -85,7 +85,7 @@ class SchemaTest extends TestCase
             $this->fail("constructing from invalid descriptor should throw exception");
         } catch (\frictionlessdata\tableschema\Exceptions\SchemaLoadException $e) {
             $this->assertEquals(
-                'error loading descriptor from source "--invalid--": file_get_contents(--invalid--): failed to open stream: No such file or directory',
+                'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage("--invalid--"),
                 $e->getMessage()
             );
         }
@@ -137,7 +137,7 @@ class SchemaTest extends TestCase
             ],
             [
                 "descriptor" => "foobar",
-                "expected_errors" => 'error loading descriptor from source "foobar": file_get_contents(foobar): failed to open stream: No such file or directory'
+                "expected_errors" => 'error loading descriptor from source "foobar": '.$this->getFileGetContentsErrorMessage("foobar")
             ],
             [
                 "descriptor" => (object)[
@@ -198,5 +198,15 @@ class SchemaTest extends TestCase
                 Schema::validate($descriptor)
             )
         );
+    }
+
+    protected function getFileGetContentsErrorMessage($in)
+    {
+        try {
+            file_get_contents($in);
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        throw new \Exception();
     }
 }

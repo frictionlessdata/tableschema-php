@@ -49,7 +49,7 @@ class TableTest extends TestCase
     public function testLoadingFromInvalidSource()
     {
         $this->assertTableValidation(
-            ['fopen(--invalid--): failed to open stream: No such file or directory'],
+            [$this->getFopenErrorMessage("--invalid--")],
             "--invalid--", null
         );
     }
@@ -135,5 +135,15 @@ class TableTest extends TestCase
             $actualErrors[] = $error->getMessage();
         };
         $this->assertEquals($expectedErrors, $actualErrors);
+    }
+
+    protected function getFopenErrorMessage($in)
+    {
+        try {
+            fopen($in, "r");
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+        throw new \Exception();
     }
 }
