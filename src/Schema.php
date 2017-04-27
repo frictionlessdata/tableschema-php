@@ -85,14 +85,41 @@ class Schema
         return $fields;
     }
 
+    /**
+     * @param mixed[] $row
+     * @return mixed[]
+     * @throws Exceptions\FieldValidationException
+     */
     public function castRow($row)
     {
         $outRow = [];
-        $fields = $this->fields();
-        foreach ($row as $k=>$v) {
-            $outRow[$k] = $fields[$k]->castValue($v);
+        $validationErrors = [];
+        foreach ($this->fields() as $fieldName => $field) {
+            $value = array_key_exists($fieldName, $row) ? $row[$fieldName] : null;
+            try {
+                $outRow[$fieldName] = $field->castValue($value);
+            } catch (Exceptions\FieldValidationException $e) {
+                $validationErrors = array_merge($validationErrors, $e->validationErrors);
+            }
+        }
+        if (count($validationErrors) > 0) {
+            throw new Exceptions\FieldValidationException($validationErrors);
         }
         return $outRow;
+    }
+
+    /**
+     * @param array $row
+     * @return SchemaValidationError[]
+     */
+    public function validateRow($row)
+    {
+        try {
+            $this->castRow($row);
+            return [];
+        } catch (Exceptions\FieldValidationException $e) {
+            return $e->validationErrors;
+        }
     }
 
     protected $descriptor;

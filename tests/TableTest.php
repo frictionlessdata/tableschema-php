@@ -64,7 +64,7 @@ class TableTest extends TestCase
     public function testInvalidDataInPeekRows()
     {
         $this->assertNativeTableValidation(
-            ['row 2.email(bad and invalid email): invalid value for email format'],
+            ['row 2 email: value is not a valid email (bad and invalid email)'],
             [["email" => "good@email.nice"], ["email" => "bad and invalid email"]],
             (object)["fields" => [
                 (object)["name" => "email", "type" => "string", "format" => "email"]
@@ -79,7 +79,7 @@ class TableTest extends TestCase
             (object)["name" => "foo", "type" => "string"]
         ]]);
         // this is fine, as the foo field is not required and other fields in the csv are ignored
-        $this->assertEmpty(Table::validate($dataSource, $schema));
+        $this->assertEquals([], Table::validate($dataSource, $schema));
         // the missing values are empty
         $table = new Table($dataSource, $schema);
         $lines = [];

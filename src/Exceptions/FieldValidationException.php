@@ -3,15 +3,8 @@ namespace frictionlessdata\tableschema\Exceptions;
 
 use frictionlessdata\tableschema\SchemaValidationError;
 
-/**
- * error in validation of a data row
- * the array of validation errors is available
- */
-class TableRowValidationException extends \Exception
+class FieldValidationException extends \Exception
 {
-    /**
-     * @var SchemaValidationError[]
-     */
     public $validationErrors;
 
     /**
