@@ -190,6 +190,19 @@ class SchemaTest extends TestCase
 
     }
 
+    public function testCastRow()
+    {
+        $schema = new Schema((object)[
+            "fields" => [
+                (object)["name" => "id", "type" => "integer"],
+                (object)["name" => "email", "type" => "string", "format" => "email"]
+            ]
+        ]);
+        $this->assertEquals(
+            ["id" => 1, "email" => "test@example.com"],
+            $schema->castRow(["id" => "1", "email" => "test@example.com"]));
+    }
+
     protected function assertValidationErrors($expectedValidationErrors, $descriptor)
     {
         $this->assertEquals(

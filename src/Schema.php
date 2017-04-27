@@ -75,5 +75,25 @@ class Schema
         return $this->descriptor;
     }
 
+    public function fields()
+    {
+        $fields = [];
+        foreach ($this->descriptor()->fields as $fieldDescriptor) {
+            $field = Fields\FieldsFactory::field($fieldDescriptor);
+            $fields[$field->name()] = $field;
+        }
+        return $fields;
+    }
+
+    public function castRow($row)
+    {
+        $outRow = [];
+        $fields = $this->fields();
+        foreach ($row as $k=>$v) {
+            $outRow[$k] = $fields[$k]->castValue($v);
+        }
+        return $outRow;
+    }
+
     protected $descriptor;
 }
