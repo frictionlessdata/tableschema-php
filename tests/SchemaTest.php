@@ -190,6 +190,35 @@ class SchemaTest extends TestCase
 
     }
 
+    public function testCastRow()
+    {
+        $schema = new Schema((object)[
+            "fields" => [
+                (object)["name" => "id", "type" => "integer"],
+                (object)["name" => "email", "type" => "string", "format" => "email"]
+            ]
+        ]);
+        $this->assertEquals(
+            ["id" => 1, "email" => "test@example.com"],
+            $schema->castRow(["id" => "1", "email" => "test@example.com"]));
+    }
+
+    public function testValidateRow()
+    {
+        $schema = new Schema((object)[
+            "fields" => [
+                (object)["name" => "id", "type" => "integer"],
+                (object)["name" => "email", "type" => "string", "format" => "email"]
+            ]
+        ]);
+        $this->assertEquals(
+            "id: value must be numeric (foobar), email: value is not a valid email (bad.email)",
+            SchemaValidationError::getErrorMessages(
+                $schema->validateRow(["id" => "foobar", "email" => "bad.email"])
+            )
+        );
+    }
+
     protected function assertValidationErrors($expectedValidationErrors, $descriptor)
     {
         $this->assertEquals(

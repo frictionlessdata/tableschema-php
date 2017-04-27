@@ -12,4 +12,4 @@ before_script:
 script:
   - COMPOSER_DISABLE_XDEBUG_WARN=1 TABLESCHEMA_ENABLE_FRAGILE_TESTS=1 composer test
 after_success:
-  - vendor/bin/coveralls
+  - '[ "$TRAVIS_PHP_VERSION" == "7.1" ] && vendor/bin/coveralls'

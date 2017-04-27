@@ -8,7 +8,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8.35",
-        "satooshi/php-coveralls": "^1.0"
+        "satooshi/php-coveralls": "^1.0",
+        "psy/psysh": "@stable"
     },
     "autoload": {
         "psr-4": {

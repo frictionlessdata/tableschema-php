@@ -50,10 +50,10 @@ $ composer require frictionlessdata/tableschema
 ### Usage
 
 ```php
-use frictionlessdata\tableschema;
+use frictionlessdata\tableschema\Schema;
 
 // construct schema from json string
-$schema = new tableschema\Schema('{
+$schema = new Schema('{
     "fields": [
         {"name": "id"},
         {"name": "height", "type": "integer"}
@@ -71,6 +71,16 @@ $validationErrors = tableschema\Schema::validate("https://raw.githubusercontent.
 foreach ($validationErrors as $validationError) {
     print(validationError->getMessage();
 };
+
+// validate and cast a row according to schema
+$schema = new Schema('{"fields": ["name": "id", "type": "integer"]}');
+$row = $schema->castRow(["id" => "1"]);
+// raise exception if row fails validation
+// returns row with all native values
+
+// validate a row
+$validationErrors = $schema->validateRow(["id" => "foobar"]);
+// error that id is not numeric
 
 // iterate over a remote data source conforming to a table schema
 $table = new tableschema\Table(
