@@ -93,65 +93,11 @@ class TableTest extends TestCase
 
     public function testInferSchemaFailsAfterLock()
     {
-        $inputRows = [
-            //      integer,          string       ==> best inferred: integer, string
+        $this->assertInferSchemaException("id: value must be an integer (3.5)", [
             ["id" => "1", "email" => "test1_example_com"],
-            //      integer,          string(email)  ==> best inferred: integer, string
             ["id" => "2", "email" => "test2@example.com"],
-            //      number,          string(email)  ==> best inferred: integer, string
-            ["id" => "3.5", "email" => "test3@example.com"],
-        ];
-        $dataSource = new NativeDataSource($inputRows);
-        $schema = new InferSchema();
-        $table = new Table($dataSource, $schema);
-        $i = 0;
-        $exceptionMessage = "";
-        try {
-            foreach ($table as $row) {
-                $this->assertEquals([
-                    // the rows as they come in after casting by the schema inferred so far
-                    ["id" => 1, "email" => "test1_example_com"],
-                    ["id" => 2, "email" => "test2@example.com"],
-                    // next row has:
-                    // "id" => "3.5"
-                    // this is invalid for integer type which is the inferred schema (locked after 2 rows)
-                ][$i], $row);
-                if (++$i == 2) { // lock the inferred schema after 2 rows
-                    $this->assertEquals([
-                        // rows cast using the locked inferred schema (which is the same as the default cast in this case)
-                        ["id" => 1, "email" => "test1_example_com"],
-                        ["id" => 2, "email" => "test2@example.com"]
-                    ], $schema->lock());
-                }
-            }
-        } catch (FieldValidationException $e) {
-            $exceptionMessage = $e->getMessage();
-        }
-        // the 3rd row did not match the inferred schema
-        $this->assertEquals("id: value must be an integer (3.5)", $exceptionMessage);
-        // try again with the same data source, but this time continue inferring the 3rd row as well
-        $dataSource = new NativeDataSource($inputRows);
-        $schema = new InferSchema();
-        $table = new Table($dataSource, $schema);
-        $i = 0;
-        foreach ($table as $row) {
-            $this->assertEquals([
-                // the rows as they come in after casting by the schema inferred so far
-                ["id" => 1, "email" => "test1_example_com"],
-                ["id" => 2, "email" => "test2@example.com"],
-                // here the type changes to number - you can see this below in the rows received from lock
-                ["id" => 3.5, "email" => "test3@example.com"],
-            ][$i], $row);
-            $i++;
-        }
-        $this->assertEquals(
-            [
-                ["id" => 1, "email" => "test1_example_com"],
-                ["id" => 2, "email" => "test2@example.com"],
-                ["id" => 3.5, "email" => "test3@example.com"],
-            ],
-            $schema->lock()
-        );
+            ["id" => "3.5", "email" => "test3@example.com"]
+        ], 2);
     }
 
     public function testInferSchemaWorksWithMoreRows()

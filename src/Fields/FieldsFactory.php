@@ -10,7 +10,7 @@ class FieldsFactory
      * list of all the available field classes
      * ordered in infer order - the most strict field first
      */
-    const FIELD_CLASSES = [
+    public static $fieldClasses = [
         "\\frictionlessdata\\tableschema\\Fields\\IntegerField",
         "\\frictionlessdata\\tableschema\\Fields\\NumberField",
         "\\frictionlessdata\\tableschema\\Fields\\StringField",
@@ -24,7 +24,7 @@ class FieldsFactory
      */
     public static function field($descriptor)
     {
-        foreach (static::FIELD_CLASSES as $fieldClass) {
+        foreach (static::$fieldClasses as $fieldClass) {
             /** @var BaseField $fieldClass */
             if ($field = $fieldClass::inferDescriptor($descriptor)) {
                 return $field;
@@ -45,7 +45,7 @@ class FieldsFactory
      */
     public static function infer($val, $descriptor=null, $lenient=false)
     {
-        foreach (static::FIELD_CLASSES as $fieldClass) {
+        foreach (static::$fieldClasses as $fieldClass) {
             /** @var BaseField $fieldClass */
             if ($field = $fieldClass::infer($val, $descriptor, $lenient)) {
                 return $field;
