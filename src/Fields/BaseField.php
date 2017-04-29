@@ -3,6 +3,7 @@ namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
 use frictionlessdata\tableschema\SchemaValidationError;
+use frictionlessdata\tableschema\TableValidationError;
 
 abstract class BaseField
 {
