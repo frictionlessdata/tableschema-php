@@ -42,7 +42,8 @@ class StringField extends BaseField
     public function getInferIdentifier($lenient=false)
     {
         $inferId = parent::getInferIdentifier();
-        if (!$lenient && !empty($this->format())) {
+        $format = $this->format();
+        if (!$lenient && !empty($format)) {
             $inferId .= ":".$this->format();
         };
         return $inferId;
