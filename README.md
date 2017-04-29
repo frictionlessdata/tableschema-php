@@ -94,6 +94,20 @@ foreach ($table as $person) {
 // validate a remote data source
 $validationErrors = tableschema\Table::validate($dataSource, $schema);
 print(tableschema\SchemaValidationError::getErrorMessages($validationErrors));
+
+// infer schema of a remote data source
+$dataSource = new tableschema\DataSources\CsvDataSource("http://www.example.com/data.csv");
+$schema = new tableschema\InferSchema();
+$table = new tableschema\Table($dataSource, $schema);
+foreach ($table as $row) {
+    var_dump($row); // row will be in inferred native values
+    var_dump($schema->descriptor()); // will contain the inferred schema descriptor
+    // the more iterations you make, the more accurate the inferred schema might be
+    // once you are satisifed with the schema, lock it
+    $rows = $schema->lock();
+    // it returns all the rows received until the lock, casted to the final inferred schema
+    // you may now continue to iterate over the rest of the rows
+};
 ```
 
 ## Contributing
