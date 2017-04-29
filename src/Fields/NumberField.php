@@ -1,11 +1,11 @@
 <?php
 namespace frictionlessdata\tableschema\Fields;
 
-class IntegerField extends BaseField
+class NumberField extends BaseField
 {
     /**
      * @param mixed $val
-     * @return integer
+     * @return float
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
     public function validateValue($val)
@@ -13,17 +13,12 @@ class IntegerField extends BaseField
         if (!is_numeric($val)) {
             throw $this->getValidationException("value must be numeric", $val);
         } else {
-            $intVal = (integer)$val;
-            if ($intVal != (float)$val) {
-                throw $this->getValidationException("value must be an integer", $val);
-            } else {
-                return $intVal;
-            }
+            return (float)$val;
         }
     }
 
     public static function type()
     {
-        return "integer";
+        return "number";
     }
 }
