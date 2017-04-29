@@ -103,7 +103,10 @@ abstract class BaseField
      * should be implemented by extending classes to return the table schema type of this field
      * @return string
      */
-    abstract static public function type();
+    static public function type()
+    {
+        throw new \Exception("must be implemented by extending classes");
+    }
 
     protected $descriptor;
 
