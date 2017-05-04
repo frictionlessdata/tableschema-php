@@ -16,6 +16,14 @@ abstract class BaseField
         return $this->descriptor;
     }
 
+    public function fullDescriptor()
+    {
+        $fullDescriptor = $this->descriptor();
+        $fullDescriptor->format = $this->format();
+        $fullDescriptor->type = $this->type();
+        return $fullDescriptor;
+    }
+
     public function name()
     {
         return $this->descriptor()->name;

@@ -7,6 +7,8 @@ namespace frictionlessdata\tableschema;
  */
 class Schema
 {
+    protected $DEFAULT_FIELD_CLASS = "\\frictionlessdata\\tableschema\\Fields\\StringField";
+
     /**
      * Schema constructor.
      * @param mixed $descriptor
@@ -75,6 +77,18 @@ class Schema
         return $this->descriptor;
     }
 
+    public function fullDescriptor()
+    {
+        $fullDescriptor = $this->descriptor();
+        $fullFieldDescriptors = [];
+        foreach ($this->fields() as $field) {
+            $fullFieldDescriptors[] = $field->fullDescriptor();
+        }
+        $fullDescriptor->fields = $fullFieldDescriptors;
+        $fullDescriptor->missingValues = $this->missingValues();
+        return $fullDescriptor;
+    }
+
     public function field($name)
     {
         foreach ($this->fields() as $field) {
@@ -90,7 +104,11 @@ class Schema
     {
         $fields = [];
         foreach ($this->descriptor()->fields as $fieldDescriptor) {
-            $field = Fields\FieldsFactory::field($fieldDescriptor);
+            if (!array_key_exists("type", $fieldDescriptor)) {
+                $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
+            } else {
+                $field = Fields\FieldsFactory::field($fieldDescriptor);
+            }
             $fields[$field->name()] = $field;
         }
         return $fields;
@@ -98,12 +116,17 @@ class Schema
 
     public function missingValues()
     {
-        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [];
+        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [""];
     }
 
     public function primaryKey()
     {
         return isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
+    }
+
+    public function foreignKeys()
+    {
+        return isset($this->descriptor()->foreignKeys) ? $this->descriptor()->foreignKeys : [];
     }
 
     /**
@@ -142,6 +165,11 @@ class Schema
         } catch (Exceptions\FieldValidationException $e) {
             return $e->validationErrors;
         }
+    }
+
+    public function save($filename)
+    {
+        file_put_contents($filename, json_encode($this->fullDescriptor()));
     }
 
     protected $descriptor;
