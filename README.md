@@ -108,6 +108,23 @@ foreach ($table as $row) {
     // it returns all the rows received until the lock, casted to the final inferred schema
     // you may now continue to iterate over the rest of the rows
 };
+
+// schema creation, editing and saving
+
+// EditableSchema extends the Schema object with editing capabilities
+$schema = new EditableSchema();
+// set fields
+$schema->fields([
+    "id" => FieldsFactory::field((object)["name" => "id", "type" => "integer"])
+]);
+// remove field
+$schema->removeField("age");
+// edit primaryKey
+$schema->primaryKey(["id"]);
+
+// after every change - schema is validated and will raise Exception in case of validation errors
+// finally, you can save the schema to a json file
+$schema->save("my-schema.json");
 ```
 
 ## Contributing

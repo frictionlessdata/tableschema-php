@@ -2,10 +2,11 @@
 namespace frictionlessdata\tableschema\tests;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use frictionlessdata\tableschema\InferSchema;
+use frictionlessdata\tableschema\EditableSchema;
 use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
+use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class SchemaTest extends TestCase
 {
@@ -408,6 +409,87 @@ class SchemaTest extends TestCase
                 ]
             ]
         ], (new Schema($this->maxDescriptorJson))->foreignKeys());
+    }
+
+    public function testEditable()
+    {
+        $schema = new EditableSchema();
+        // set fields
+        $schema->fields([
+            "id" => FieldsFactory::field((object)["name" => "id", "type" => "integer"])
+        ]);
+        // add field
+        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "integer"]));
+        // edit field
+        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "number"]));
+        // remove field
+        $schema->removeField("age");
+        // after every change - schema is validated and will raise Exception in case of validation errors
+        try {
+            $schema->field("age", FieldsFactory::field((object)[])); $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Could not find a valid field for descriptor: {}', $e->getMessage());
+        }
+        // additional fields available for editing
+        try {
+            $schema->primaryKey(["aardvark"]); $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Schema failed validation: primary key must refer to a field name (aardvark)', $e->getMessage());
+        }
+        $schema->primaryKey(["id"]);
+        $foreignKeys = [
+            (object)[
+                "fields"=> ["nonexistantfield"],
+                "reference"=> (object)[
+                    "resource"=> "non-existant-external-resource.csv",
+                    "fields"=> ["doesnt_matter"]
+                ]
+            ]
+        ];
+        try {
+            $schema->foreignKeys($foreignKeys); $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'Schema failed validation: foreign key fields must refer to a field name (nonexistantfield)',
+                $e->getMessage()
+            );
+        }
+        $foreignKeys[0]->fields = "invalidstringvalue";
+        try {
+            $schema->foreignKeys($foreignKeys); $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'Schema failed validation: [foreignKeys[0].fields] String value found, but an array is required',
+                $e->getMessage()
+            );
+        }
+        $foreignKeys[0]->fields = ["id"];
+        $schema->foreignKeys($foreignKeys);
+        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "integer"]));
+        $foreignKeys[0]->fields = ["age"];
+        try {
+            $schema->missingValues("invalid value"); $this->fail();
+        } catch (\Exception $e) {
+            $this->assertEquals('Schema failed validation: [missingValues] String value found, but an array is required', $e->getMessage());
+        }
+        $schema->missingValues(["", "null"]);
+        $this->assertEquals((object)[
+            "fields" => [
+                (object)["name" => "id", "type" => "integer", "format" => "default"],
+                (object)["name" => "age", "type" => "integer", "format" => "default"]
+            ],
+            "primaryKey" => ["id"],
+            "foreignKeys" => [
+                (object)[
+                    "fields" => ["age"],
+                    "reference" => (object)[
+                        "resource" => "non-existant-external-resource.csv",
+                        "fields" => ["doesnt_matter"]
+                    ]
+                ]
+            ],
+            "missingValues" => ["", "null"]
+        ], $schema->fullDescriptor());
     }
 
     public function testSave()
