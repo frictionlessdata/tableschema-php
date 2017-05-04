@@ -1,5 +1,7 @@
 <?php
 namespace frictionlessdata\tableschema;
+use frictionlessdata\tableschema\Exceptions\DataSourceException;
+use frictionlessdata\tableschema\Fields\BaseField;
 
 /**
  * represents a data source which validates against a table schema
@@ -18,6 +20,7 @@ class Table implements \Iterator
         $this->dataSource = $dataSource;
         $this->schema = $schema;
         $this->dataSource->open();
+        $this->uniqueFieldValues = [];
     }
 
     /**
@@ -68,7 +71,21 @@ class Table implements \Iterator
      * @throws Exceptions\DataSourceException
      */
     public function current() {
-        return $this->schema->castRow($this->dataSource->getNextLine());
+        $row = $this->schema->castRow($this->dataSource->getNextLine());
+        foreach ($this->schema->fields() as $field) {
+            if ($field->unique()) {
+                if (!array_key_exists($field->name(), $this->uniqueFieldValues)) {
+                    $this->uniqueFieldValues[$field->name()] = [];
+                };
+                $value = $row[$field->name()];
+                if (in_array($value, $this->uniqueFieldValues[$field->name()])) {
+                    throw new DataSourceException("field must be unique", $this->currentLine);
+                } else {
+                    $this->uniqueFieldValues[$field->name()][] = $value;
+                }
+            }
+        }
+        return $row;
     }
 
     // not interesting, standard iterator functions
@@ -82,4 +99,5 @@ class Table implements \Iterator
     protected $currentLine = 0;
     protected $dataSource;
     protected $schema;
+    protected $uniqueFieldValues;
 }

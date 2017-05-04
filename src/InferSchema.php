@@ -6,6 +6,11 @@ namespace frictionlessdata\tableschema;
  */
 class InferSchema extends Schema
 {
+    /**
+     * InferSchema constructor.
+     * @param null $descriptor optional descriptor object - will be used as an initial descriptor
+     * @param bool $lenient if true - infer just basic types, without strict format requirements
+     */
     public function __construct($descriptor=null, $lenient=false)
     {
         $this->descriptor = empty($descriptor) ? (object)["fields" => []] : $descriptor;

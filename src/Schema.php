@@ -7,6 +7,8 @@ namespace frictionlessdata\tableschema;
  */
 class Schema
 {
+    protected $DEFAULT_FIELD_CLASS = "\\frictionlessdata\\tableschema\\Fields\\StringField";
+
     /**
      * Schema constructor.
      * @param mixed $descriptor
@@ -75,14 +77,59 @@ class Schema
         return $this->descriptor;
     }
 
+    public function fullDescriptor()
+    {
+        $fullDescriptor = $this->descriptor();
+        $fullFieldDescriptors = [];
+        foreach ($this->fields() as $field) {
+            $fullFieldDescriptors[] = $field->fullDescriptor();
+        }
+        $fullDescriptor->fields = $fullFieldDescriptors;
+        $fullDescriptor->missingValues = $this->missingValues();
+        return $fullDescriptor;
+    }
+
+    public function field($name)
+    {
+        $fields = $this->fields();
+        if (array_key_exists($name, $fields)) {
+            return $fields[$name];
+        } else {
+            throw new \Exception("unknown field name: {$name}");
+        }
+    }
+
+    /**
+     * @return Fields\BaseField[] array of field name => field object
+     */
     public function fields()
     {
-        $fields = [];
-        foreach ($this->descriptor()->fields as $fieldDescriptor) {
-            $field = Fields\FieldsFactory::field($fieldDescriptor);
-            $fields[$field->name()] = $field;
+        if (empty($this->fieldsCache)) {
+            foreach ($this->descriptor()->fields as $fieldDescriptor) {
+                if (!array_key_exists("type", $fieldDescriptor)) {
+                    $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
+                } else {
+                    $field = Fields\FieldsFactory::field($fieldDescriptor);
+                }
+                $this->fieldsCache[$field->name()] = $field;
+            }
         }
-        return $fields;
+        return $this->fieldsCache;
+    }
+
+    public function missingValues()
+    {
+        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [""];
+    }
+
+    public function primaryKey()
+    {
+        return isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
+    }
+
+    public function foreignKeys()
+    {
+        return isset($this->descriptor()->foreignKeys) ? $this->descriptor()->foreignKeys : [];
     }
 
     /**
@@ -96,6 +143,7 @@ class Schema
         $validationErrors = [];
         foreach ($this->fields() as $fieldName => $field) {
             $value = array_key_exists($fieldName, $row) ? $row[$fieldName] : null;
+            if (in_array($value, $this->missingValues())) $value = null;
             try {
                 $outRow[$fieldName] = $field->castValue($value);
             } catch (Exceptions\FieldValidationException $e) {
@@ -122,5 +170,11 @@ class Schema
         }
     }
 
+    public function save($filename)
+    {
+        file_put_contents($filename, json_encode($this->fullDescriptor()));
+    }
+
     protected $descriptor;
+    protected $fieldsCache = null;
 }
