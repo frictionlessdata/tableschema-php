@@ -8,8 +8,9 @@ class IntegerField extends BaseField
      * @return integer
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
-    public function validateValue($val)
+    public function validateCastValue($val)
     {
+        $val = parent::validateCastValue($val);
         if (!is_numeric($val)) {
             throw $this->getValidationException("value must be numeric", $val);
         } else {
@@ -25,5 +26,10 @@ class IntegerField extends BaseField
     public static function type()
     {
         return "integer";
+    }
+
+    protected function isEmptyValue($val)
+    {
+        return (!is_numeric($val) && empty($val));
     }
 }

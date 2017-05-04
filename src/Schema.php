@@ -75,6 +75,9 @@ class Schema
         return $this->descriptor;
     }
 
+    /**
+     * @return Fields\BaseField[]
+     */
     public function fields()
     {
         $fields = [];
@@ -83,6 +86,11 @@ class Schema
             $fields[$field->name()] = $field;
         }
         return $fields;
+    }
+
+    public function missingValues()
+    {
+        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [];
     }
 
     /**
@@ -96,6 +104,7 @@ class Schema
         $validationErrors = [];
         foreach ($this->fields() as $fieldName => $field) {
             $value = array_key_exists($fieldName, $row) ? $row[$fieldName] : null;
+            if (in_array($value, $this->missingValues())) $value = null;
             try {
                 $outRow[$fieldName] = $field->castValue($value);
             } catch (Exceptions\FieldValidationException $e) {

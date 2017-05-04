@@ -21,6 +21,45 @@ abstract class BaseField
         return $this->descriptor()->name;
     }
 
+    public function format()
+    {
+        return isset($this->descriptor()->format) ? $this->descriptor()->format : "default";
+    }
+
+    public function constraints()
+    {
+        if (!$this->constraintsDisabled && isset($this->descriptor()->constraints)) {
+            return $this->descriptor()->constraints;
+        } else {
+            return (object)[];
+        }
+    }
+
+    public function required()
+    {
+        return (isset($this->constraints()->required) && $this->constraints()->required);
+    }
+
+    public function unique()
+    {
+        return (isset($this->constraints()->unique) && $this->constraints()->unique);
+    }
+
+    public function disableConstraints()
+    {
+        $this->constraintsDisabled = true;
+        return $this;
+    }
+
+    public function enum()
+    {
+        if (isset($this->constraints()->enum) && !empty($this->constraints()->enum)) {
+            return $this->constraints()->enum;
+        } else {
+            return [];
+        }
+    }
+
     /**
      * try to create a field object based on the descriptor
      * by default uses the type attribute
@@ -30,7 +69,7 @@ abstract class BaseField
      */
     public static function inferDescriptor($descriptor)
     {
-        if ($descriptor->type == static::type()) {
+        if (isset($descriptor->type) && $descriptor->type == static::type()) {
             return new static($descriptor);
         } else {
             return false;
@@ -48,7 +87,7 @@ abstract class BaseField
     {
         $field = new static($descriptor);
         try {
-            $field->validateValue($val);
+            $field->castValue($val);
         } catch (FieldValidationException $e) {
             return false;
         }
@@ -68,23 +107,24 @@ abstract class BaseField
      * @return mixed
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
-    public function validateValue($val)
+    final public function castValue($val)
     {
-        // extending classes should raise FieldValidationException on any errors here
-        // can use getValidationException function to get a simple exception with single validation error message
-        // you can also throw an exception with multiple validation errors manually
-        // must make sure all validation is done in this function and ensure castValue doesn't raise any errors
-        return $val;
+        if ($this->isEmptyValue($val)) {
+            if ($this->required()) throw $this->getValidationException("field is required", $val);
+            return null;
+        } else {
+            return $this->validateCastValue($val);
+        }
     }
 
-    /**
-     * @param mixed $val
-     * @return mixed
-     * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
-     */
-    public function castValue($val)
+    public function validateValue($val)
     {
-        return $this->validateValue($val);
+        try {
+            $this->castValue($val);
+            return [];
+        } catch (FieldValidationException $e) {
+            return $e->validationErrors;
+        }
     }
 
     /**
@@ -109,6 +149,7 @@ abstract class BaseField
     }
 
     protected $descriptor;
+    protected $constraintsDisabled = false;
 
     protected function getValidationException($errorMsg, $val=null)
     {
@@ -119,5 +160,135 @@ abstract class BaseField
                 "error" => $errorMsg
             ])
         ]);
+    }
+
+    protected function isEmptyValue($val)
+    {
+        return is_null($val);
+    }
+
+    /**
+     * @param mixed $val
+     * @return mixed
+     * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
+     */
+    protected function validateCastValue($val)
+    {
+        // extending classes should extend this method
+        // value is guaranteed not to be an empty value, that is handled elsewhere
+        // should raise FieldValidationException on any validation errors
+        // can use getValidationException function to get a simple exception with single validation error message
+        // you can also throw an exception with multiple validation errors manually
+        if (!$this->constraintsDisabled) {
+            $validationErrors = $this->checkConstraints($val);
+            if (count($validationErrors) > 0) {
+                throw new FieldValidationException($validationErrors);
+            }
+        }
+        return $val;
+    }
+
+    protected function checkConstraints($val)
+    {
+        $validationErrors = [];
+        $allowedValues = $this->getAllowedValues();
+        if (!empty($allowedValues) && !in_array($val, $allowedValues)) {
+            $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                "field" => $this->name(),
+                "value" => $val,
+                "error" => "value not in enum"
+            ]);
+        }
+        $constraints = $this->constraints();
+        if (isset($constraints->pattern)) {
+            if (!$this->checkPatternConstraint($val, $constraints->pattern)) {
+                $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                    "field" => $this->name(),
+                    "value" => $val,
+                    "error" => "value does not match pattern"
+                ]);
+            }
+        }
+        if (
+            isset($constraints->minimum)
+            && !$this->checkMinimumConstraint($val, $this->castValueNoConstraints($constraints->minimum))
+        ) {
+            $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                "field" => $this->name(),
+                "value" => $val,
+                "error" => "value is below minimum"
+            ]);
+        }
+        if (
+            isset($constraints->maximum)
+            && !$this->checkMaximumConstraint($val, $this->castValueNoConstraints($constraints->maximum))
+        ) {
+            $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                "field" => $this->name(),
+                "value" => $val,
+                "error" => "value is above maximum"
+            ]);
+        }
+        if (
+            isset($constraints->minLength) && !$this->checkMinLengthConstraint($val, $constraints->minLength)
+        ) {
+            $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                "field" => $this->name(),
+                "value" => $val,
+                "error" => "value is below minimum length"
+            ]);
+        }
+        if (
+            isset($constraints->maxLength) && !$this->checkMaxLengthConstraint($val, $constraints->maxLength)
+        ) {
+            $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
+                "field" => $this->name(),
+                "value" => $val,
+                "error" => "value is above maximum length"
+            ]);
+        }
+        return $validationErrors;
+    }
+
+    protected function checkPatternConstraint($val, $pattern)
+    {
+        return preg_match("/^".$pattern."\$/", $val) === 1;
+    }
+
+    protected function checkMinimumConstraint($val, $minConstraint)
+    {
+        return $val >= $minConstraint;
+    }
+
+    protected function checkMaximumConstraint($val, $maxConstraint)
+    {
+        return $val <= $maxConstraint;
+    }
+
+    protected function checkMinLengthConstraint($val, $minLength)
+    {
+        return strlen($val) >= $minLength;
+    }
+
+    protected function checkMaxLengthConstraint($val, $maxLength)
+    {
+        return strlen($val) <= $maxLength;
+    }
+
+    protected function getAllowedValues()
+    {
+        $allowedValues = [];
+        foreach ($this->enum() as $val) {
+            $allowedValues[] = $this->castValueNoConstraints($val);
+        }
+        return $allowedValues;
+    }
+
+    protected function castValueNoConstraints($val)
+    {
+        $this->disableConstraints();
+        $val = $this->castValue($val);
+        $this->constraintsDisabled = false;
+        return $val;
     }
 }
