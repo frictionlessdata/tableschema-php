@@ -75,6 +75,14 @@ class Schema
         return $this->descriptor;
     }
 
+    public function field($name)
+    {
+        foreach ($this->fields() as $field) {
+            if ($field->name() == $name) return $field;
+        }
+        throw new \Exception("unknown field name: {$name}");
+    }
+
     /**
      * @return Fields\BaseField[]
      */
@@ -91,6 +99,11 @@ class Schema
     public function missingValues()
     {
         return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [];
+    }
+
+    public function primaryKey()
+    {
+        return isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
     }
 
     /**

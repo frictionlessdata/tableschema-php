@@ -135,6 +135,33 @@ class TableTest extends TestCase
         $this->assertInferSchema($inputRows, $inputRows, 1, true);
     }
 
+    public function testInferSchema()
+    {
+        $this->assertInferSchemaTypes([
+            "id" => "integer",
+            "age" => "integer",
+            "name" => "string"
+        ], "data_infer.csv");
+    }
+
+    public function testInferSchemaUtf8()
+    {
+        $this->assertInferSchemaTypes([
+            "id" => "integer",
+            "age" => "integer",
+            "name" => "string"
+        ], "data_infer_utf8.csv");
+    }
+
+    public function testInferSchemaRowLimit()
+    {
+        $this->assertInferSchemaTypes([
+            "id" => "integer",
+            "age" => "integer",
+            "name" => "string"
+        ], "data_infer_utf8.csv", 4);
+    }
+
     protected $fixturesPath;
     protected $validSchema;
 
@@ -217,9 +244,29 @@ class TableTest extends TestCase
         $exceptionMessage = null;
         try {
             $this->assertInferSchema([], $inputRows, $lockRowNum);
+            $this->fail();
         } catch (FieldValidationException $e) {
-            $expectionMessage = $e->getMessage();
+            $this->assertEquals($expectedException, $e->getMessage());
         }
-        $this->assertEquals($expectedException, $expectionMessage);
+    }
+
+    protected function assertInferSchemaTypes($expectedTypes, $filename, $numRows=1)
+    {
+        $schema = $this->getInferSchema($filename, $numRows);
+        foreach ($expectedTypes as $fieldName => $expectedType) {
+            $this->assertEquals($expectedType, $schema->field($fieldName)->type());
+        }
+    }
+
+    protected function getInferSchema($filename, $numRows=1)
+    {
+        $dataSource = new CsvDataSource(dirname(__FILE__).DIRECTORY_SEPARATOR."fixtures".DIRECTORY_SEPARATOR.$filename);
+        $schema = new InferSchema();
+        $table = new Table($dataSource, $schema);
+        $i = 0;
+        foreach ($table as $row) {
+            if (++$i > $numRows) break;
+        }
+        return $schema;
     }
 }
