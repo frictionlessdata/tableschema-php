@@ -33,6 +33,9 @@ class SchemaValidator
     {
         $this->errors = [];
         $this->validateSchema();
+        if (count($this->errors) == 0) {
+            $this->validateKeys();
+        }
         return $this->errors;
     }
 
@@ -61,6 +64,46 @@ class SchemaValidator
                     SchemaValidationError::SCHEMA_VIOLATION,
                     sprintf("[%s] %s", $error['property'], $error['message'])
                 );
+            }
+        }
+    }
+
+    protected function validateKeys()
+    {
+        $fieldNames = array_map(function($field) {
+            return $field->name;
+        }, $this->descriptor->fields);
+        if (isset($this->descriptor->primaryKey)) {
+            foreach ($this->descriptor->primaryKey as $primaryKey) {
+                if (!in_array($primaryKey, $fieldNames)) {
+                    $this->addError(
+                        SchemaValidationError::SCHEMA_VIOLATION,
+                        "primary key must refer to a field name ({$primaryKey})"
+                    );
+                }
+            }
+        }
+        if (isset($this->descriptor->foreignKeys)) {
+            foreach ($this->descriptor->foreignKeys as $foreignKey) {
+                foreach ($foreignKey->fields as $field) {
+                    if (!in_array($field, $fieldNames)) {
+                        $this->addError(
+                            SchemaValidationError::SCHEMA_VIOLATION,
+                            "foreign key fields must refer to a field name ({$field})"
+                        );
+                    }
+                }
+                if ($foreignKey->reference->resource == "") {
+                    // empty resource = reference to self
+                    foreach ($foreignKey->reference->fields as $field) {
+                        if (!in_array($field, $fieldNames)) {
+                            $this->addError(
+                                SchemaValidationError::SCHEMA_VIOLATION,
+                                "foreign key reference to self must refer to a field name ({$field})"
+                            );
+                        }
+                    }
+                }
             }
         }
     }
