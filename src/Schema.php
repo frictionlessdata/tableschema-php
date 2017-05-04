@@ -91,27 +91,30 @@ class Schema
 
     public function field($name)
     {
-        foreach ($this->fields() as $field) {
-            if ($field->name() == $name) return $field;
+        $fields = $this->fields();
+        if (array_key_exists($name, $fields)) {
+            return $fields[$name];
+        } else {
+            throw new \Exception("unknown field name: {$name}");
         }
-        throw new \Exception("unknown field name: {$name}");
     }
 
     /**
-     * @return Fields\BaseField[]
+     * @return Fields\BaseField[] array of field name => field object
      */
     public function fields()
     {
-        $fields = [];
-        foreach ($this->descriptor()->fields as $fieldDescriptor) {
-            if (!array_key_exists("type", $fieldDescriptor)) {
-                $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
-            } else {
-                $field = Fields\FieldsFactory::field($fieldDescriptor);
+        if (empty($this->fieldsCache)) {
+            foreach ($this->descriptor()->fields as $fieldDescriptor) {
+                if (!array_key_exists("type", $fieldDescriptor)) {
+                    $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
+                } else {
+                    $field = Fields\FieldsFactory::field($fieldDescriptor);
+                }
+                $this->fieldsCache[$field->name()] = $field;
             }
-            $fields[$field->name()] = $field;
         }
-        return $fields;
+        return $this->fieldsCache;
     }
 
     public function missingValues()
@@ -173,4 +176,5 @@ class Schema
     }
 
     protected $descriptor;
+    protected $fieldsCache = null;
 }
