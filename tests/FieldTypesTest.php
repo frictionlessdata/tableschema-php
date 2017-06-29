@@ -2,18 +2,12 @@
 
 namespace frictionlessdata\tableschema\tests;
 
-use frictionlessdata\tableschema\DataSources\NativeDataSource;
-use frictionlessdata\tableschema\Exceptions\DataSourceException;
-use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use frictionlessdata\tableschema\Schema;
-use frictionlessdata\tableschema\SchemaValidationError;
-use frictionlessdata\tableschema\Table;
 use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class FieldTypesTest extends TestCase
 {
-    const ERROR = "~~ERROR~~";
+    const ERROR = '~~ERROR~~';
 
     /*
 
@@ -247,11 +241,11 @@ class FieldTypesTest extends TestCase
      */
     public function testString()
     {
-        $this->assertFieldTestData("string", [
+        $this->assertFieldTestData('string', [
             // format , input value , expected cast value, (optional) expected infer type
             ['default', 'string', 'string'],
             ['default', '', ''],
-            ['default', 0, "0"],
+            ['default', 0, '0'],
             ['uri', 'http://google.com', 'http://google.com'],
             ['uri', 'string', self::ERROR],
             ['uri', '', self::ERROR],
@@ -270,7 +264,7 @@ class FieldTypesTest extends TestCase
     {
         $native_time_6 = mktime(6, 0, 0);
         $native_time_3 = mktime(3, 0, 0);
-        $this->assertFieldTestData("time", [
+        $this->assertFieldTestData('time', [
             // format , input value , expected cast value, (optional) expected infer type
             ['default', '06:00:00', $native_time_6],
             ['default', '3 am', self::ERROR],
@@ -303,23 +297,23 @@ class FieldTypesTest extends TestCase
 
     public function testYear()
     {
-        $this->assertFieldTestData("year", [
+        $this->assertFieldTestData('year', [
             // format , input value , expected cast value, (optional) expected infer type
             ['default', 2000, 2000],
             ['default', '2000', 2000],
             ['default', 20000, 20000],
             ['default', '3.14', self::ERROR],
-            ['default', '', self::ERROR]
+            ['default', '', self::ERROR],
         ]);
     }
 
     public function testYearMonth()
     {
-        $this->assertFieldTestData("yearmonth", [
+        $this->assertFieldTestData('yearmonth', [
             // format , input value , expected cast value, (optional) expected infer type
             ['default', [2000, 10], [2000, 10]],
-            ['default', [2000, 10], [2000, 10], "string"],
-            ['default', '2000-10', [2000, 10], "string"],
+            ['default', [2000, 10], [2000, 10], 'string'],
+            ['default', '2000-10', [2000, 10], 'string'],
             ['default', [2000, 10, 20], self::ERROR],
             ['default', '2000-13-20', self::ERROR],
             ['default', '2000-13', self::ERROR],
@@ -335,10 +329,12 @@ class FieldTypesTest extends TestCase
     protected function assertFieldTestData($fieldType, $testData)
     {
         foreach ($testData as $testLine) {
-            if (!isset($testLine[3])) $testLine[3] = null;
+            if (!isset($testLine[3])) {
+                $testLine[3] = null;
+            }
             list($format, $inputValue, $expectedCastValue, $expectedInferType) = $testLine;
             $assertMessage = "format='{$format}', input='".json_encode($inputValue)."', expected='".json_encode($expectedCastValue)."'";
-            $field = FieldsFactory::field((object)["type" => $fieldType, "format" => $format]);
+            $field = FieldsFactory::field((object) ['type' => $fieldType, 'format' => $format]);
             if ($expectedCastValue == self::ERROR) {
                 $this->assertTrue(count($field->validateValue($inputValue)) > 0, $assertMessage);
             } else {

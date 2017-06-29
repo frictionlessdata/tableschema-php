@@ -8,7 +8,7 @@ use frictionlessdata\tableschema\SchemaValidationError;
 class FieldsFactory
 {
     /**
-     * list of all the available field classes
+     * list of all the available field classes.
      *
      * this list is used when inferring field type from a value
      * infer works by trying to case the value to the field, in the fieldClasses order

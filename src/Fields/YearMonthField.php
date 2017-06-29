@@ -8,17 +8,17 @@ class YearMonthField extends BaseField
     {
         $val = parent::validateCastValue($val);
         if (!is_array($val)) {
-            $val = explode("-", $val);
+            $val = explode('-', $val);
         }
         if (count($val) != 2) {
             throw $this->getValidationException(null, $val);
         } else {
             list($year, $month) = $val;
-            if ($year == "" || $month == "") {
+            if ($year == '' || $month == '') {
                 throw $this->getValidationException(null, $val);
             } else {
-                $year = (int)$year;
-                $month = (int)$month;
+                $year = (int) $year;
+                $month = (int) $month;
                 if ($month < 1 || $month > 12) {
                     throw $this->getValidationException(null, $val);
                 } else {

@@ -25,20 +25,24 @@ class StringField extends BaseField
     {
         $val = parent::validateCastValue($val);
         switch ($this->format()) {
-            case "email":
-                if (strpos($val, '@') === false)
+            case 'email':
+                if (strpos($val, '@') === false) {
                     throw $this->getValidationException('value is not a valid email', $val);
+                }
                 break;
-            case "uri":
-                if (filter_var($val, FILTER_VALIDATE_URL) === false)
+            case 'uri':
+                if (filter_var($val, FILTER_VALIDATE_URL) === false) {
                     throw $this->getValidationException(null, $val);
+                }
                 break;
-            case "binary":
+            case 'binary':
                 $decoded = base64_decode($val, true);
-                if ($decoded === false)
+                if ($decoded === false) {
                     throw $this->getValidationException(null, $val);
+                }
                 break;
         }
+
         return $val;
     }
 

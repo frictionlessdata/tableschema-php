@@ -180,9 +180,9 @@ abstract class BaseField
     {
         return new FieldValidationException([
             new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                'field' => isset($this->descriptor()->name) ? $this->name() : "unknown",
+                'field' => isset($this->descriptor()->name) ? $this->name() : 'unknown',
                 'value' => $val,
-                'error' => is_null($errorMsg) ? "invalid value" : $errorMsg,
+                'error' => is_null($errorMsg) ? 'invalid value' : $errorMsg,
             ]),
         ]);
     }
