@@ -82,7 +82,7 @@ class SchemaTest extends TestCase
     {
         if (getenv('TABLESCHEMA_ENABLE_FRAGILE_TESTS')) {
             $this->assertValidationErrors(
-                '[primaryKey] String value found, but an array is required',
+                '',
                 'https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json'
             );
         } else {
@@ -393,6 +393,13 @@ class SchemaTest extends TestCase
         $this->assertEquals(['id'], (new Schema($this->maxDescriptorJson))->primaryKey());
     }
 
+    public function testPrimaryKeyAsString()
+    {
+        $descriptor = json_decode($this->maxDescriptorJson);
+        $descriptor->primaryKey = "id";
+        $this->assertEquals(["id"], (new Schema($descriptor))->primaryKey());
+    }
+
     public function testForeignKeys()
     {
         $this->assertEquals([], (new Schema($this->minDescriptorJson))->foreignKeys());
@@ -405,6 +412,21 @@ class SchemaTest extends TestCase
                 ],
             ],
         ], (new Schema($this->maxDescriptorJson))->foreignKeys());
+    }
+
+    public function testForeignKeyFieldsAsString()
+    {
+        $descriptor = json_decode($this->maxDescriptorJson);
+        $descriptor->foreignKeys[0]->fields = "name";
+        // not sure why the reference fields don't support string
+        $descriptor->foreignKeys[0]->reference->fields = ["id"];
+        $this->assertEquals([(object)[
+            "fields" => ["name"],
+            "reference" => (object) [
+                "resource" => "data.csv",
+                "fields" => ["id"]
+            ]
+        ]], (new Schema($descriptor))->foreignKeys());
     }
 
     public function testEditable()

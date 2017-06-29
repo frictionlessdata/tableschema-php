@@ -78,11 +78,12 @@ class SchemaValidator
             return $field->name;
         }, $this->descriptor->fields);
         if (isset($this->descriptor->primaryKey)) {
-            foreach ($this->descriptor->primaryKey as $primaryKey) {
-                if (!in_array($primaryKey, $fieldNames)) {
+            $primaryKey = is_array($this->descriptor->primaryKey) ? $this->descriptor->primaryKey : [$this->descriptor->primaryKey];
+            foreach ($primaryKey as $primaryKeyField) {
+                if (!in_array($primaryKeyField, $fieldNames)) {
                     $this->addError(
                         SchemaValidationError::SCHEMA_VIOLATION,
-                        "primary key must refer to a field name ({$primaryKey})"
+                        "primary key must refer to a field name ({$primaryKeyField})"
                     );
                 }
             }
