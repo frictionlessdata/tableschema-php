@@ -18,7 +18,6 @@ $ composer install
 $ composer test
 ```
 
-
 ## Phpunit - for unit tests
 
 [![Travis](https://travis-ci.org/frictionlessdata/tableschema-php.svg?branch=master)](https://travis-ci.org/frictionlessdata/tableschema-php)
@@ -46,6 +45,13 @@ It does static code analysis and ensure confirmation to the coding stnadards.
 At the moment, the integration with frictionlessdata repo is not working, you can setup a Scrutinizer-ci account for your fork and run against that.
 
 
+## php-cs-fixer - code style check & autofix
+
+[php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) is run on every build and fails the build in case of style problems
+
+you can automatically fix by running: `composer style-fix`
+ 
+
 ## Publishing to Packagist
 
 [![Packagist](https://img.shields.io/packagist/dm/frictionlessdata/tableschema.svg)](https://packagist.org/packages/frictionlessdata/tableschema)
@@ -56,3 +62,9 @@ At the moment, the integration with frictionlessdata repo is not working, you ca
 * Login with GitHub which has permissions
 * click "Update"
 * all releases from GitHub appear as releases on Packagist
+
+## updating frictionlessdata schemas
+
+The json schemas for the frictionlessdata specs are stored locally as part of the package.
+
+They might change from time to time, to donwnload the latest specs run `composer update_registry`
