@@ -131,6 +131,7 @@ abstract class BaseField
             if ($this->required()) {
                 throw $this->getValidationException('field is required', $val);
             }
+
             return null;
         } else {
             return $this->validateCastValue($val);

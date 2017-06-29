@@ -435,9 +435,9 @@ class SchemaTest extends TestCase
             $this->assertEquals('Schema failed validation: primary key must refer to a field name (aardvark)', $e->getMessage());
         }
         $schema->primaryKey(['id']);
-        $this->assertEquals((object)[
-            "fields" => [(object)["name" => "id", "type" => "integer"]],
-            "primaryKey" => ["id"]
+        $this->assertEquals((object) [
+            'fields' => [(object) ['name' => 'id', 'type' => 'integer']],
+            'primaryKey' => ['id'],
         ], $schema->descriptor());
         $foreignKeys = [
             (object) [
