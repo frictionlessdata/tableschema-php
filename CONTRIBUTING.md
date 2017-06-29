@@ -63,8 +63,9 @@ you need to manually install it, then you can run : `composer style-check` or `c
 * click "Update"
 * all releases from GitHub appear as releases on Packagist
 
-## updating frictionlessdata schemas
 
-The json schemas for the frictionlessdata specs are stored locally as part of the package.
+## Updating the json schema
 
-They might change from time to time, to donwnload the latest specs run `composer update_registry`
+The json schema for table schema might be modified from time to time, to update it run `composer update-schema`
+
+Then, you should review the changes, and possibly write / update unit tests to match the new schema.

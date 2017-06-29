@@ -18,6 +18,7 @@
     },
     "scripts": {
         "test": "phpunit --debug --bootstrap tests/autoload.php tests/ --coverage-clover coverage-clover.xml",
+        "update-schema": "php update-schema.php",
         "style-check" : "php-cs-fixer fix --dry-run --verbose --diff",
         "style-fix" : "php-cs-fixer fix --verbose"
     }
