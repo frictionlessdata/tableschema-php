@@ -38,7 +38,7 @@ class SchemaTest extends TestCase
                 {"name": "occupation", "type": "string"}
             ],
             "primaryKey": ["id"],
-            "foreignKeys": [{"fields": ["name"], "reference": {"resource": "", "fields": ["id"]}}],
+            "foreignKeys": [{"fields": ["name"], "reference": {"resource": "data.csv", "fields": ["id"]}}],
             "missingValues": ["", "-", "null"]
         }';
         $this->simpleDescriptor = json_decode($this->simpleDescriptorJson);
@@ -189,7 +189,6 @@ class SchemaTest extends TestCase
                     '[fields[0].type] Does not have a value in the enumeration ["duration"]',
                     '[fields[0].type] Does not have a value in the enumeration ["any"]',
                     '[fields[0]] Failed to match at least one schema',
-                    '[primaryKey] String value found, but an array is required',
                     '[foreignKeys] String value found, but an array is required',
                 ]),
             ],
@@ -264,7 +263,6 @@ class SchemaTest extends TestCase
                     .'[fields[0].type] Does not have a value in the enumeration ["duration"], '
                     .'[fields[0].type] Does not have a value in the enumeration ["any"], '
                     .'[fields[0]] Failed to match at least one schema, '
-                    .'[primaryKey] String value found, but an array is required, '
                     .'[foreignKeys[0].reference.resource] The property resource is required, '
                     .'[foreignKeys[0].reference.fields] String value found, but an array is required',
                 $e->getMessage()
@@ -402,7 +400,7 @@ class SchemaTest extends TestCase
             (object) [
                 'fields' => ['name'],
                 'reference' => (object) [
-                    'resource' => '',
+                    'resource' => 'data.csv',
                     'fields' => ['id'],
                 ],
             ],
@@ -437,6 +435,10 @@ class SchemaTest extends TestCase
             $this->assertEquals('Schema failed validation: primary key must refer to a field name (aardvark)', $e->getMessage());
         }
         $schema->primaryKey(['id']);
+        $this->assertEquals((object)[
+            "fields" => [(object)["name" => "id", "type" => "integer"]],
+            "primaryKey" => ["id"]
+        ], $schema->descriptor());
         $foreignKeys = [
             (object) [
                 'fields' => ['nonexistantfield'],
@@ -455,17 +457,10 @@ class SchemaTest extends TestCase
                 $e->getMessage()
             );
         }
-        $foreignKeys[0]->fields = 'invalidstringvalue';
-        try {
-            $schema->foreignKeys($foreignKeys);
-            $this->fail();
-        } catch (\Exception $e) {
-            $this->assertEquals(
-                'Schema failed validation: [foreignKeys[0].fields] String value found, but an array is required',
-                $e->getMessage()
-            );
-        }
-        $foreignKeys[0]->fields = ['id'];
+        // fields supports a string value, in that case it's considered an array of 1 field
+        $foreignKeys[0]->fields = 'id';
+        // this is equivalent to:
+        // $foreignKeys[0]->fields = ['id'];
         $schema->foreignKeys($foreignKeys);
         $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'integer']));
         $foreignKeys[0]->fields = ['age'];

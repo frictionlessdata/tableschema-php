@@ -89,7 +89,8 @@ class SchemaValidator
         }
         if (isset($this->descriptor->foreignKeys)) {
             foreach ($this->descriptor->foreignKeys as $foreignKey) {
-                foreach ($foreignKey->fields as $field) {
+                $fields = is_array($foreignKey->fields) ? $foreignKey->fields : [$foreignKey->fields];
+                foreach ($fields as $field) {
                     if (!in_array($field, $fieldNames)) {
                         $this->addError(
                             SchemaValidationError::SCHEMA_VIOLATION,
@@ -116,12 +117,14 @@ class SchemaValidator
     {
         if (isset($descriptor->foreignKeys) && is_array($descriptor->foreignKeys)) {
             foreach ($descriptor->foreignKeys as $foreignKey) {
+                // the resource field of foreign keys has problems validating as standard uri string
+                // we just override the validation entirely by placing a valid uri
                 if (
                     is_object($foreignKey)
                     && isset($foreignKey->reference) && is_object($foreignKey->reference)
-                    && isset($foreignKey->reference->resource) && empty($foreignKey->reference->resource)
+                    && isset($foreignKey->reference->resource) && !empty($foreignKey->reference->resource)
                 ) {
-                    $foreignKey->reference->resource = 'self';
+                    $foreignKey->reference->resource = 'void://'.$foreignKey->reference->resource;
                 }
             }
         }
