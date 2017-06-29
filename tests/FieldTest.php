@@ -92,7 +92,7 @@ class FieldTest extends TestCase
             FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue('');
             $this->fail();
         } catch (FieldValidationException $e) {
-            $this->assertEquals('id: field is required ()', $e->getMessage());
+            $this->assertEquals('id: field is required ("")', $e->getMessage());
         }
     }
 
@@ -123,8 +123,8 @@ class FieldTest extends TestCase
     public function testValidateValue()
     {
         $this->assertFieldValidateValue('', $this->DESCRIPTOR_MAX, '1');
-        $this->assertFieldValidateValue('id: value must be numeric (string)', $this->DESCRIPTOR_MAX, 'string');
-        $this->assertFieldValidateValue('id: field is required ()', $this->DESCRIPTOR_MAX, '');
+        $this->assertFieldValidateValue('id: value must be numeric ("string")', $this->DESCRIPTOR_MAX, 'string');
+        $this->assertFieldValidateValue('id: field is required ("")', $this->DESCRIPTOR_MAX, '');
     }
 
     public function testValidateValueDisableConstraints()
@@ -160,11 +160,11 @@ class FieldTest extends TestCase
         $this->assertSchemaValidateValue('', $schema, 'none');
         $this->assertSchemaValidateValue('', $schema, 'nil');
         $this->assertSchemaValidateValue('', $schema, 'nan');
-        $this->assertSchemaValidateValue('name: field is required ()', $schema, 'NA');
-        $this->assertSchemaValidateValue('name: field is required ()', $schema, 'N/A');
+        $this->assertSchemaValidateValue('name: field is required (null)', $schema, 'NA');
+        $this->assertSchemaValidateValue('name: field is required (null)', $schema, 'N/A');
         $this->assertSchemaValidateValue('', $schema, '-');
-        $this->assertSchemaValidateValue('name: field is required ()', $schema, '');
-        $this->assertSchemaValidateValue('name: field is required ()', $schema, null);
+        $this->assertSchemaValidateValue('name: field is required (null)', $schema, '');
+        $this->assertSchemaValidateValue('name: field is required (null)', $schema, null);
     }
 
     public function testValidateValuePattern()
@@ -176,7 +176,7 @@ class FieldTest extends TestCase
         ];
         $this->assertFieldValidateValue('', $descriptor, '3');
         $this->assertFieldValidateValue('', $descriptor, '321');
-        $this->assertFieldValidateValue('name: value does not match pattern (123)', $descriptor, '123');
+        $this->assertFieldValidateValue('name: value does not match pattern ("123")', $descriptor, '123');
     }
 
     public function testValidateValueUnique()
@@ -223,7 +223,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 2);
         $this->assertFieldValidateValue('', $descriptor, '3');
-        $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, '4');
+        $this->assertFieldValidateValue('name: value not in enum ("4")', $descriptor, '4');
         $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, 4);
     }
 
@@ -238,7 +238,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 2);
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, '0');
+        $this->assertFieldValidateValue('name: value is below minimum ("0")', $descriptor, '0');
         $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, 0);
     }
 
@@ -253,7 +253,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 0);
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, '2');
+        $this->assertFieldValidateValue('name: value is above maximum ("2")', $descriptor, '2');
         $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, 2);
     }
 
@@ -268,7 +268,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 'aaaa');
         // null value passes (because field is not required)
         $this->assertFieldValidateValue('', $descriptor, null);
-        $this->assertFieldValidateValue('name: value is below minimum length (a)', $descriptor, 'a');
+        $this->assertFieldValidateValue('name: value is below minimum length ("a")', $descriptor, 'a');
     }
 
     public function testValidateValueMaxLength()
@@ -282,7 +282,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 'a');
         $this->assertFieldValidateValue('', $descriptor, null);
         $this->assertFieldValidateValue('', $descriptor, '');
-        $this->assertFieldValidateValue('name: value is above maximum length (aaa)', $descriptor, 'aaa');
+        $this->assertFieldValidateValue('name: value is above maximum length ("aaa")', $descriptor, 'aaa');
     }
 
     protected function assertFieldValidateValue($expectedErrors, $descriptor, $value)

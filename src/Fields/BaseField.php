@@ -176,13 +176,13 @@ abstract class BaseField
     protected $descriptor;
     protected $constraintsDisabled = false;
 
-    protected function getValidationException($errorMsg, $val = null)
+    protected function getValidationException($errorMsg = null, $val = null)
     {
         return new FieldValidationException([
             new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                'field' => $this->name(),
+                'field' => isset($this->descriptor()->name) ? $this->name() : "unknown",
                 'value' => $val,
-                'error' => $errorMsg,
+                'error' => is_null($errorMsg) ? "invalid value" : $errorMsg,
             ]),
         ]);
     }

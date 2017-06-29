@@ -9,12 +9,20 @@ class FieldsFactory
 {
     /**
      * list of all the available field classes
-     * ordered in infer order - the most strict field first.
+     *
+     * this list is used when inferring field type from a value
+     * infer works by trying to case the value to the field, in the fieldClasses order
+     * first field that doesn't raise exception on infer wins
      */
     public static $fieldClasses = [
         '\\frictionlessdata\\tableschema\\Fields\\IntegerField',
         '\\frictionlessdata\\tableschema\\Fields\\NumberField',
         '\\frictionlessdata\\tableschema\\Fields\\StringField',
+
+        // these fields will not be inferred - StringField will catch all values before it reaches these
+        '\\frictionlessdata\\tableschema\\Fields\\YearMonthField',
+        '\\frictionlessdata\\tableschema\\Fields\\YearField',
+        '\\frictionlessdata\\tableschema\\Fields\\TimeField',
     ];
 
     /**
