@@ -133,6 +133,7 @@ class Schema
     public function primaryKey()
     {
         $primaryKey = isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
+
         return is_array($primaryKey) ? $primaryKey : [$primaryKey];
     }
 
@@ -140,9 +141,14 @@ class Schema
     {
         $foreignKeys = isset($this->descriptor()->foreignKeys) ? $this->descriptor()->foreignKeys : [];
         foreach ($foreignKeys as &$foreignKey) {
-            if (!is_array($foreignKey->fields)) $foreignKey->fields = [$foreignKey->fields];
-            if (!is_array($foreignKey->reference->fields)) $foreignKey->reference->fields = [$foreignKey->reference->fields];
+            if (!is_array($foreignKey->fields)) {
+                $foreignKey->fields = [$foreignKey->fields];
+            }
+            if (!is_array($foreignKey->reference->fields)) {
+                $foreignKey->reference->fields = [$foreignKey->reference->fields];
+            }
         }
+
         return $foreignKeys;
     }
 

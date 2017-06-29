@@ -396,8 +396,8 @@ class SchemaTest extends TestCase
     public function testPrimaryKeyAsString()
     {
         $descriptor = json_decode($this->maxDescriptorJson);
-        $descriptor->primaryKey = "id";
-        $this->assertEquals(["id"], (new Schema($descriptor))->primaryKey());
+        $descriptor->primaryKey = 'id';
+        $this->assertEquals(['id'], (new Schema($descriptor))->primaryKey());
     }
 
     public function testForeignKeys()
@@ -417,15 +417,15 @@ class SchemaTest extends TestCase
     public function testForeignKeyFieldsAsString()
     {
         $descriptor = json_decode($this->maxDescriptorJson);
-        $descriptor->foreignKeys[0]->fields = "name";
+        $descriptor->foreignKeys[0]->fields = 'name';
         // not sure why the reference fields don't support string
-        $descriptor->foreignKeys[0]->reference->fields = ["id"];
-        $this->assertEquals([(object)[
-            "fields" => ["name"],
-            "reference" => (object) [
-                "resource" => "data.csv",
-                "fields" => ["id"]
-            ]
+        $descriptor->foreignKeys[0]->reference->fields = ['id'];
+        $this->assertEquals([(object) [
+            'fields' => ['name'],
+            'reference' => (object) [
+                'resource' => 'data.csv',
+                'fields' => ['id'],
+            ],
         ]], (new Schema($descriptor))->foreignKeys());
     }
 
