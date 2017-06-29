@@ -1,11 +1,12 @@
 <?php
+
 namespace frictionlessdata\tableschema\Exceptions;
 
 use frictionlessdata\tableschema\SchemaValidationError;
 
 /**
  * schema validation failed
- * the array of validation errors is available
+ * the array of validation errors is available.
  */
 class SchemaValidationFailedException extends \Exception
 {
@@ -19,7 +20,7 @@ class SchemaValidationFailedException extends \Exception
      */
     public function __construct($validationErrors)
     {
-        parent::__construct("Schema failed validation: ".SchemaValidationError::getErrorMessages($validationErrors));
+        parent::__construct('Schema failed validation: '.SchemaValidationError::getErrorMessages($validationErrors));
         $this->validationErrors = $validationErrors;
     }
 }

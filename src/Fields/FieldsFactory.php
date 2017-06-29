@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
@@ -8,18 +9,21 @@ class FieldsFactory
 {
     /**
      * list of all the available field classes
-     * ordered in infer order - the most strict field first
+     * ordered in infer order - the most strict field first.
      */
     public static $fieldClasses = [
-        "\\frictionlessdata\\tableschema\\Fields\\IntegerField",
-        "\\frictionlessdata\\tableschema\\Fields\\NumberField",
-        "\\frictionlessdata\\tableschema\\Fields\\StringField",
+        '\\frictionlessdata\\tableschema\\Fields\\IntegerField',
+        '\\frictionlessdata\\tableschema\\Fields\\NumberField',
+        '\\frictionlessdata\\tableschema\\Fields\\StringField',
     ];
 
     /**
-     * get a new field object in the correct type according to the descriptor
+     * get a new field object in the correct type according to the descriptor.
+     *
      * @param object $descriptor
+     *
      * @return BaseField
+     *
      * @throws \Exception
      */
     public static function field($descriptor)
@@ -33,17 +37,19 @@ class FieldsFactory
         throw new FieldValidationException([
             new SchemaValidationError(
                 SchemaValidationError::SCHEMA_VIOLATION,
-                "Could not find a valid field for descriptor: ".json_encode($descriptor))
+                'Could not find a valid field for descriptor: '.json_encode($descriptor)),
         ]);
     }
 
     /**
      * @param $val
      * @param null $descriptor
+     *
      * @return mixed
+     *
      * @throws FieldValidationException
      */
-    public static function infer($val, $descriptor=null, $lenient=false)
+    public static function infer($val, $descriptor = null, $lenient = false)
     {
         foreach (static::$fieldClasses as $fieldClass) {
             /** @var BaseField $fieldClass */
@@ -54,7 +60,7 @@ class FieldsFactory
         throw new FieldValidationException([
             new SchemaValidationError(
                 SchemaValidationError::SCHEMA_VIOLATION,
-                "Could not find a valid field for value: ".json_encode($val))
+                'Could not find a valid field for value: '.json_encode($val)),
         ]);
     }
 }

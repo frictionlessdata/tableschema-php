@@ -1,14 +1,15 @@
 <?php
+
 namespace frictionlessdata\tableschema;
 
 class EditableSchema extends Schema
 {
-    public function __construct($descriptor=null)
+    public function __construct($descriptor = null)
     {
-        $this->descriptor = empty($descriptor) ? (object)["fields" => []] : $descriptor;
+        $this->descriptor = empty($descriptor) ? (object) ['fields' => []] : $descriptor;
     }
 
-    public function fields($newFields=null)
+    public function fields($newFields = null)
     {
         if (!is_null($newFields)) {
             $this->fieldsCache = $newFields;
@@ -16,17 +17,19 @@ class EditableSchema extends Schema
             foreach ($newFields as $field) {
                 $this->descriptor()->fields[] = $field->descriptor();
             }
+
             return $this->revalidate();
         } else {
             return is_null($this->fieldsCache) ? [] : $this->fieldsCache;
         }
     }
 
-    public function field($name, $field=null)
+    public function field($name, $field = null)
     {
         $fields = $this->fields();
         if (!is_null($field)) {
             $fields[$name] = $field;
+
             return $this->fields($fields);
         } elseif (array_key_exists($name, $fields)) {
             return $fields[$name];
@@ -39,35 +42,39 @@ class EditableSchema extends Schema
     {
         $fields = $this->fields();
         unset($fields[$name]);
+
         return $this->fields($fields);
     }
 
-    public function primaryKey($primaryKey=null)
+    public function primaryKey($primaryKey = null)
     {
         if (is_null($primaryKey)) {
             return parent::primaryKey();
         } else {
             $this->descriptor()->primaryKey = $primaryKey;
+
             return $this->revalidate();
         }
     }
 
-    public function foreignKeys($foreignKeys=null)
+    public function foreignKeys($foreignKeys = null)
     {
         if (is_null($foreignKeys)) {
             return parent::foreignKeys();
         } else {
             $this->descriptor()->foreignKeys = $foreignKeys;
+
             return $this->revalidate();
         }
     }
 
-    public function missingValues($missingValues=null)
+    public function missingValues($missingValues = null)
     {
         if (is_null($missingValues)) {
             return parent::missingValues();
         } else {
             $this->descriptor()->missingValues = $missingValues;
+
             return $this->revalidate();
         }
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
@@ -8,7 +9,7 @@ class FieldsInferrer
     /**
      * @param null|array $rows optional initial rows to infer by, each row is an array of field name => field value
      */
-    public function __construct($rows=null, $lenient=false)
+    public function __construct($rows = null, $lenient = false)
     {
         $this->lenient = $lenient;
         if (!empty($rows)) {
@@ -17,8 +18,10 @@ class FieldsInferrer
     }
 
     /**
-     * add rows and updates the fieldsPopularity array - to make the inferred fields more accurate
+     * add rows and updates the fieldsPopularity array - to make the inferred fields more accurate.
+     *
      * @param $rows
+     *
      * @throws FieldValidationException
      */
     public function addRows($rows)
@@ -38,15 +41,17 @@ class FieldsInferrer
                     $this->fieldsPopularity[$fieldName][$inferredFieldType] = 0;
                     $this->fieldsPopularityObjects[$fieldName][$inferredFieldType] = $inferredField;
                 }
-                $this->fieldsPopularity[$fieldName][$inferredFieldType]++;
+                ++$this->fieldsPopularity[$fieldName][$inferredFieldType];
                 arsort($this->fieldsPopularity[$fieldName]);
             }
         }
     }
 
     /**
-     * return the best inferred fields along with the best value casting according to the rows received so far
+     * return the best inferred fields along with the best value casting according to the rows received so far.
+     *
      * @return array field name => inferred field object
+     *
      * @throws FieldValidationException
      */
     public function infer()
@@ -55,11 +60,13 @@ class FieldsInferrer
         foreach ($this->fieldsPopularity as $fieldName => $fieldTypesPopularity) {
             $bestInferredFields[$fieldName] = $this->inferField($fieldName, $fieldTypesPopularity);
         }
+
         return $bestInferredFields;
     }
 
     /**
-     * returns all the input rows got so far with the best cast value for each field
+     * returns all the input rows got so far with the best cast value for each field.
+     *
      * @return array of arrays of field name => best cast value
      */
     public function castRows()
@@ -75,17 +82,21 @@ class FieldsInferrer
 
     /**
      * infer field objects for the given row
-     * raises exception if fails to infer a field
+     * raises exception if fails to infer a field.
+     *
      * @param $row array field name => value to infer by
+     *
      * @return array field name => inferred field object
+     *
      * @throws FieldValidationException
      */
     protected function inferRow($row)
     {
         $rowFields = [];
         foreach ($row as $k => $v) {
-            $rowFields[$k] = FieldsFactory::infer($v, (object)["name" => $k], $this->lenient);
+            $rowFields[$k] = FieldsFactory::infer($v, (object) ['name' => $k], $this->lenient);
         }
+
         return $rowFields;
     }
 
@@ -101,9 +112,11 @@ class FieldsInferrer
 
     /**
      * finds the best inferred fields for the given field name according to the popularity
-     * also updates the castRows array with the latest cast values
+     * also updates the castRows array with the latest cast values.
+     *
      * @param $fieldName
      * @param $fieldTypesPopularity
+     *
      * @return BaseField|null
      */
     protected function inferField($fieldName, $fieldTypesPopularity)
@@ -116,9 +129,11 @@ class FieldsInferrer
             try {
                 $rowNum = 0;
                 foreach ($this->inputRows as $inputRow) {
-                    if (!array_key_exists($rowNum, $this->castRows)) $this->castRows[$rowNum] = [];
+                    if (!array_key_exists($rowNum, $this->castRows)) {
+                        $this->castRows[$rowNum] = [];
+                    }
                     $this->castRows[$rowNum][$fieldName] = $inferredField->castValue($inputRow[$fieldName]);
-                    $rowNum++;
+                    ++$rowNum;
                 }
                 break;
             } catch (FieldValidationException $e) {
@@ -126,6 +141,7 @@ class FieldsInferrer
                 continue;
             }
         }
+
         return $inferredField;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\tests;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
@@ -37,38 +38,38 @@ class SchemaTest extends TestCase
                 {"name": "occupation", "type": "string"}
             ],
             "primaryKey": ["id"],
-            "foreignKeys": [{"fields": ["name"], "reference": {"resource": "", "fields": ["id"]}}],
+            "foreignKeys": [{"fields": ["name"], "reference": {"resource": "data.csv", "fields": ["id"]}}],
             "missingValues": ["", "-", "null"]
         }';
         $this->simpleDescriptor = json_decode($this->simpleDescriptorJson);
-        $this->fullDescriptor = (object)[
-            "fields" => [
-                (object)["name" => "id", "type" => "string", "constraints" => (object)["required" => true]],
-                (object)["name" => "height", "type" => "number"],
-                (object)["name" => "age", "type" => "integer"],
-                (object)["name" => "name", "type" => "string"],
-                (object)["name" => "occupation", "type" => "string"],
+        $this->fullDescriptor = (object) [
+            'fields' => [
+                (object) ['name' => 'id', 'type' => 'string', 'constraints' => (object) ['required' => true]],
+                (object) ['name' => 'height', 'type' => 'number'],
+                (object) ['name' => 'age', 'type' => 'integer'],
+                (object) ['name' => 'name', 'type' => 'string'],
+                (object) ['name' => 'occupation', 'type' => 'string'],
             ],
-            "primaryKey" => ["id"],
-            "foreignKeys" => [
-                (object)[
-                    "fields" => ["name"],
-                    "reference" => (object)[
-                        "resource" => "related-resource-idntifier-or-url", "fields" => ["id"]
-                    ]
-                ]
+            'primaryKey' => ['id'],
+            'foreignKeys' => [
+                (object) [
+                    'fields' => ['name'],
+                    'reference' => (object) [
+                        'resource' => 'related-resource-idntifier-or-url', 'fields' => ['id'],
+                    ],
+                ],
             ],
         ];
-        $this->schemaValidFullFilename = dirname(__FILE__).DIRECTORY_SEPARATOR."fixtures".DIRECTORY_SEPARATOR."schema_valid_full.json";
-        $this->schemaValidSimpleFilename = dirname(__FILE__).DIRECTORY_SEPARATOR."fixtures".DIRECTORY_SEPARATOR."schema_valid_simple.json";
-        $this->schemaInvalidMultipleErrorsFilename = dirname(__FILE__).DIRECTORY_SEPARATOR."fixtures".DIRECTORY_SEPARATOR."schema_invalid_multiple_errors.json";
+        $this->schemaValidFullFilename = dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_valid_full.json';
+        $this->schemaValidSimpleFilename = dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_valid_simple.json';
+        $this->schemaInvalidMultipleErrorsFilename = dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_invalid_multiple_errors.json';
     }
 
     public function testInitializeFromJsonString()
     {
         $schema = new Schema($this->simpleDescriptorJson);
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
-        $this->assertEquals("id", $schema->descriptor()->fields[0]->name);
+        $this->assertEquals('id', $schema->descriptor()->fields[0]->name);
     }
 
     public function testInitializeFromPhpObject()
@@ -79,51 +80,50 @@ class SchemaTest extends TestCase
 
     public function testInitializeFromRemoteResource()
     {
-        if (getenv("TABLESCHEMA_ENABLE_FRAGILE_TESTS")) {
+        if (getenv('TABLESCHEMA_ENABLE_FRAGILE_TESTS')) {
             $this->assertValidationErrors(
-                "[primaryKey] String value found, but an array is required",
-                "https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json"
+                '',
+                'https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json'
             );
         } else {
-            $this->markTestSkipped("skipping fragile tests, to enable set TABLESCHEMA_ENABLE_FRAGILE_TESTS=1");
+            $this->markTestSkipped('skipping fragile tests, to enable set TABLESCHEMA_ENABLE_FRAGILE_TESTS=1');
         }
     }
 
     public function testValidateInvalidResources()
     {
         $this->assertValidationErrors(
-            'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage("--invalid--"),
-            "--invalid--"
-
+            'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage('--invalid--'),
+            '--invalid--'
         );
         $this->assertValidationErrors(
             'error decoding descriptor {"fields":[]}: descriptor must be an object',
-            ["fields" => []]
+            ['fields' => []]
         );
     }
 
     public function testConstructFromInvalidResource()
     {
         try {
-            new Schema("--invalid--");
-            $this->fail("constructing from invalid descriptor should throw exception");
+            new Schema('--invalid--');
+            $this->fail('constructing from invalid descriptor should throw exception');
         } catch (\frictionlessdata\tableschema\Exceptions\SchemaLoadException $e) {
             $this->assertEquals(
-                'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage("--invalid--"),
+                'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage('--invalid--'),
                 $e->getMessage()
             );
         }
         try {
-            new Schema(["fields" => []]);
-            $this->fail("constructing from invalid descriptor should throw exception");
+            new Schema(['fields' => []]);
+            $this->fail('constructing from invalid descriptor should throw exception');
         } catch (\frictionlessdata\tableschema\Exceptions\SchemaLoadException $e) {
             $this->assertEquals(
                 'error decoding descriptor {"fields":[]}: descriptor must be an object',
                 $e->getMessage());
         }
         try {
-            new Schema((object)["fields" => []]);
-            $this->fail("constructing from invalid descriptor should throw exception");
+            new Schema((object) ['fields' => []]);
+            $this->fail('constructing from invalid descriptor should throw exception');
         } catch (\frictionlessdata\tableschema\Exceptions\SchemaValidationFailedException $e) {
             $this->assertEquals(
                 'Schema failed validation: [fields] There must be a minimum of 1 items in the array',
@@ -134,21 +134,21 @@ class SchemaTest extends TestCase
 
     public function testDifferentValidDescriptorSources()
     {
-        $simpleFile = tempnam(sys_get_temp_dir(), "tableschema-php-tests");
-        $fullFile = tempnam(sys_get_temp_dir(), "tableschema-php-tests");
+        $simpleFile = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
+        $fullFile = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
         file_put_contents($simpleFile, json_encode($this->simpleDescriptor));
         file_put_contents($fullFile, json_encode($this->fullDescriptor));
         $descriptors = [
-            ["descriptor" => $this->simpleDescriptor, "expected" => $this->simpleDescriptor],
-            ["descriptor" => $this->fullDescriptor, "expected" => $this->fullDescriptor],
-            ["descriptor" => json_encode($this->simpleDescriptor), "expected" => $this->simpleDescriptor],
-            ["descriptor" => json_encode($this->fullDescriptor), "expected" => $this->fullDescriptor],
-            ["descriptor" => $simpleFile, "expected" => $this->simpleDescriptor],
-            ["descriptor" => $fullFile, "expected" => $this->fullDescriptor],
+            ['descriptor' => $this->simpleDescriptor, 'expected' => $this->simpleDescriptor],
+            ['descriptor' => $this->fullDescriptor, 'expected' => $this->fullDescriptor],
+            ['descriptor' => json_encode($this->simpleDescriptor), 'expected' => $this->simpleDescriptor],
+            ['descriptor' => json_encode($this->fullDescriptor), 'expected' => $this->fullDescriptor],
+            ['descriptor' => $simpleFile, 'expected' => $this->simpleDescriptor],
+            ['descriptor' => $fullFile, 'expected' => $this->fullDescriptor],
         ];
         foreach ($descriptors as $data) {
-            $schema = new Schema($data["descriptor"]);
-            $this->assertEquals($data["expected"], $schema->descriptor());
+            $schema = new Schema($data['descriptor']);
+            $this->assertEquals($data['expected'], $schema->descriptor());
         }
     }
 
@@ -156,76 +156,74 @@ class SchemaTest extends TestCase
     {
         $descriptors = [
             [
-                "descriptor" => [],
-                "expected_errors" => 'unexpected load error: descriptor must be an object'
+                'descriptor' => [],
+                'expected_errors' => 'unexpected load error: descriptor must be an object',
             ],
             [
-                "descriptor" => "foobar",
-                "expected_errors" => 'error loading descriptor from source "foobar": '.$this->getFileGetContentsErrorMessage("foobar")
+                'descriptor' => 'foobar',
+                'expected_errors' => 'error loading descriptor from source "foobar": '.$this->getFileGetContentsErrorMessage('foobar'),
             ],
             [
-                "descriptor" => (object)[
-                    "fields" => [
-                        (object)["name" => "id", "title" => "Identifier", "type" => "magical_unicorn"],
-                        (object)["name" => "title", "title" => "Title", "type" => "string"]
+                'descriptor' => (object) [
+                    'fields' => [
+                        (object) ['name' => 'id', 'title' => 'Identifier', 'type' => 'magical_unicorn'],
+                        (object) ['name' => 'title', 'title' => 'Title', 'type' => 'string'],
                     ],
-                    "primaryKey" => "identifier",
-                    "foreignKeys" => "foobar"
+                    'primaryKey' => 'identifier',
+                    'foreignKeys' => 'foobar',
                 ],
-                "expected_errors" => implode(", ", [
-                    "[fields[0].type] Does not have a value in the enumeration [\"string\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"number\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"integer\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"date\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"time\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"datetime\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"year\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"yearmonth\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"boolean\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"object\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"geopoint\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"geojson\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"array\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"duration\"]",
-                    "[fields[0].type] Does not have a value in the enumeration [\"any\"]",
-                    "[fields[0]] Failed to match at least one schema",
-                    "[primaryKey] String value found, but an array is required",
-                    "[foreignKeys] String value found, but an array is required"
-                ])
+                'expected_errors' => implode(', ', [
+                    '[fields[0].type] Does not have a value in the enumeration ["string"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["number"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["integer"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["date"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["time"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["datetime"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["year"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["yearmonth"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["boolean"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["object"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["geopoint"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["geojson"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["array"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["duration"]',
+                    '[fields[0].type] Does not have a value in the enumeration ["any"]',
+                    '[fields[0]] Failed to match at least one schema',
+                    '[foreignKeys] String value found, but an array is required',
+                ]),
             ],
             [
-                "descriptor" => (object)[
-                    "fields" => [1, 2, 3],
-                    "primaryKey" => ["foobar", "bazbax"],
+                'descriptor' => (object) [
+                    'fields' => [1, 2, 3],
+                    'primaryKey' => ['foobar', 'bazbax'],
                 ],
-                "expected_errors" => implode(", ", [
-                    "[fields[0]] Integer value found, but an object is required",
-                    "[fields[0]] Failed to match at least one schema",
-                    "[fields[1]] Integer value found, but an object is required",
-                    "[fields[1]] Failed to match at least one schema",
-                    "[fields[2]] Integer value found, but an object is required",
-                    "[fields[2]] Failed to match at least one schema"
-                ])
-            ]
+                'expected_errors' => implode(', ', [
+                    '[fields[0]] Integer value found, but an object is required',
+                    '[fields[0]] Failed to match at least one schema',
+                    '[fields[1]] Integer value found, but an object is required',
+                    '[fields[1]] Failed to match at least one schema',
+                    '[fields[2]] Integer value found, but an object is required',
+                    '[fields[2]] Failed to match at least one schema',
+                ]),
+            ],
         ];
         foreach ($descriptors as $data) {
-            $this->assertValidationErrors($data["expected_errors"], $data["descriptor"]);
+            $this->assertValidationErrors($data['expected_errors'], $data['descriptor']);
         }
-
     }
 
     public function testValidateRow()
     {
-        $schema = new Schema((object)[
-            "fields" => [
-                (object)["name" => "id", "type" => "integer"],
-                (object)["name" => "email", "type" => "string", "format" => "email"]
-            ]
+        $schema = new Schema((object) [
+            'fields' => [
+                (object) ['name' => 'id', 'type' => 'integer'],
+                (object) ['name' => 'email', 'type' => 'string', 'format' => 'email'],
+            ],
         ]);
         $this->assertEquals(
-            "id: value must be numeric (foobar), email: value is not a valid email (bad.email)",
+            'id: value must be numeric (foobar), email: value is not a valid email (bad.email)',
             SchemaValidationError::getErrorMessages(
-                $schema->validateRow(["id" => "foobar", "email" => "bad.email"])
+                $schema->validateRow(['id' => 'foobar', 'email' => 'bad.email'])
             )
         );
     }
@@ -265,7 +263,6 @@ class SchemaTest extends TestCase
                     .'[fields[0].type] Does not have a value in the enumeration ["duration"], '
                     .'[fields[0].type] Does not have a value in the enumeration ["any"], '
                     .'[fields[0]] Failed to match at least one schema, '
-                    .'[primaryKey] String value found, but an array is required, '
                     .'[foreignKeys[0].reference.resource] The property resource is required, '
                     .'[foreignKeys[0].reference.fields] String value found, but an array is required',
                 $e->getMessage()
@@ -281,57 +278,56 @@ class SchemaTest extends TestCase
 
     public function testDescriptorDefaults()
     {
-        $schema = new Schema((object)[
-            "fields" => [
-                (object)["name" => "id"],
-                (object)["name" => "height", "type" => "integer"]
-            ]
-        ]);
-        $this->assertEquals((object)[
-            "fields" => [
-                (object)["name" => "id", "type" => "string", "format" => "default"],
-                (object)["name" => "height", "type" => "integer", "format" => "default"]
+        $schema = new Schema((object) [
+            'fields' => [
+                (object) ['name' => 'id'],
+                (object) ['name' => 'height', 'type' => 'integer'],
             ],
-            "missingValues" => [""]
+        ]);
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'id', 'type' => 'string', 'format' => 'default'],
+                (object) ['name' => 'height', 'type' => 'integer', 'format' => 'default'],
+            ],
+            'missingValues' => [''],
         ], $schema->fullDescriptor());
     }
 
     public function testCastRow()
     {
         $this->assertCastRow(
-            ["id" => 1, "email" => "test@example.com"],
-            (object)[
-                "fields" => [
-                    (object)["name" => "id", "type" => "integer"],
-                    (object)["name" => "email", "type" => "string", "format" => "email"]
-                ]
+            ['id' => 1, 'email' => 'test@example.com'],
+            (object) [
+                'fields' => [
+                    (object) ['name' => 'id', 'type' => 'integer'],
+                    (object) ['name' => 'email', 'type' => 'string', 'format' => 'email'],
+                ],
             ],
-            ["id" => "1", "email" => "test@example.com"]
+            ['id' => '1', 'email' => 'test@example.com']
         );
         $this->assertCastRow(
-            ["id" => "string", "height" => 10.0, "age" => 1, "name" => "string", "occupation" => "string"],
+            ['id' => 'string', 'height' => 10.0, 'age' => 1, 'name' => 'string', 'occupation' => 'string'],
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "10.0", "age" => "1", "name" => "string", "occupation" => "string"]
+            ['id' => 'string', 'height' => '10.0', 'age' => '1', 'name' => 'string', 'occupation' => 'string']
         );
     }
 
     public function testCastRowNullValues()
     {
         $this->assertCastRow(
-            ["id" => "string", "height" => null, "age" => null, "name" => "string", "occupation" => null],
+            ['id' => 'string', 'height' => null, 'age' => null, 'name' => 'string', 'occupation' => null],
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "", "age" => "", "name" => "string", "occupation" => "null"]
+            ['id' => 'string', 'height' => '', 'age' => '', 'name' => 'string', 'occupation' => 'null']
         );
     }
-
 
     public function testCastRowTooShort()
     {
         // missing values in row are completed with null value from schema (if not required)
         $this->assertCastRow(
-            ["id" => "string", "height" => 10.0, "age" => 1, "name" => "string", "occupation" => null],
+            ['id' => 'string', 'height' => 10.0, 'age' => 1, 'name' => 'string', 'occupation' => null],
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "10.0", "age" => "1", "name" => "string"]
+            ['id' => 'string', 'height' => '10.0', 'age' => '1', 'name' => 'string']
         );
     }
 
@@ -339,46 +335,46 @@ class SchemaTest extends TestCase
     {
         // additiona values in row are ignored
         $this->assertCastRow(
-            ["id" => "string", "height" => 10.0, "age" => 1, "name" => "string", "occupation" => null],
+            ['id' => 'string', 'height' => 10.0, 'age' => 1, 'name' => 'string', 'occupation' => null],
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "10.0", "age" => "1", "name" => "string", "additional" => "string"]
+            ['id' => 'string', 'height' => '10.0', 'age' => '1', 'name' => 'string', 'additional' => 'string']
         );
     }
 
     public function testCastRowWrongType()
     {
         $this->assertCastRowException(
-            "height: value must be numeric (notdecimal)",
+            'height: value must be numeric (notdecimal)',
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "notdecimal", "age" => "1", "name" => "string", "additional" => "string"]
+            ['id' => 'string', 'height' => 'notdecimal', 'age' => '1', 'name' => 'string', 'additional' => 'string']
         );
     }
 
     public function testCastRowWrongTypeMultipleErrors()
     {
         $this->assertCastRowException(
-            "height: value must be numeric (notdecimal), age: value must be an integer (10.6)",
+            'height: value must be numeric (notdecimal), age: value must be an integer (10.6)',
             $this->maxDescriptorJson,
-            ["id" => "string", "height" => "notdecimal", "age" => "10.6", "name" => "string", "additional" => "string"]
+            ['id' => 'string', 'height' => 'notdecimal', 'age' => '10.6', 'name' => 'string', 'additional' => 'string']
         );
     }
 
     public function testFields()
     {
         $schema = new Schema($this->minDescriptorJson);
-        $this->assertEquals(["id", "height"], array_keys($schema->fields()));
+        $this->assertEquals(['id', 'height'], array_keys($schema->fields()));
     }
 
     public function testGetField()
     {
         $schema = new Schema($this->minDescriptorJson);
-        $this->assertEquals("id", $schema->field("id")->name());
-        $this->assertEquals("height", $schema->field("height")->name());
+        $this->assertEquals('id', $schema->field('id')->name());
+        $this->assertEquals('height', $schema->field('height')->name());
         try {
-            $schema->field("undefined")->name();
+            $schema->field('undefined')->name();
             $this->fail();
         } catch (\Exception $e) {
-            $this->assertEquals("unknown field name: undefined", $e->getMessage());
+            $this->assertEquals('unknown field name: undefined', $e->getMessage());
         }
     }
 
@@ -386,29 +382,51 @@ class SchemaTest extends TestCase
     {
         $schema = new Schema($this->minDescriptorJson);
         $fields = $schema->fields();
-        $this->assertArrayHasKey("id", $fields);
-        $this->assertArrayHasKey("height", $fields);
-        $this->assertArrayNotHasKey("undefined", $fields);
+        $this->assertArrayHasKey('id', $fields);
+        $this->assertArrayHasKey('height', $fields);
+        $this->assertArrayNotHasKey('undefined', $fields);
     }
 
     public function testPrimaryKey()
     {
         $this->assertEquals([], (new Schema($this->minDescriptorJson))->primaryKey());
-        $this->assertEquals(["id"], (new Schema($this->maxDescriptorJson))->primaryKey());
+        $this->assertEquals(['id'], (new Schema($this->maxDescriptorJson))->primaryKey());
+    }
+
+    public function testPrimaryKeyAsString()
+    {
+        $descriptor = json_decode($this->maxDescriptorJson);
+        $descriptor->primaryKey = 'id';
+        $this->assertEquals(['id'], (new Schema($descriptor))->primaryKey());
     }
 
     public function testForeignKeys()
     {
         $this->assertEquals([], (new Schema($this->minDescriptorJson))->foreignKeys());
         $this->assertEquals([
-            (object)[
-                "fields" => ["name"],
-                "reference" => (object)[
-                    "resource" => "",
-                    "fields" => ["id"]
-                ]
-            ]
+            (object) [
+                'fields' => ['name'],
+                'reference' => (object) [
+                    'resource' => 'data.csv',
+                    'fields' => ['id'],
+                ],
+            ],
         ], (new Schema($this->maxDescriptorJson))->foreignKeys());
+    }
+
+    public function testForeignKeyFieldsAsString()
+    {
+        $descriptor = json_decode($this->maxDescriptorJson);
+        $descriptor->foreignKeys[0]->fields = 'name';
+        // not sure why the reference fields don't support string
+        $descriptor->foreignKeys[0]->reference->fields = ['id'];
+        $this->assertEquals([(object) [
+            'fields' => ['name'],
+            'reference' => (object) [
+                'resource' => 'data.csv',
+                'fields' => ['id'],
+            ],
+        ]], (new Schema($descriptor))->foreignKeys());
     }
 
     public function testEditable()
@@ -416,79 +434,81 @@ class SchemaTest extends TestCase
         $schema = new EditableSchema();
         // set fields
         $schema->fields([
-            "id" => FieldsFactory::field((object)["name" => "id", "type" => "integer"])
+            'id' => FieldsFactory::field((object) ['name' => 'id', 'type' => 'integer']),
         ]);
         // add field
-        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "integer"]));
+        $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'integer']));
         // edit field
-        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "number"]));
+        $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'number']));
         // remove field
-        $schema->removeField("age");
+        $schema->removeField('age');
         // after every change - schema is validated and will raise Exception in case of validation errors
         try {
-            $schema->field("age", FieldsFactory::field((object)[])); $this->fail();
+            $schema->field('age', FieldsFactory::field((object) []));
+            $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals('Could not find a valid field for descriptor: {}', $e->getMessage());
         }
         // additional fields available for editing
         try {
-            $schema->primaryKey(["aardvark"]); $this->fail();
+            $schema->primaryKey(['aardvark']);
+            $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals('Schema failed validation: primary key must refer to a field name (aardvark)', $e->getMessage());
         }
-        $schema->primaryKey(["id"]);
+        $schema->primaryKey(['id']);
+        $this->assertEquals((object) [
+            'fields' => [(object) ['name' => 'id', 'type' => 'integer']],
+            'primaryKey' => ['id'],
+        ], $schema->descriptor());
         $foreignKeys = [
-            (object)[
-                "fields"=> ["nonexistantfield"],
-                "reference"=> (object)[
-                    "resource"=> "non-existant-external-resource.csv",
-                    "fields"=> ["doesnt_matter"]
-                ]
-            ]
+            (object) [
+                'fields' => ['nonexistantfield'],
+                'reference' => (object) [
+                    'resource' => 'non-existant-external-resource.csv',
+                    'fields' => ['doesnt_matter'],
+                ],
+            ],
         ];
         try {
-            $schema->foreignKeys($foreignKeys); $this->fail();
+            $schema->foreignKeys($foreignKeys);
+            $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals(
                 'Schema failed validation: foreign key fields must refer to a field name (nonexistantfield)',
                 $e->getMessage()
             );
         }
-        $foreignKeys[0]->fields = "invalidstringvalue";
-        try {
-            $schema->foreignKeys($foreignKeys); $this->fail();
-        } catch (\Exception $e) {
-            $this->assertEquals(
-                'Schema failed validation: [foreignKeys[0].fields] String value found, but an array is required',
-                $e->getMessage()
-            );
-        }
-        $foreignKeys[0]->fields = ["id"];
+        // fields supports a string value, in that case it's considered an array of 1 field
+        $foreignKeys[0]->fields = 'id';
+        // this is equivalent to:
+        // $foreignKeys[0]->fields = ['id'];
         $schema->foreignKeys($foreignKeys);
-        $schema->field("age", FieldsFactory::field((object)["name" => "age", "type" => "integer"]));
-        $foreignKeys[0]->fields = ["age"];
+        $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'integer']));
+        $foreignKeys[0]->fields = ['age'];
         try {
-            $schema->missingValues("invalid value"); $this->fail();
+            $schema->missingValues('invalid value');
+            $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals('Schema failed validation: [missingValues] String value found, but an array is required', $e->getMessage());
         }
-        $schema->missingValues(["", "null"]);
-        $this->assertEquals((object)[
-            "fields" => [
-                (object)["name" => "id", "type" => "integer", "format" => "default"],
-                (object)["name" => "age", "type" => "integer", "format" => "default"]
+        $schema->missingValues(['', 'null']);
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'id', 'type' => 'integer', 'format' => 'default'],
+                (object) ['name' => 'age', 'type' => 'integer', 'format' => 'default'],
             ],
-            "primaryKey" => ["id"],
-            "foreignKeys" => [
-                (object)[
-                    "fields" => ["age"],
-                    "reference" => (object)[
-                        "resource" => "non-existant-external-resource.csv",
-                        "fields" => ["doesnt_matter"]
-                    ]
-                ]
+            'primaryKey' => ['id'],
+            'foreignKeys' => [
+                (object) [
+                    'fields' => ['age'],
+                    'reference' => (object) [
+                        'resource' => 'non-existant-external-resource.csv',
+                        'fields' => ['doesnt_matter'],
+                    ],
+                ],
             ],
-            "missingValues" => ["", "null"]
+            'missingValues' => ['', 'null'],
         ], $schema->fullDescriptor());
     }
 
@@ -498,6 +518,29 @@ class SchemaTest extends TestCase
         $filename = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
         $schema->save($filename);
         $this->assertEquals($schema->fullDescriptor(), json_decode(file_get_contents($filename)));
+    }
+
+    public function testSpecsUriFormat()
+    {
+        $validator = new \JsonSchema\Validator();
+        // we will validate this against a simple schema of an array of uri strings
+        $descriptor = ['data/data.csv'];
+        $validator->validate(
+            $descriptor,
+            // this is a simple schema with only an array of uri strings
+            (object) ['$ref' => 'file://'.realpath(dirname(__FILE__)).'/fixtures/uri-string-schema.json']
+        );
+        // validation fails
+        $this->assertFalse($validator->isValid());
+        $this->assertEquals([[
+            'property' => '[0]',
+            'pointer' => '/0',
+            // it considers file names to be invalid uris
+            'message' => 'Invalid URL format',
+            'constraint' => 'format',
+            'context' => 1,
+            'format' => 'uri',
+        ]], $validator->getErrors());
     }
 
     protected function assertValidationErrors($expectedValidationErrors, $descriptor)
@@ -524,6 +567,7 @@ class SchemaTest extends TestCase
     {
         $schema = new Schema($descriptor);
         $this->assertEquals($expectedRow, $schema->castRow($inputRow));
+
         return $schema;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
@@ -6,9 +7,9 @@ use frictionlessdata\tableschema\SchemaValidationError;
 
 abstract class BaseField
 {
-    public function __construct($descriptor=null)
+    public function __construct($descriptor = null)
     {
-        $this->descriptor = empty($descriptor) ? (object)[] : $descriptor;
+        $this->descriptor = empty($descriptor) ? (object) [] : $descriptor;
     }
 
     public function descriptor()
@@ -21,6 +22,7 @@ abstract class BaseField
         $fullDescriptor = $this->descriptor();
         $fullDescriptor->format = $this->format();
         $fullDescriptor->type = $this->type();
+
         return $fullDescriptor;
     }
 
@@ -31,7 +33,7 @@ abstract class BaseField
 
     public function format()
     {
-        return isset($this->descriptor()->format) ? $this->descriptor()->format : "default";
+        return isset($this->descriptor()->format) ? $this->descriptor()->format : 'default';
     }
 
     public function constraints()
@@ -39,23 +41,24 @@ abstract class BaseField
         if (!$this->constraintsDisabled && isset($this->descriptor()->constraints)) {
             return $this->descriptor()->constraints;
         } else {
-            return (object)[];
+            return (object) [];
         }
     }
 
     public function required()
     {
-        return (isset($this->constraints()->required) && $this->constraints()->required);
+        return isset($this->constraints()->required) && $this->constraints()->required;
     }
 
     public function unique()
     {
-        return (isset($this->constraints()->unique) && $this->constraints()->unique);
+        return isset($this->constraints()->unique) && $this->constraints()->unique;
     }
 
     public function disableConstraints()
     {
         $this->constraintsDisabled = true;
+
         return $this;
     }
 
@@ -71,8 +74,10 @@ abstract class BaseField
     /**
      * try to create a field object based on the descriptor
      * by default uses the type attribute
-     * return the created field object or false if the descriptor does not match this field
+     * return the created field object or false if the descriptor does not match this field.
+     *
      * @param object $descriptor
+     *
      * @return bool|BaseField
      */
     public static function inferDescriptor($descriptor)
@@ -85,13 +90,15 @@ abstract class BaseField
     }
 
     /**
-     * try to create a new field object based on the given value
-     * @param mixed $val
+     * try to create a new field object based on the given value.
+     *
+     * @param mixed       $val
      * @param null|object $descriptor
      * @param bool @lenient
+     *
      * @return bool|BaseField
      */
-    public static function infer($val, $descriptor=null, $lenient=false)
+    public static function infer($val, $descriptor = null, $lenient = false)
     {
         $field = new static($descriptor);
         try {
@@ -100,6 +107,7 @@ abstract class BaseField
             return false;
         }
         $field->inferProperties($val, $lenient);
+
         return $field;
     }
 
@@ -112,13 +120,18 @@ abstract class BaseField
 
     /**
      * @param mixed $val
+     *
      * @return mixed
+     *
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
     final public function castValue($val)
     {
         if ($this->isEmptyValue($val)) {
-            if ($this->required()) throw $this->getValidationException("field is required", $val);
+            if ($this->required()) {
+                throw $this->getValidationException('field is required', $val);
+            }
+
             return null;
         } else {
             return $this->validateCastValue($val);
@@ -129,6 +142,7 @@ abstract class BaseField
     {
         try {
             $this->castValue($val);
+
             return [];
         } catch (FieldValidationException $e) {
             return $e->validationErrors;
@@ -138,35 +152,38 @@ abstract class BaseField
     /**
      * get a unique identifier for this field
      * used in the inferring process
-     * this is usually the type, but can be modified to support more advanced inferring process
+     * this is usually the type, but can be modified to support more advanced inferring process.
+     *
      * @param bool @lenient
+     *
      * @return string
      */
-    public function getInferIdentifier($lenient=false)
+    public function getInferIdentifier($lenient = false)
     {
         return $this->type();
     }
 
     /**
-     * should be implemented by extending classes to return the table schema type of this field
+     * should be implemented by extending classes to return the table schema type of this field.
+     *
      * @return string
      */
-    static public function type()
+    public static function type()
     {
-        throw new \Exception("must be implemented by extending classes");
+        throw new \Exception('must be implemented by extending classes');
     }
 
     protected $descriptor;
     protected $constraintsDisabled = false;
 
-    protected function getValidationException($errorMsg, $val=null)
+    protected function getValidationException($errorMsg, $val = null)
     {
         return new FieldValidationException([
             new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => $errorMsg
-            ])
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => $errorMsg,
+            ]),
         ]);
     }
 
@@ -177,7 +194,9 @@ abstract class BaseField
 
     /**
      * @param mixed $val
+     *
      * @return mixed
+     *
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
     protected function validateCastValue($val)
@@ -193,6 +212,7 @@ abstract class BaseField
                 throw new FieldValidationException($validationErrors);
             }
         }
+
         return $val;
     }
 
@@ -202,18 +222,18 @@ abstract class BaseField
         $allowedValues = $this->getAllowedValues();
         if (!empty($allowedValues) && !in_array($val, $allowedValues)) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => "value not in enum"
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => 'value not in enum',
             ]);
         }
         $constraints = $this->constraints();
         if (isset($constraints->pattern)) {
             if (!$this->checkPatternConstraint($val, $constraints->pattern)) {
                 $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                    "field" => $this->name(),
-                    "value" => $val,
-                    "error" => "value does not match pattern"
+                    'field' => $this->name(),
+                    'value' => $val,
+                    'error' => 'value does not match pattern',
                 ]);
             }
         }
@@ -222,9 +242,9 @@ abstract class BaseField
             && !$this->checkMinimumConstraint($val, $this->castValueNoConstraints($constraints->minimum))
         ) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => "value is below minimum"
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => 'value is below minimum',
             ]);
         }
         if (
@@ -232,35 +252,36 @@ abstract class BaseField
             && !$this->checkMaximumConstraint($val, $this->castValueNoConstraints($constraints->maximum))
         ) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => "value is above maximum"
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => 'value is above maximum',
             ]);
         }
         if (
             isset($constraints->minLength) && !$this->checkMinLengthConstraint($val, $constraints->minLength)
         ) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => "value is below minimum length"
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => 'value is below minimum length',
             ]);
         }
         if (
             isset($constraints->maxLength) && !$this->checkMaxLengthConstraint($val, $constraints->maxLength)
         ) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
-                "field" => $this->name(),
-                "value" => $val,
-                "error" => "value is above maximum length"
+                'field' => $this->name(),
+                'value' => $val,
+                'error' => 'value is above maximum length',
             ]);
         }
+
         return $validationErrors;
     }
 
     protected function checkPatternConstraint($val, $pattern)
     {
-        return preg_match("/^".$pattern."\$/", $val) === 1;
+        return preg_match('/^'.$pattern.'$/', $val) === 1;
     }
 
     protected function checkMinimumConstraint($val, $minConstraint)
@@ -289,6 +310,7 @@ abstract class BaseField
         foreach ($this->enum() as $val) {
             $allowedValues[] = $this->castValueNoConstraints($val);
         }
+
         return $allowedValues;
     }
 
@@ -297,6 +319,7 @@ abstract class BaseField
         $this->disableConstraints();
         $val = $this->castValue($val);
         $this->constraintsDisabled = false;
+
         return $val;
     }
 }
