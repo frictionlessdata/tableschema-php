@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\Exceptions;
 
 use frictionlessdata\tableschema\SchemaValidationError;

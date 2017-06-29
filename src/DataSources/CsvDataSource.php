@@ -1,4 +1,5 @@
 <?php
+
 namespace frictionlessdata\tableschema\DataSources;
 
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
@@ -6,7 +7,7 @@ use frictionlessdata\tableschema\Exceptions\DataSourceException;
 /**
  * handles reading data from a csv source
  * responsible for finding the header row based on options
- * support skipping rows from the csv
+ * support skipping rows from the csv.
  */
 class CsvDataSource extends BaseDataSource
 {
@@ -17,18 +18,18 @@ class CsvDataSource extends BaseDataSource
     {
         $this->curRowNum = 0;
         try {
-            $this->resource = fopen($this->dataSource, "r");
+            $this->resource = fopen($this->dataSource, 'r');
         } catch (\Exception $e) {
             throw new DataSourceException($e->getMessage());
         }
-        $this->headerRow = $this->getOption("headerRow");
+        $this->headerRow = $this->getOption('headerRow');
         if ($this->headerRow) {
             $headerRowNum = 0;
             $defaultSkipRows = 0;
         } else {
-            $defaultSkipRows = $headerRowNum = $this->getOption("headerRowNum", 1);
+            $defaultSkipRows = $headerRowNum = $this->getOption('headerRowNum', 1);
         }
-        $skipRows = $this->getOption("skipRows", $defaultSkipRows);
+        $skipRows = $this->getOption('skipRows', $defaultSkipRows);
         if ($skipRows > 0) {
             foreach (range(1, $skipRows) as $i) {
                 $row = $this->getRow();
@@ -39,7 +40,7 @@ class CsvDataSource extends BaseDataSource
             }
         }
         if (!$this->headerRow) {
-            throw new DataSourceException("Failed to get header row");
+            throw new DataSourceException('Failed to get header row');
         }
     }
 
@@ -53,6 +54,7 @@ class CsvDataSource extends BaseDataSource
 
     /**
      * @return array
+     *
      * @throws DataSourceException
      */
     public function getNextLine()
@@ -63,11 +65,13 @@ class CsvDataSource extends BaseDataSource
         foreach ($this->headerRow as $fieldName) {
             $obj[$fieldName] = $row[$colNum++];
         }
+
         return $obj;
     }
 
     /**
      * @return bool
+     *
      * @throws DataSourceException
      */
     public function isEof()
@@ -77,7 +81,6 @@ class CsvDataSource extends BaseDataSource
         } catch (\Exception $e) {
             throw new DataSourceException($e->getMessage(), $this->curRowNum);
         }
-
     }
 
     /**
@@ -90,7 +93,6 @@ class CsvDataSource extends BaseDataSource
         } catch (\Exception $e) {
             throw new DataSourceException($e->getMessage(), $this->curRowNum);
         }
-
     }
 
     protected $resource;
@@ -100,11 +102,12 @@ class CsvDataSource extends BaseDataSource
 
     /**
      * @return array
+     *
      * @throws DataSourceException
      */
     protected function getRow()
     {
-        $this->curRowNum++;
+        ++$this->curRowNum;
         try {
             return fgetcsv($this->resource);
         } catch (\Exception $e) {

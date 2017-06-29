@@ -1,17 +1,20 @@
 <?php
+
 namespace frictionlessdata\tableschema;
 
 /**
  *  Table Schema representation.
- *  Loads and validates a Table Schema descriptor from a descriptor / path to file / url containing the descriptor
+ *  Loads and validates a Table Schema descriptor from a descriptor / path to file / url containing the descriptor.
  */
 class Schema
 {
-    protected $DEFAULT_FIELD_CLASS = "\\frictionlessdata\\tableschema\\Fields\\StringField";
+    protected $DEFAULT_FIELD_CLASS = '\\frictionlessdata\\tableschema\\Fields\\StringField';
 
     /**
      * Schema constructor.
+     *
      * @param mixed $descriptor
+     *
      * @throws Exceptions\SchemaLoadException
      * @throws Exceptions\SchemaValidationFailedException
      */
@@ -41,28 +44,31 @@ class Schema
             $this->descriptor = $descriptor;
         }
         if (!is_object($this->descriptor())) {
-            throw new Exceptions\SchemaLoadException($descriptor, null, "descriptor must be an object");
+            throw new Exceptions\SchemaLoadException($descriptor, null, 'descriptor must be an object');
         }
         $validationErrors = SchemaValidator::validate($this->descriptor());
         if (count($validationErrors) > 0) {
             throw new Exceptions\SchemaValidationFailedException($validationErrors);
-        };
+        }
     }
 
     /**
      * loads and validates the given descriptor source (php object / string / path to file / url)
-     * returns an array of validation error objects
+     * returns an array of validation error objects.
+     *
      * @param mixed $descriptor
+     *
      * @return array
      */
     public static function validate($descriptor)
     {
         try {
             new static($descriptor);
+
             return [];
         } catch (Exceptions\SchemaLoadException $e) {
             return [
-                new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage())
+                new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage()),
             ];
         } catch (Exceptions\SchemaValidationFailedException $e) {
             return $e->validationErrors;
@@ -86,6 +92,7 @@ class Schema
         }
         $fullDescriptor->fields = $fullFieldDescriptors;
         $fullDescriptor->missingValues = $this->missingValues();
+
         return $fullDescriptor;
     }
 
@@ -106,7 +113,7 @@ class Schema
     {
         if (empty($this->fieldsCache)) {
             foreach ($this->descriptor()->fields as $fieldDescriptor) {
-                if (!array_key_exists("type", $fieldDescriptor)) {
+                if (!array_key_exists('type', $fieldDescriptor)) {
                     $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
                 } else {
                     $field = Fields\FieldsFactory::field($fieldDescriptor);
@@ -114,12 +121,13 @@ class Schema
                 $this->fieldsCache[$field->name()] = $field;
             }
         }
+
         return $this->fieldsCache;
     }
 
     public function missingValues()
     {
-        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [""];
+        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [''];
     }
 
     public function primaryKey()
@@ -134,7 +142,9 @@ class Schema
 
     /**
      * @param mixed[] $row
+     *
      * @return mixed[]
+     *
      * @throws Exceptions\FieldValidationException
      */
     public function castRow($row)
@@ -143,7 +153,9 @@ class Schema
         $validationErrors = [];
         foreach ($this->fields() as $fieldName => $field) {
             $value = array_key_exists($fieldName, $row) ? $row[$fieldName] : null;
-            if (in_array($value, $this->missingValues())) $value = null;
+            if (in_array($value, $this->missingValues())) {
+                $value = null;
+            }
             try {
                 $outRow[$fieldName] = $field->castValue($value);
             } catch (Exceptions\FieldValidationException $e) {
@@ -153,17 +165,20 @@ class Schema
         if (count($validationErrors) > 0) {
             throw new Exceptions\FieldValidationException($validationErrors);
         }
+
         return $outRow;
     }
 
     /**
      * @param array $row
+     *
      * @return SchemaValidationError[]
      */
     public function validateRow($row)
     {
         try {
             $this->castRow($row);
+
             return [];
         } catch (Exceptions\FieldValidationException $e) {
             return $e->validationErrors;

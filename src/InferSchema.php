@@ -1,19 +1,21 @@
 <?php
+
 namespace frictionlessdata\tableschema;
 
 /**
- *  Table Schema which updates the descriptor based on input data
+ *  Table Schema which updates the descriptor based on input data.
  */
 class InferSchema extends Schema
 {
     /**
      * InferSchema constructor.
+     *
      * @param null $descriptor optional descriptor object - will be used as an initial descriptor
-     * @param bool $lenient if true - infer just basic types, without strict format requirements
+     * @param bool $lenient    if true - infer just basic types, without strict format requirements
      */
-    public function __construct($descriptor=null, $lenient=false)
+    public function __construct($descriptor = null, $lenient = false)
     {
-        $this->descriptor = empty($descriptor) ? (object)["fields" => []] : $descriptor;
+        $this->descriptor = empty($descriptor) ? (object) ['fields' => []] : $descriptor;
         $this->fieldsInferer = new Fields\FieldsInferrer(null, $lenient);
     }
 
@@ -27,7 +29,9 @@ class InferSchema extends Schema
 
     /**
      * @param mixed[] $row
+     *
      * @return mixed[]
+     *
      * @throws Exceptions\FieldValidationException
      */
     public function castRow($row)
@@ -40,17 +44,19 @@ class InferSchema extends Schema
             $this->fieldsInferer->addRows([$row]);
             $this->descriptor->fields = [];
             foreach ($this->fieldsInferer->infer() as $fieldName => $inferredField) {
-                /** @var Fields\BaseField $inferredField */
+                /* @var Fields\BaseField $inferredField */
                 $this->descriptor->fields[] = $inferredField->descriptor();
             }
             $this->castRows = $this->fieldsInferer->castRows();
-            return $this->castRows[count($this->castRows)-1];
+
+            return $this->castRows[count($this->castRows) - 1];
         }
     }
 
     public function lock()
     {
         $this->isLocked = true;
+
         return $this->castRows;
     }
 

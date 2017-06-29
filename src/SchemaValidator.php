@@ -1,19 +1,22 @@
 <?php
+
 namespace frictionlessdata\tableschema;
 
 /**
  * validates a table schema descriptor object
- * returns a list of validation errors
+ * returns a list of validation errors.
  */
 class SchemaValidator
 {
     /**
      * @param object $descriptor
+     *
      * @return SchemaValidationError[]
      */
     public static function validate($descriptor)
     {
         $validator = new self($descriptor);
+
         return $validator->getValidationErrors();
     }
 
@@ -36,14 +39,15 @@ class SchemaValidator
         if (count($this->errors) == 0) {
             $this->validateKeys();
         }
+
         return $this->errors;
     }
 
     /**
-     * @param integer $code
+     * @param int   $code
      * @param mixed $extraDetails
      */
-    protected function addError($code, $extraDetails=null)
+    protected function addError($code, $extraDetails = null)
     {
         $this->errors[] = new SchemaValidationError($code, $extraDetails);
     }
@@ -56,13 +60,13 @@ class SchemaValidator
         $this->applyForeignKeysResourceHack($descriptor);
         $validator->validate(
             $descriptor,
-            (object)['$ref' => 'file://' . realpath(dirname(__FILE__)).'/schemas/table-schema.json']
+            (object) ['$ref' => 'file://'.realpath(dirname(__FILE__)).'/schemas/table-schema.json']
         );
         if (!$validator->isValid()) {
             foreach ($validator->getErrors() as $error) {
                 $this->addError(
                     SchemaValidationError::SCHEMA_VIOLATION,
-                    sprintf("[%s] %s", $error['property'], $error['message'])
+                    sprintf('[%s] %s', $error['property'], $error['message'])
                 );
             }
         }
@@ -70,7 +74,7 @@ class SchemaValidator
 
     protected function validateKeys()
     {
-        $fieldNames = array_map(function($field) {
+        $fieldNames = array_map(function ($field) {
             return $field->name;
         }, $this->descriptor->fields);
         if (isset($this->descriptor->primaryKey)) {
@@ -93,7 +97,7 @@ class SchemaValidator
                         );
                     }
                 }
-                if ($foreignKey->reference->resource == "") {
+                if ($foreignKey->reference->resource == '') {
                     // empty resource = reference to self
                     foreach ($foreignKey->reference->fields as $field) {
                         if (!in_array($field, $fieldNames)) {
@@ -117,7 +121,7 @@ class SchemaValidator
                     && isset($foreignKey->reference) && is_object($foreignKey->reference)
                     && isset($foreignKey->reference->resource) && empty($foreignKey->reference->resource)
                 ) {
-                    $foreignKey->reference->resource = "self";
+                    $foreignKey->reference->resource = 'self';
                 }
             }
         }
