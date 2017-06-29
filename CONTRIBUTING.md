@@ -47,9 +47,9 @@ At the moment, the integration with frictionlessdata repo is not working, you ca
 
 ## php-cs-fixer - code style check & autofix
 
-[php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) is run on every build and fails the build in case of style problems
+[php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) can be used to check and fix code style
 
-you can automatically fix by running: `composer style-fix`
+you need to manually install it, then you can run : `composer style-check` or `composer style-fix`
  
 
 ## Publishing to Packagist
