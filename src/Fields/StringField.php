@@ -21,9 +21,8 @@ class StringField extends BaseField
      *
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
-    public function validateCastValue($val)
+    protected function validateCastValue($val)
     {
-        $val = parent::validateCastValue($val);
         try {
             $val = (string)$val;
         } catch (\Exception $e) {

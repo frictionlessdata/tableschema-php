@@ -10,9 +10,8 @@ use Carbon\Carbon;
  */
 class TimeField extends BaseField
 {
-    public function validateCastValue($val)
+    protected function validateCastValue($val)
     {
-        $val = trim(parent::validateCastValue($val));
         switch ($this->format()) {
             case 'default':
                 $time = explode(':', $val);
@@ -43,11 +42,6 @@ class TimeField extends BaseField
     public static function type()
     {
         return 'time';
-    }
-
-    protected function isEmptyValue($val)
-    {
-        return (parent::isEmptyValue($val) || trim($val) == "");
     }
 
     protected function getNativeTime($hour, $minute, $second)

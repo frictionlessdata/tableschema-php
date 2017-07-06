@@ -8,9 +8,8 @@ namespace frictionlessdata\tableschema\Fields;
  */
 class YearMonthField extends BaseField
 {
-    public function validateCastValue($val)
+    protected function validateCastValue($val)
     {
-        $val = parent::validateCastValue($val);
         if (!is_array($val)) {
             $val = explode('-', $val);
         }
@@ -40,10 +39,5 @@ class YearMonthField extends BaseField
     protected function getNativeYearMonth($year, $month)
     {
         return [$year, $month];
-    }
-
-    protected function isEmptyValue($val)
-    {
-        return (parent::isEmptyValue($val) || (!is_array($val) && trim($val) == "") || (is_array($val) && empty($val)));
     }
 }

@@ -23,6 +23,15 @@ class FieldsFactory
         '\\frictionlessdata\\tableschema\\Fields\\YearMonthField',
         '\\frictionlessdata\\tableschema\\Fields\\YearField',
         '\\frictionlessdata\\tableschema\\Fields\\TimeField',
+        '\\frictionlessdata\\tableschema\\Fields\\ObjectField',
+        '\\frictionlessdata\\tableschema\\Fields\\GeopointField',
+        '\\frictionlessdata\\tableschema\\Fields\\GeojsonField',
+        '\\frictionlessdata\\tableschema\\Fields\\DurationField',
+        '\\frictionlessdata\\tableschema\\Fields\\DatetimeField',
+        '\\frictionlessdata\\tableschema\\Fields\\DateField',
+        '\\frictionlessdata\\tableschema\\Fields\\BooleanField',
+        '\\frictionlessdata\\tableschema\\Fields\\ArrayField',
+        '\\frictionlessdata\\tableschema\\Fields\\AnyField',
     ];
 
     /**

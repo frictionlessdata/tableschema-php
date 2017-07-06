@@ -134,7 +134,14 @@ abstract class BaseField
 
             return null;
         } else {
-            return $this->validateCastValue($val);
+            $val = $this->validateCastValue($val);
+            if (!$this->constraintsDisabled) {
+                $validationErrors = $this->checkConstraints($val);
+                if (count($validationErrors) > 0) {
+                    throw new FieldValidationException($validationErrors);
+                }
+            }
+            return $val;
         }
     }
 
@@ -199,28 +206,18 @@ abstract class BaseField
      *
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
-    protected function validateCastValue($val)
-    {
-        // extending classes should extend this method
-        // value is guaranteed not to be an empty value, that is handled elsewhere
-        // should raise FieldValidationException on any validation errors
-        // can use getValidationException function to get a simple exception with single validation error message
-        // you can also throw an exception with multiple validation errors manually
-        if (!$this->constraintsDisabled) {
-            $validationErrors = $this->checkConstraints($val);
-            if (count($validationErrors) > 0) {
-                throw new FieldValidationException($validationErrors);
-            }
-        }
-
-        return $val;
-    }
+    // extending classes should extend this method
+    // value is guaranteed not to be an empty value, that is handled elsewhere
+    // should raise FieldValidationException on any validation errors
+    // can use getValidationException function to get a simple exception with single validation error message
+    // you can also throw an exception with multiple validation errors manually
+    abstract protected function validateCastValue($val);
 
     protected function checkConstraints($val)
     {
         $validationErrors = [];
         $allowedValues = $this->getAllowedValues();
-        if (!empty($allowedValues) && !in_array($val, $allowedValues)) {
+        if (!empty($allowedValues) && !$this->checkAllowedValues($allowedValues, $val)) {
             $validationErrors[] = new SchemaValidationError(SchemaValidationError::FIELD_VALIDATION, [
                 'field' => $this->name(),
                 'value' => $val,
@@ -296,12 +293,28 @@ abstract class BaseField
 
     protected function checkMinLengthConstraint($val, $minLength)
     {
-        return strlen($val) >= $minLength;
+        if (is_string($val)) {
+            return strlen($val) >= $minLength;
+        } elseif (is_array($val)) {
+            return count($val) >= $minLength;
+        } elseif (is_object($val)) {
+            return count($val) >= $minLength;
+        } else {
+            throw $this->getValidationException("invalid value for minLength constraint", $val);
+        }
     }
 
     protected function checkMaxLengthConstraint($val, $maxLength)
     {
-        return strlen($val) <= $maxLength;
+        if (is_string($val)) {
+            return strlen($val) <= $maxLength;
+        } elseif (is_array($val)) {
+            return count($val) <= $maxLength;
+        } elseif (is_object($val)) {
+            return count($val) <= $maxLength;
+        } else {
+            throw $this->getValidationException("invalid value for maxLength constraint", $val);
+        }
     }
 
     protected function getAllowedValues()
@@ -312,6 +325,11 @@ abstract class BaseField
         }
 
         return $allowedValues;
+    }
+
+    protected function checkAllowedValues($allowedValues, $val)
+    {
+        return in_array($val, $allowedValues, !is_object($val));
     }
 
     protected function castValueNoConstraints($val)

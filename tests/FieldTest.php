@@ -89,10 +89,10 @@ class FieldTest extends TestCase
     public function testCastValueConstraintError()
     {
         try {
-            FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue('');
+            FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue(null);
             $this->fail();
         } catch (FieldValidationException $e) {
-            $this->assertEquals('id: field is required ("")', $e->getMessage());
+            $this->assertEquals('id: field is required (null)', $e->getMessage());
         }
     }
 
@@ -104,7 +104,7 @@ class FieldTest extends TestCase
         );
         $this->assertEquals(
             null,
-            FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->castValue('')
+            FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->castValue(null)
         );
     }
 
@@ -124,13 +124,13 @@ class FieldTest extends TestCase
     {
         $this->assertFieldValidateValue('', $this->DESCRIPTOR_MAX, '1');
         $this->assertFieldValidateValue('id: value must be numeric ("string")', $this->DESCRIPTOR_MAX, 'string');
-        $this->assertFieldValidateValue('id: field is required ("")', $this->DESCRIPTOR_MAX, '');
+        $this->assertFieldValidateValue('id: field is required (null)', $this->DESCRIPTOR_MAX, null);
     }
 
     public function testValidateValueDisableConstraints()
     {
         $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MIN)->disableConstraints()->validateValue(''));
-        $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->validateValue(''));
+        $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->validateValue(null));
     }
 
     public function testStringMissingValues()
@@ -223,7 +223,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 2);
         $this->assertFieldValidateValue('', $descriptor, '3');
-        $this->assertFieldValidateValue('name: value not in enum ("4")', $descriptor, '4');
+        $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, '4');
         $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, 4);
     }
 
@@ -238,7 +238,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 2);
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is below minimum ("0")', $descriptor, '0');
+        $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, '0');
         $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, 0);
     }
 
@@ -253,7 +253,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, 0);
         $this->assertFieldValidateValue('', $descriptor, '1');
         $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is above maximum ("2")', $descriptor, '2');
+        $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, '2');
         $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, 2);
     }
 

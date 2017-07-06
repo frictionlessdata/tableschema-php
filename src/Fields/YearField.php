@@ -8,9 +8,8 @@ namespace frictionlessdata\tableschema\Fields;
  */
 class YearField extends BaseField
 {
-    public function validateCastValue($val)
+    protected function validateCastValue($val)
     {
-        $val = parent::validateCastValue($val);
         $year = (int) $val;
         if ((float) $val != (float) $year) {
             throw $this->getValidationException(null, $val);
@@ -22,10 +21,5 @@ class YearField extends BaseField
     public static function type()
     {
         return 'year';
-    }
-
-    protected function isEmptyValue($val)
-    {
-        return (parent::isEmptyValue($val) || trim($val) == "");
     }
 }
