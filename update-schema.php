@@ -16,7 +16,7 @@ function update()
     } else {
         echo "schema changed - updating local file\n";
         file_put_contents($filename, $new_schema);
-        file_put_contents($base_filename.'LAST_UPDATE', date('c'));
+        file_put_contents($base_filename.'CHANGELOG', "\n\n".date('c')."\n* check the git diff and summarize the spec changes here\n* \n\n", FILE_APPEND);
     }
 
     return 0;

@@ -246,25 +246,7 @@ class SchemaTest extends TestCase
             $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals(
-                'Schema failed validation: '
-                    .'[fields[0].type] Does not have a value in the enumeration ["string"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["number"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["integer"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["date"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["time"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["datetime"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["year"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["yearmonth"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["boolean"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["object"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["geopoint"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["geojson"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["array"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["duration"], '
-                    .'[fields[0].type] Does not have a value in the enumeration ["any"], '
-                    .'[fields[0]] Failed to match at least one schema, '
-                    .'[foreignKeys[0].reference.resource] The property resource is required, '
-                    .'[foreignKeys[0].reference.fields] String value found, but an array is required',
+                'Schema failed validation: [fields[0].type] Does not have a value in the enumeration ["string"], [fields[0].type] Does not have a value in the enumeration ["number"], [fields[0].type] Does not have a value in the enumeration ["integer"], [fields[0].type] Does not have a value in the enumeration ["date"], [fields[0].type] Does not have a value in the enumeration ["time"], [fields[0].type] Does not have a value in the enumeration ["datetime"], [fields[0].type] Does not have a value in the enumeration ["year"], [fields[0].type] Does not have a value in the enumeration ["yearmonth"], [fields[0].type] Does not have a value in the enumeration ["boolean"], [fields[0].type] Does not have a value in the enumeration ["object"], [fields[0].type] Does not have a value in the enumeration ["geopoint"], [fields[0].type] Does not have a value in the enumeration ["geojson"], [fields[0].type] Does not have a value in the enumeration ["array"], [fields[0].type] Does not have a value in the enumeration ["duration"], [fields[0].type] Does not have a value in the enumeration ["any"], [fields[0]] Failed to match at least one schema',
                 $e->getMessage()
             );
         }
@@ -434,10 +416,10 @@ class SchemaTest extends TestCase
         $schema = new EditableSchema();
         // set fields
         $schema->fields([
-            'id' => FieldsFactory::field((object) ['name' => 'id', 'type' => 'integer']),
+            'id' => (object) ['type' => 'integer'],
         ]);
         // add field
-        $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'integer']));
+        $schema->field('age', (object) ['type' => 'integer']);
         // edit field
         $schema->field('age', FieldsFactory::field((object) ['name' => 'age', 'type' => 'number']));
         // remove field

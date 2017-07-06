@@ -57,7 +57,6 @@ class SchemaValidator
         // Validate
         $validator = new \JsonSchema\Validator();
         $descriptor = json_decode(json_encode($this->descriptor));
-        $this->applyForeignKeysResourceHack($descriptor);
         $validator->validate(
             $descriptor,
             (object) ['$ref' => 'file://'.realpath(dirname(__FILE__)).'/schemas/table-schema.json']
@@ -109,23 +108,6 @@ class SchemaValidator
                             );
                         }
                     }
-                }
-            }
-        }
-    }
-
-    protected function applyForeignKeysResourceHack($descriptor)
-    {
-        if (isset($descriptor->foreignKeys) && is_array($descriptor->foreignKeys)) {
-            foreach ($descriptor->foreignKeys as $foreignKey) {
-                // the resource field of foreign keys has problems validating as standard uri string
-                // we just override the validation entirely by placing a valid uri
-                if (
-                    is_object($foreignKey)
-                    && isset($foreignKey->reference) && is_object($foreignKey->reference)
-                    && isset($foreignKey->reference->resource) && !empty($foreignKey->reference->resource)
-                ) {
-                    $foreignKey->reference->resource = 'void://'.$foreignKey->reference->resource;
                 }
             }
         }
