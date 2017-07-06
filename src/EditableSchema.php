@@ -2,7 +2,6 @@
 
 namespace frictionlessdata\tableschema;
 
-use frictionlessdata\tableschema\Fields\BaseField;
 use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class EditableSchema extends Schema
@@ -18,8 +17,10 @@ class EditableSchema extends Schema
             $this->descriptor()->fields = [];
             $this->fieldsCache = [];
             foreach ($newFields as $name => $field) {
-                if (!is_a($field, "frictionlessdata\\tableschema\\Fields\\BaseField")) {
-                    if (!isset($field->name)) $field->name = $name;
+                if (!is_a($field, 'frictionlessdata\\tableschema\\Fields\\BaseField')) {
+                    if (!isset($field->name)) {
+                        $field->name = $name;
+                    }
                     $field = FieldsFactory::field($field);
                 }
                 $this->fieldsCache[$name] = $field;
