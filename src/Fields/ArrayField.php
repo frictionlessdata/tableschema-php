@@ -15,12 +15,12 @@ class ArrayField extends BaseField
                 throw $this->getValidationException($e->getMessage(), $val);
             }
             if (!is_array($val)) {
-                throw $this->getValidationException("json string must decode to array", $val);
+                throw $this->getValidationException('json string must decode to array', $val);
             } else {
                 return $val;
             }
         } else {
-            throw $this->getValidationException("must be array or string", $val);
+            throw $this->getValidationException('must be array or string', $val);
         }
     }
 

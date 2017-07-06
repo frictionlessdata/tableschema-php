@@ -24,7 +24,7 @@ class StringField extends BaseField
     protected function validateCastValue($val)
     {
         try {
-            $val = (string)$val;
+            $val = (string) $val;
         } catch (\Exception $e) {
             $val = json_encode($val);
         }

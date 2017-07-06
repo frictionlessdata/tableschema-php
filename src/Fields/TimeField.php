@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 /**
  * Class TimeField
- * casts to array [hour, minute, second]
+ * casts to array [hour, minute, second].
  */
 class TimeField extends BaseField
 {
@@ -19,6 +19,7 @@ class TimeField extends BaseField
                     throw $this->getValidationException(null, $val);
                 } else {
                     list($hour, $minute, $second) = $time;
+
                     return $this->getNativeTime($hour, $minute, $second);
                 }
                 break;
@@ -28,6 +29,7 @@ class TimeField extends BaseField
                 } catch (\Exception $e) {
                     throw $this->getValidationException($e->getMessage(), $val);
                 }
+
                 return $this->getNativeTime($dt->hour, $dt->minute, $dt->second);
             default:
                 $date = strptime($val, $this->format());
@@ -50,6 +52,7 @@ class TimeField extends BaseField
         foreach ($parts as &$part) {
             $part = (int) $part;
         }
+
         return $parts;
     }
 }

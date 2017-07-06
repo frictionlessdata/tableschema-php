@@ -14,9 +14,9 @@ class GeojsonField extends BaseField
             }
         }
         if (!is_object($val)) {
-            throw $this->getValidationException("must be an object", $val);
+            throw $this->getValidationException('must be an object', $val);
         }
-        if ($this->format() == "default") {
+        if ($this->format() == 'default') {
             try {
                 // this validates the geojson
                 \GeoJson\GeoJson::jsonUnserialize($val);
@@ -24,6 +24,7 @@ class GeojsonField extends BaseField
                 throw $this->getValidationException($e->getMessage(), $val);
             }
         }
+
         return $val;
     }
 

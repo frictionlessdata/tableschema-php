@@ -4,7 +4,7 @@ namespace frictionlessdata\tableschema\Fields;
 
 /**
  * Class YearMonthField
- * casts to array [year, month]
+ * casts to array [year, month].
  */
 class YearMonthField extends BaseField
 {

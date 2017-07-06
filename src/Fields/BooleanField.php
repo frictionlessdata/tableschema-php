@@ -9,12 +9,12 @@ class BooleanField extends BaseField
         if (isset($this->descriptor()->trueValues)) {
             $trueValues = $this->descriptor()->trueValues;
         } else {
-            $trueValues = [ "true", "True", "TRUE", "1" ];
+            $trueValues = ['true', 'True', 'TRUE', '1'];
         }
         if (isset($this->descriptor()->falseValues)) {
             $falseValues = $this->descriptor()->falseValues;
         } else {
-            $falseValues = [ "false", "False", "FALSE", "0" ];
+            $falseValues = ['false', 'False', 'FALSE', '0'];
         }
         if (is_bool($val)) {
             return $val;
@@ -24,10 +24,10 @@ class BooleanField extends BaseField
             } elseif (in_array($val, $falseValues)) {
                 return false;
             } else {
-                throw $this->getValidationException("invalid bool value", $val);
+                throw $this->getValidationException('invalid bool value', $val);
             }
         } else {
-            throw $this->getValidationException("value must be a bool or string", $val);
+            throw $this->getValidationException('value must be a bool or string', $val);
         }
     }
 

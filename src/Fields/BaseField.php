@@ -141,6 +141,7 @@ abstract class BaseField
                     throw new FieldValidationException($validationErrors);
                 }
             }
+
             return $val;
         }
     }
@@ -300,7 +301,7 @@ abstract class BaseField
         } elseif (is_object($val)) {
             return count($val) >= $minLength;
         } else {
-            throw $this->getValidationException("invalid value for minLength constraint", $val);
+            throw $this->getValidationException('invalid value for minLength constraint', $val);
         }
     }
 
@@ -313,7 +314,7 @@ abstract class BaseField
         } elseif (is_object($val)) {
             return count($val) <= $maxLength;
         } else {
-            throw $this->getValidationException("invalid value for maxLength constraint", $val);
+            throw $this->getValidationException('invalid value for maxLength constraint', $val);
         }
     }
 

@@ -4,7 +4,7 @@ namespace frictionlessdata\tableschema\Fields;
 
 /**
  * Class YearField
- * casts to integer
+ * casts to integer.
  */
 class YearField extends BaseField
 {

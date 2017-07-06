@@ -2,7 +2,6 @@
 
 namespace frictionlessdata\tableschema\Fields;
 
-use Carbon\Carbon;
 use Carbon\CarbonInterval;
 
 class DurationField extends BaseField
@@ -10,7 +9,7 @@ class DurationField extends BaseField
     protected function validateCastValue($val)
     {
         if (!is_string($val)) {
-            throw $this->getValidationException("must be string", $val);
+            throw $this->getValidationException('must be string', $val);
         } else {
             $val = trim($val);
             try {
@@ -37,8 +36,11 @@ class DurationField extends BaseField
                 && $val->hours == $allowedValue->hours
                 && $val->minutes == $allowedValue->minutes
                 && $val->seconds == $allowedValue->seconds
-            ) return true;
+            ) {
+                return true;
+            }
         }
+
         return false;
     }
 }

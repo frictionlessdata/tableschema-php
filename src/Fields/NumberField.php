@@ -15,20 +15,20 @@ class NumberField extends BaseField
     {
         $isPercent = false;
         if (is_string($val)) {
-            if (substr($val, -1) == "%") {
-                $val = rtrim($val, "%");
+            if (substr($val, -1) == '%') {
+                $val = rtrim($val, '%');
                 $isPercent = true;
             }
             if (isset($this->descriptor()->groupChar)) {
-                $val = str_replace($this->descriptor()->groupChar, "", $val);
+                $val = str_replace($this->descriptor()->groupChar, '', $val);
             }
-            if (isset($this->descriptor()->decimalChar) && $this->descriptor()->decimalChar != ".") {
-                $val = str_replace($this->descriptor()->decimalChar, ".", $val);
+            if (isset($this->descriptor()->decimalChar) && $this->descriptor()->decimalChar != '.') {
+                $val = str_replace($this->descriptor()->decimalChar, '.', $val);
             }
             if (isset($this->descriptor()->currency) && $this->descriptor()->currency) {
-                $newval = "";
+                $newval = '';
                 foreach (str_split($val) as $chr) {
-                    if (is_numeric($chr) || $chr == "." || $chr == "+" || $chr == "-") {
+                    if (is_numeric($chr) || $chr == '.' || $chr == '+' || $chr == '-') {
                         $newval .= $chr;
                     }
                 }
@@ -42,6 +42,7 @@ class NumberField extends BaseField
             if ($isPercent) {
                 $val = $val / 100;
             }
+
             return $val;
         }
     }

@@ -4,7 +4,7 @@ namespace frictionlessdata\tableschema\Fields;
 
 /**
  * Class ObjectField
- * casts to php object
+ * casts to php object.
  */
 class ObjectField extends BaseField
 {
