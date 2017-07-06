@@ -2,6 +2,10 @@
 
 namespace frictionlessdata\tableschema\Fields;
 
+/**
+ * Class YearMonthField
+ * casts to array [year, month]
+ */
 class YearMonthField extends BaseField
 {
     public function validateCastValue($val)
@@ -22,7 +26,7 @@ class YearMonthField extends BaseField
                 if ($month < 1 || $month > 12) {
                     throw $this->getValidationException(null, $val);
                 } else {
-                    return [$year, $month];
+                    return $this->getNativeYearMonth($year, $month);
                 }
             }
         }
@@ -31,5 +35,15 @@ class YearMonthField extends BaseField
     public static function type()
     {
         return 'yearmonth';
+    }
+
+    protected function getNativeYearMonth($year, $month)
+    {
+        return [$year, $month];
+    }
+
+    protected function isEmptyValue($val)
+    {
+        return (parent::isEmptyValue($val) || (!is_array($val) && trim($val) == "") || (is_array($val) && empty($val)));
     }
 }

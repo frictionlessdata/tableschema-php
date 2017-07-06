@@ -2,6 +2,7 @@
 
 namespace frictionlessdata\tableschema\tests;
 
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Fields\FieldsFactory;
 
@@ -262,35 +263,33 @@ class FieldTypesTest extends TestCase
 
     public function testTime()
     {
-        $native_time_6 = mktime(6, 0, 0);
-        $native_time_3 = mktime(3, 0, 0);
         $this->assertFieldTestData('time', [
             // format , input value , expected cast value, (optional) expected infer type
-            ['default', '06:00:00', $native_time_6],
+            ['default', '06:00:00', [6, 0, 0]],
             ['default', '3 am', self::ERROR],
             ['default', '3.00', self::ERROR],
             ['default', 'invalid', self::ERROR],
             ['default', true, self::ERROR],
-            ['default', '', self::ERROR],
-            ['any', '06:00:00', $native_time_6],
-            ['any', '3:00 am', $native_time_3],
+            ['default', '', null],
+            ['any', '06:00:00', [6, 0, 0]],
+            ['any', '3:00 am', [3, 0, 0]],
             ['any', 'some night', self::ERROR],
             ['any', 'invalid', self::ERROR],
             ['any', true, self::ERROR],
-            ['any', '', self::ERROR],
-            ['%H:%M', '06:00', $native_time_6],
+            ['any', '', null],
+            ['%H:%M', '06:00', [6, 0, 0]],
             ['%H:%M', '3:00 am', self::ERROR],
             ['%H:%M', 'some night', self::ERROR],
             ['%H:%M', 'invalid', self::ERROR],
             ['%H:%M', true, self::ERROR],
-            ['%H:%M', '', self::ERROR],
-            ['invalid', '', self::ERROR],
-            ['default', '06:35:21', mktime(6, 35, 21)],
-            ['any', '06:35:21', mktime(6, 35, 21)],
-            ['any', '06:35', mktime(6, 35, 0)],
+            ['%H:%M', '', null],
+            ['invalid', '', null],
+            ['default', '06:35:21', [6, 35, 21]],
+            ['any', '06:35:21', [6, 35, 21]],
+            ['any', '06:35', [6, 35, 0]],
             ['any', '6', self::ERROR],
-            ['any', '3 am', mktime(3, 0, 0)],
-            ['%H:%M:%S', '06:35:21', mktime(6, 35, 21)],
+            ['any', '3 am', [3, 0, 0]],
+            ['%H:%M:%S', '06:35:21', [6, 35, 21]],
             ['%H:%M', '06:35:21', self::ERROR],
         ]);
     }
@@ -303,7 +302,7 @@ class FieldTypesTest extends TestCase
             ['default', '2000', 2000],
             ['default', 20000, 20000],
             ['default', '3.14', self::ERROR],
-            ['default', '', self::ERROR],
+            ['default', '', null],
         ]);
     }
 
@@ -322,7 +321,7 @@ class FieldTypesTest extends TestCase
             ['default', -10, self::ERROR],
             ['default', 20, self::ERROR],
             ['default', '3.14', self::ERROR],
-            ['default', '', self::ERROR],
+            ['default', '', null],
         ]);
     }
 
@@ -338,11 +337,11 @@ class FieldTypesTest extends TestCase
             if ($expectedCastValue == self::ERROR) {
                 $this->assertTrue(count($field->validateValue($inputValue)) > 0, $assertMessage);
             } else {
-                $this->assertEquals($expectedCastValue, $field->castValue($inputValue), $assertMessage);
+                $this->assertSame($expectedCastValue, $field->castValue($inputValue), $assertMessage);
             }
             $inferredType = FieldsFactory::infer($inputValue)->type();
             if ($expectedInferType) {
-                $this->assertEquals($expectedInferType, $inferredType, $assertMessage);
+                $this->assertSame($expectedInferType, $inferredType, $assertMessage);
             }
         }
     }

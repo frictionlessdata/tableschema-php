@@ -24,6 +24,11 @@ class StringField extends BaseField
     public function validateCastValue($val)
     {
         $val = parent::validateCastValue($val);
+        try {
+            $val = (string)$val;
+        } catch (\Exception $e) {
+            $val = json_encode($val);
+        }
         switch ($this->format()) {
             case 'email':
                 if (strpos($val, '@') === false) {
