@@ -221,7 +221,7 @@ class SchemaTest extends TestCase
             ],
         ]);
         $this->assertEquals(
-            'id: value must be numeric (foobar), email: value is not a valid email (bad.email)',
+            'id: value must be numeric ("foobar"), email: value is not a valid email ("bad.email")',
             SchemaValidationError::getErrorMessages(
                 $schema->validateRow(['id' => 'foobar', 'email' => 'bad.email'])
             )
@@ -344,7 +344,7 @@ class SchemaTest extends TestCase
     public function testCastRowWrongType()
     {
         $this->assertCastRowException(
-            'height: value must be numeric (notdecimal)',
+            'height: value must be numeric ("notdecimal")',
             $this->maxDescriptorJson,
             ['id' => 'string', 'height' => 'notdecimal', 'age' => '1', 'name' => 'string', 'additional' => 'string']
         );
@@ -353,7 +353,7 @@ class SchemaTest extends TestCase
     public function testCastRowWrongTypeMultipleErrors()
     {
         $this->assertCastRowException(
-            'height: value must be numeric (notdecimal), age: value must be an integer (10.6)',
+            'height: value must be numeric ("notdecimal"), age: value must be an integer ("10.6")',
             $this->maxDescriptorJson,
             ['id' => 'string', 'height' => 'notdecimal', 'age' => '10.6', 'name' => 'string', 'additional' => 'string']
         );

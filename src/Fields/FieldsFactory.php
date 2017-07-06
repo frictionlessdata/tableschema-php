@@ -8,13 +8,30 @@ use frictionlessdata\tableschema\SchemaValidationError;
 class FieldsFactory
 {
     /**
-     * list of all the available field classes
-     * ordered in infer order - the most strict field first.
+     * list of all the available field classes.
+     *
+     * this list is used when inferring field type from a value
+     * infer works by trying to case the value to the field, in the fieldClasses order
+     * first field that doesn't raise exception on infer wins
      */
     public static $fieldClasses = [
         '\\frictionlessdata\\tableschema\\Fields\\IntegerField',
         '\\frictionlessdata\\tableschema\\Fields\\NumberField',
         '\\frictionlessdata\\tableschema\\Fields\\StringField',
+
+        // these fields will not be inferred - StringField will catch all values before it reaches these
+        '\\frictionlessdata\\tableschema\\Fields\\YearMonthField',
+        '\\frictionlessdata\\tableschema\\Fields\\YearField',
+        '\\frictionlessdata\\tableschema\\Fields\\TimeField',
+        '\\frictionlessdata\\tableschema\\Fields\\ObjectField',
+        '\\frictionlessdata\\tableschema\\Fields\\GeopointField',
+        '\\frictionlessdata\\tableschema\\Fields\\GeojsonField',
+        '\\frictionlessdata\\tableschema\\Fields\\DurationField',
+        '\\frictionlessdata\\tableschema\\Fields\\DatetimeField',
+        '\\frictionlessdata\\tableschema\\Fields\\DateField',
+        '\\frictionlessdata\\tableschema\\Fields\\BooleanField',
+        '\\frictionlessdata\\tableschema\\Fields\\ArrayField',
+        '\\frictionlessdata\\tableschema\\Fields\\AnyField',
     ];
 
     /**

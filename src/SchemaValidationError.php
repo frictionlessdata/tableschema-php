@@ -40,7 +40,7 @@ class SchemaValidationError
             case self::FIELD_VALIDATION:
                 $field = $this->extraDetails['field'];
                 $error = $this->extraDetails['error'];
-                $value = $this->extraDetails['value'];
+                $value = json_encode($this->extraDetails['value']);
 
                 return "{$field}: {$error} ({$value})";
             case self::ROW_FIELD_VALIDATION:

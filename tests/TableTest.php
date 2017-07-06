@@ -94,7 +94,7 @@ class TableTest extends TestCase
 
     public function testInferSchemaFailsAfterLock()
     {
-        $this->assertInferSchemaException('id: value must be an integer (3.5)', [
+        $this->assertInferSchemaException('id: value must be an integer ("3.5")', [
             ['id' => '1', 'email' => 'test1_example_com'],
             ['id' => '2', 'email' => 'test2@example.com'],
             ['id' => '3.5', 'email' => 'test3@example.com'],
@@ -127,7 +127,7 @@ class TableTest extends TestCase
         ];
         $this->assertInferSchemaException(
             // lock after 1 row, so that locked schema will be string with email format
-            'email: value is not a valid email (invalid_email)', $inputRows, 1
+            'email: value is not a valid email ("invalid_email")', $inputRows, 1
         );
         // try again with locking after 2nd row - no exception
         // (value is not cast, because it's still a string)

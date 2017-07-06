@@ -11,23 +11,44 @@ class NumberField extends BaseField
      *
      * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
      */
-    public function validateCastValue($val)
+    protected function validateCastValue($val)
     {
-        $val = parent::validateCastValue($val);
+        $isPercent = false;
+        if (is_string($val)) {
+            if (substr($val, -1) == '%') {
+                $val = rtrim($val, '%');
+                $isPercent = true;
+            }
+            if (isset($this->descriptor()->groupChar)) {
+                $val = str_replace($this->descriptor()->groupChar, '', $val);
+            }
+            if (isset($this->descriptor()->decimalChar) && $this->descriptor()->decimalChar != '.') {
+                $val = str_replace($this->descriptor()->decimalChar, '.', $val);
+            }
+            if (isset($this->descriptor()->currency) && $this->descriptor()->currency) {
+                $newval = '';
+                foreach (str_split($val) as $chr) {
+                    if (is_numeric($chr) || $chr == '.' || $chr == '+' || $chr == '-') {
+                        $newval .= $chr;
+                    }
+                }
+                $val = $newval;
+            }
+        }
         if (!is_numeric($val)) {
             throw $this->getValidationException('value must be numeric', $val);
         } else {
-            return (float) $val;
+            $val = (float) $val;
+            if ($isPercent) {
+                $val = $val / 100;
+            }
+
+            return $val;
         }
     }
 
     public static function type()
     {
         return 'number';
-    }
-
-    protected function isEmptyValue($val)
-    {
-        return !is_numeric($val) && empty($val);
     }
 }
