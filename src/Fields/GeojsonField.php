@@ -12,7 +12,11 @@ class GeojsonField extends BaseField
             } catch (\Exception $e) {
                 throw $this->getValidationException($e->getMessage(), $val);
             }
+            if (!$val) {
+                throw $this->getValidationException('failed to decode json', $val);
+            }
         }
+        $val = json_decode(json_encode($val));
         if (!is_object($val)) {
             throw $this->getValidationException('must be an object', $val);
         }

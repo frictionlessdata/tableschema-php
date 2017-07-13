@@ -86,6 +86,23 @@ class FieldTest extends TestCase
         $this->assertEquals(1, FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue('1'));
     }
 
+    public function testAdditionalMethods()
+    {
+        $field = FieldsFactory::field(['name' => 'name', 'type' => 'string']);
+        $this->assertEquals(null, $field->title());
+        $this->assertEquals(null, $field->description());
+        $this->assertEquals(null, $field->rdfType());
+        $field = FieldsFactory::field([
+            'name' => 'name', 'type' => 'string',
+            'title' => 'Title',
+            'description' => 'Description',
+            'rdfType' => 'http://schema.org/Thing',
+        ]);
+        $this->assertEquals('Title', $field->title());
+        $this->assertEquals('Description', $field->description());
+        $this->assertEquals('http://schema.org/Thing', $field->rdfType());
+    }
+
     public function testCastValueConstraintError()
     {
         try {

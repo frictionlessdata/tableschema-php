@@ -18,6 +18,58 @@ A utility library for working with [Table Schema](https://specs.frictionlessdata
 $ composer require frictionlessdata/tableschema
 ```
 
+### Table
+
+Table class allows to iterate over data conforming to a table schema
+
+Instantiate a Table object based on a data source and a table schema.
+
+```php
+use frictionlessdata\tableschema\Table;
+
+$table = new Table("tests/fixtures/data.csv", ["fields" => [
+    ["name" => "first_name"],
+    ["name" => "last_name"],
+    ["name" => "order"]
+]]);
+```
+
+Schema can be any parameter valid for the Schema object (See below), so you can use a url or filename which contains the schema
+
+```php
+$table = new Table("tests/fixtures/data.csv", "tests/fixtures/data.json");
+```
+
+iterate over the data, all the values are cast and validated according to the schema
+
+```php
+foreach ($table as $row) {
+    print($row["order"]." ".$row["first_name"]." ".$row["last_name"]."\n");
+};
+```
+
+validate function will validate the schema and get some sample of the data itself to validate it as well
+ 
+```php
+Table::validate(new CsvDataSource("http://invalid.data.source/"), $schema);
+```
+
+You can instantiate a table object without schema, in this case the schema will be inferred automatically based on the data
+
+```php
+$table = new Table("tests/fixtures/data.csv");
+$table->schema()->fields();  // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
+```
+
+Additional methods and functionality
+
+```php
+$table->headers()  // ["first_name", "last_name", "order"]
+$table->save("output.csv")  // iterate over all the rows and save the to a csv file
+$table->schema()  // get the Schema object
+$table->read()  // returns all the data as an array
+```
+
 ### Schema
 
 Schema class provides helpful methods for working with a table schema and related data.
@@ -26,7 +78,7 @@ Schema class provides helpful methods for working with a table schema and relate
 
 Schema objects can be constructed using any of the following:
 
-* php array
+* php array (or object)
 ```php
 $schema = new Schema([
     'fields' => [
@@ -68,14 +120,7 @@ $schema->missingValues(); // [""]
 $schema->primaryKey();  // ["id"]
 $schema->foreignKeys();  // []
 $schema->fields(); // ["id" => IntegerField, "name" => StringField]
-$field = $schema->field("id");
-$field("id")->format();  // "default"
-$field("id")->name();  // "id"
-$field("id")->type(); // "integer"
-$field("id")->constraints();  // (object)["required"=>true, "minimum"=>1, "maximum"=>500]
-$field("id")->enum();  // []
-$field("id")->required();  // true
-$field("id")->unique();  // false
+$field = $schema->field("id");  // Field object (See Field reference below)
 ```
 
 validate function accepts the same arguemnts as the Schema constructor but returns a list of errors instead of raising exceptions
@@ -123,7 +168,7 @@ $schema->fields([
 ]);
 ```
 
-appropriate field object is created according to the given descriptor
+appropriate Field object is created according to the given descriptor (see below for Field class reference)
 
 ```php
 $schema->field("id");  // IntegerField object
@@ -145,62 +190,52 @@ $schema->primaryKey(["id"]);
 
 after every change - schema is validated and will raise Exception in case of validation errors
 
-finally, save the schema to a json file
+Finally, you can get the full validated descriptor
+
+```php
+$schema->fullDescriptor();
+```
+
+And, save it to a json file
 
 ```php
 $schema->save("my-schema.json");
 ```
 
-### Table
+### Field
 
-Table class allows to iterate over data conforming to a table schema
+Field class represents a single table schema field descriptor
 
-Instantiate a Table object based on a data source and a table schema.
+Create a field from a descriptor
 
 ```php
-use frictionlessdata\tableschema\Table;
-
-$table = new Table("tests/fixtures/data.csv", ["fields" => [
-    ["name" => "first_name"],
-    ["name" => "last_name"],
-    ["name" => "order"]
-]]);
+use frictionlessdata\tableschema\Fields\FieldsFactory;
+$field = FieldsFactory::field([
+    "name" => "id", "type" => "integer",
+    "constraints" => ["required" => true, "minimum" => 5]
+]);
 ```
 
-Schema can be any parameter valid for the Schema object, so you can use a url or filename which contains the schema
+Cast and validate values using the field
 
 ```php
-$table = new Table("tests/fixtures/data.csv", "tests/fixtures/data.json");
+$field->castValue("3");  // exception: value is below minimum
+$field->castValue("7");  // 7
 ```
 
-iterate over the data, all the values are cast and validated according to the schema
+Additional method to access field data
 
 ```php
-foreach ($table as $row) {
-    print($row["order"]." ".$row["first_name"]." ".$row["last_name"]."\n");
-};
-```
-
-validate function will validate the schema and get some sample of the data itself to validate it as well
- 
-```php
-Table::validate(new CsvDataSource("http://invalid.data.source/"), $schema);
-```
-
-You can instantiate a table object without schema, in this case the schema will be inferred automatically based on the data
-
-```php
-$table = new Table("tests/fixtures/data.csv");
-$table->schema()->fields();  // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
-```
-
-Additional methods and functionality
-
-```php
-$table->headers()  // ["first_name", "last_name", "order"]
-$table->save("output.csv")  // iterate over all the rows and save the to a csv file
-$table->schema()  // get the Schema object
-$table->read()  // returns all the data as an array
+$field("id")->format();  // "default"
+$field("id")->name();  // "id"
+$field("id")->type(); // "integer"
+$field("id")->constraints();  // (object)["required"=>true, "minimum"=>1, "maximum"=>500]
+$field("id")->enum();  // []
+$field("id")->required();  // true
+$field("id")->unique();  // false
+$field("id")->title();  // "Id" (or null if not provided in descriptor)
+$field("id")->description();  // "The ID" (or null if not provided in descriptor)
+$field("id")->rdfType();  // "http://schema.org/Thing" (or null if not provided in descriptor)
 ```
 
 ## Important Notes

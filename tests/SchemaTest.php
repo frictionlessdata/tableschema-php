@@ -127,8 +127,8 @@ class SchemaTest extends TestCase
 
     public function testDifferentValidDescriptorSources()
     {
-        $simpleFile = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
-        $fullFile = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
+        $simpleFile = $this->getTempFile();
+        $fullFile = $this->getTempFile();
         file_put_contents($simpleFile, json_encode($this->simpleDescriptor));
         file_put_contents($fullFile, json_encode($this->fullDescriptor));
         $descriptors = [
@@ -504,7 +504,7 @@ class SchemaTest extends TestCase
     public function testSave()
     {
         $schema = new Schema($this->minDescriptorJson);
-        $filename = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
+        $filename = $this->getTempFile();
         $schema->save($filename);
         $this->assertEquals($schema->fullDescriptor(), json_decode(file_get_contents($filename)));
     }
@@ -531,6 +531,17 @@ class SchemaTest extends TestCase
             'format' => 'uri',
         ]], $validator->getErrors());
     }
+
+    public function tearDown()
+    {
+        foreach ($this->tempFiles as $tempFile) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+    }
+
+    protected $tempFiles = [];
 
     protected function assertValidationErrors($expectedValidationErrors, $descriptor)
     {
@@ -569,5 +580,13 @@ class SchemaTest extends TestCase
         } catch (FieldValidationException $e) {
             $this->assertEquals($expectedError, $e->getMessage());
         }
+    }
+
+    protected function getTempFile()
+    {
+        $file = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
+        $this->tempFiles[] = $file;
+
+        return $file;
     }
 }

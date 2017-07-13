@@ -31,6 +31,21 @@ abstract class BaseField
         return $this->descriptor()->name;
     }
 
+    public function title()
+    {
+        return isset($this->descriptor()->title) ? $this->descriptor()->title : null;
+    }
+
+    public function description()
+    {
+        return isset($this->descriptor()->description) ? $this->descriptor()->description : null;
+    }
+
+    public function rdfType()
+    {
+        return isset($this->descriptor()->rdfType) ? $this->descriptor()->rdfType : null;
+    }
+
     public function format()
     {
         return isset($this->descriptor()->format) ? $this->descriptor()->format : 'default';
@@ -292,30 +307,27 @@ abstract class BaseField
         return $val <= $maxConstraint;
     }
 
-    protected function checkMinLengthConstraint($val, $minLength)
+    protected function getLengthForConstraint($val)
     {
         if (is_string($val)) {
-            return strlen($val) >= $minLength;
+            return strlen($val);
         } elseif (is_array($val)) {
-            return count($val) >= $minLength;
+            return count($val);
         } elseif (is_object($val)) {
-            return count($val) >= $minLength;
+            return count((array) $val);
         } else {
-            throw $this->getValidationException('invalid value for minLength constraint', $val);
+            throw $this->getValidationException('invalid value for length constraint', $val);
         }
+    }
+
+    protected function checkMinLengthConstraint($val, $minLength)
+    {
+        return $this->getLengthForConstraint($val) >= $minLength;
     }
 
     protected function checkMaxLengthConstraint($val, $maxLength)
     {
-        if (is_string($val)) {
-            return strlen($val) <= $maxLength;
-        } elseif (is_array($val)) {
-            return count($val) <= $maxLength;
-        } elseif (is_object($val)) {
-            return count($val) <= $maxLength;
-        } else {
-            throw $this->getValidationException('invalid value for maxLength constraint', $val);
-        }
+        return $this->getLengthForConstraint($val) <= $maxLength;
     }
 
     protected function getAllowedValues()
