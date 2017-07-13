@@ -206,5 +206,5 @@ class Schema
     }
 
     protected $descriptor;
-    protected $fieldsCache = null;
+    protected $fieldsCache = [];
 }
