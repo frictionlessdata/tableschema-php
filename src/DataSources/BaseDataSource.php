@@ -13,13 +13,13 @@ abstract class BaseDataSource implements DataSourceInterface
         $this->options = empty($options) ? (object) [] : $options;
     }
 
-    public function open()
-    {
-    }
+    abstract public function open();
 
     abstract public function getNextLine();
 
     abstract public function isEof();
+
+    abstract public function save($outputDataSource);
 
     public function close()
     {

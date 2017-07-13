@@ -27,6 +27,13 @@ interface DataSourceInterface
     public function getNextLine();
 
     /**
+     * iterate over all rows and save to the given output data source
+     *
+     * @param $outputDataSource
+     */
+    public function save($outputDataSource);
+
+    /**
      * @return bool
      */
     public function isEof();

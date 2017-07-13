@@ -95,6 +95,15 @@ class CsvDataSource extends BaseDataSource
         }
     }
 
+    public function save($outputDataSource) {
+        $file = fopen($outputDataSource, 'w');
+        fputcsv($file, $this->headerRow);
+        while (!$this->isEof()) {
+            fputcsv($file, array_values($this->getNextLine()));
+        }
+        fclose($file);
+    }
+
     protected $resource;
     protected $headerRow;
     protected $skippedRows;

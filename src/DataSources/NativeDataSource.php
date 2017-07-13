@@ -10,6 +10,11 @@ use frictionlessdata\tableschema\Exceptions\DataSourceException;
  */
 class NativeDataSource extends BaseDataSource
 {
+    public function open()
+    {
+        // no opening is needed for native data source
+    }
+
     /**
      * @return array
      *
@@ -28,6 +33,11 @@ class NativeDataSource extends BaseDataSource
     public function isEof()
     {
         return $this->curRowNum >= count($this->dataSource);
+    }
+
+    public function save($output)
+    {
+        // no point in saving for native data source
     }
 
     protected $curRowNum = 0;

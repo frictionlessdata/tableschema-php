@@ -78,6 +78,12 @@ class SchemaTest extends TestCase
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
     }
 
+    public function testInitializeFromPhpArray()
+    {
+        $schema = new Schema(json_decode($this->simpleDescriptorJson, true));
+        $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
+    }
+
     public function testInitializeFromRemoteResource()
     {
         if (getenv('TABLESCHEMA_ENABLE_FRAGILE_TESTS')) {
@@ -96,10 +102,6 @@ class SchemaTest extends TestCase
             'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage('--invalid--'),
             '--invalid--'
         );
-        $this->assertValidationErrors(
-            'error decoding descriptor {"fields":[]}: descriptor must be an object',
-            ['fields' => []]
-        );
     }
 
     public function testConstructFromInvalidResource()
@@ -112,14 +114,6 @@ class SchemaTest extends TestCase
                 'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage('--invalid--'),
                 $e->getMessage()
             );
-        }
-        try {
-            new Schema(['fields' => []]);
-            $this->fail('constructing from invalid descriptor should throw exception');
-        } catch (\frictionlessdata\tableschema\Exceptions\SchemaLoadException $e) {
-            $this->assertEquals(
-                'error decoding descriptor {"fields":[]}: descriptor must be an object',
-                $e->getMessage());
         }
         try {
             new Schema((object) ['fields' => []]);

@@ -110,27 +110,27 @@ $schema->validateRow(["id" => "foobar"]);  // ["id is not numeric", "name is req
 
 Table class allows to iterate over data conforming to a table schema
 
+Instantiate a Table object based on a data source and a table schema.
 
-instantiate a Table object based on a data source and a table schema.
-
-```
-use frictionlessdata\tableschema\DataSources\CsvDataSource;
-use frictionlessdata\tableschema\Schema;
+```php
 use frictionlessdata\tableschema\Table;
 
-$dataSource = new CsvDataSource("tests/fixtures/data.csv");
-$schema = new Schema((object)[
-   'fields' => [
-       (object)['name' => 'first_name'],
-       (object)['name' => 'last_name'],
-       (object)['name' => 'order'],
-   ]
-]);
-$table = new Table($dataSource, $schema);
+$table = new Table("tests/fixtures/data.csv", ["fields" => [
+    ["name" => "first_name"],
+    ["name" => "last_name"],
+    ["name" => "order"]
+]]);
+```
+
+Schema can be any parameter valid for the Schema object, so you can use a url or filename which contains the schema
+
+```php
+$table = new Table("tests/fixtures/data.csv", "tests/fixtures/data.json");
 ```
 
 iterate over the data, all the values are cast and validated according to the schema
-```
+
+```php
 foreach ($table as $row) {
     print($row["order"]." ".$row["first_name"]." ".$row["last_name"]."\n");
 };
@@ -138,40 +138,24 @@ foreach ($table as $row) {
 
 validate function will validate the schema and get some sample of the data itself to validate it as well
  
-```
+```php
 Table::validate(new CsvDataSource("http://invalid.data.source/"), $schema);
 ```
 
-### InferSchema
+You can instantiate a table object without schema, in this case the schema will be inferred automatically based on the data
 
-InferSchema class allows to infer a schema based on a sample of the data
-
-```
-use frictionlessdata\tableschema\InferSchema;
-use frictionlessdata\tableschema\DataSources\CsvDataSource;
-use frictionlessdata\tableschema\Table;
-
-$dataSource = new CsvDataSource("tests/fixtures/data.csv");
-$schema = new InferSchema();
-$table = new Table($dataSource, $schema);
-
-if (Table::validate($dataSource, $schema) == []) {
-    var_dump($schema->fields()); // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
-};
+```php
+$table = new Table("tests/fixtures/data.csv");
+$table->schema()->fields();  // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
 ```
 
-more control over the infer process
+Additional methods and functionality
 
-```
-foreach ($table as $row) {
-    var_dump($row); // row will be in inferred native values
-    var_dump($schema->descriptor()); // will contain the inferred schema descriptor
-    // the more iterations you make, the more accurate the inferred schema might be
-    // once you are satisifed with the schema, lock it
-    $rows = $schema->lock();
-    // it returns all the rows received until the lock, casted to the final inferred schema
-    // you may now continue to iterate over the rest of the rows
-};
+```php
+$table->headers()  // ["first_name", "last_name", "order"]
+$table->save("output.csv")  // iterate over all the rows and save the to a csv file
+$table->schema()  // get the Schema object
+$table->read()  // returns all the data as an array
 ```
 
 ### EditableSchema
