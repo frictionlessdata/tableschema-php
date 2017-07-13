@@ -102,13 +102,13 @@ class TableTest extends TestCase
     public function testAutoInferSchemaWhenNullSchema()
     {
         $table = new Table($this->fixture('data.csv'));
-        $this->assertTrue(is_a($table->schema(), "frictionlessdata\\tableschema\\InferSchema"));
+        $this->assertTrue(is_a($table->schema(), 'frictionlessdata\\tableschema\\InferSchema'));
     }
 
     public function testHeaders()
     {
         $table = new Table($this->fixture('data.csv'));
-        $this->assertEquals(["first_name", "last_name", "order"], $table->headers());
+        $this->assertEquals(['first_name', 'last_name', 'order'], $table->headers());
         $this->assertEquals([
             ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
             ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
@@ -116,7 +116,7 @@ class TableTest extends TestCase
         ], $table->read());
 
         $table = new Table($this->fixture('data.csv'));
-        $this->assertEquals(["first_name", "last_name", "order"], $table->headers(1));
+        $this->assertEquals(['first_name', 'last_name', 'order'], $table->headers(1));
         $this->assertEquals([
             ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
             ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
@@ -132,12 +132,12 @@ class TableTest extends TestCase
     public function testTableSave()
     {
         $table = new Table($this->fixture('data.csv'));
-        $table->save("test-table-save-data.csv");
+        $table->save('test-table-save-data.csv');
         $this->assertEquals(
             "first_name,last_name,order\nFoo,Bar,1\nBaz,Bax,2\nבאך,ביי,3\n",
-            file_get_contents("test-table-save-data.csv")
+            file_get_contents('test-table-save-data.csv')
         );
-        unlink("test-table-save-data.csv");
+        unlink('test-table-save-data.csv');
     }
 
     public function testInferSchemaWorksWithMoreRows()
@@ -160,13 +160,13 @@ class TableTest extends TestCase
 
     public function testSimpleInferSchema()
     {
-        $table = new Table($this->fixture("data.csv"));
-        $this->assertEquals((object)[
-            "fields" => [
-                (object)["name" => "first_name", "type" => "string"],
-                (object)["name" => "last_name", "type" => "string"],
-                (object)["name" => "order", "type" => "integer"],
-            ]
+        $table = new Table($this->fixture('data.csv'));
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'first_name', 'type' => 'string'],
+                (object) ['name' => 'last_name', 'type' => 'string'],
+                (object) ['name' => 'order', 'type' => 'integer'],
+            ],
         ], $table->schema()->descriptor());
     }
 

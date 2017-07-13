@@ -18,14 +18,14 @@ class Table implements \Iterator
      *
      * @throws Exceptions\DataSourceException
      */
-    public function __construct($dataSource, $schema=null)
+    public function __construct($dataSource, $schema = null)
     {
-        if (!is_a($dataSource, "frictionlessdata\\tableschema\\DataSources\\BaseDataSource")) {
+        if (!is_a($dataSource, 'frictionlessdata\\tableschema\\DataSources\\BaseDataSource')) {
             // TODO: more advanced data source detection
             $dataSource = new CsvDataSource($dataSource);
         }
         $this->dataSource = $dataSource;
-        if (!is_a($schema, "frictionlessdata\\tableschema\\Schema")) {
+        if (!is_a($schema, 'frictionlessdata\\tableschema\\Schema')) {
             if ($schema) {
                 $schema = new Schema($schema);
             } else {
@@ -84,12 +84,14 @@ class Table implements \Iterator
     public function schema($numPeekRows = 10)
     {
         $this->ensureInferredSchema($numPeekRows);
+
         return $this->schema;
     }
 
     public function headers($numPeekRows = 10)
     {
         $this->ensureInferredSchema($numPeekRows);
+
         return array_keys($this->schema->fields());
     }
 
@@ -99,6 +101,7 @@ class Table implements \Iterator
         foreach ($this as $row) {
             $rows[] = $row;
         }
+
         return $rows;
     }
 
@@ -182,7 +185,7 @@ class Table implements \Iterator
 
     protected function isInferSchema()
     {
-        return is_a($this->schema, "frictionlessdata\\tableschema\\InferSchema");
+        return is_a($this->schema, 'frictionlessdata\\tableschema\\InferSchema');
     }
 
     protected function ensureInferredSchema($numPeekRows = 10)
@@ -199,6 +202,6 @@ class Table implements \Iterator
                 // these rows will be returned by next current() call
                 $this->castRows = $this->schema->lock();
             }
-        };
+        }
     }
 }

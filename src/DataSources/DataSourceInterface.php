@@ -27,7 +27,7 @@ interface DataSourceInterface
     public function getNextLine();
 
     /**
-     * iterate over all rows and save to the given output data source
+     * iterate over all rows and save to the given output data source.
      *
      * @param $outputDataSource
      */
