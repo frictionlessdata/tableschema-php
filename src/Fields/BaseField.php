@@ -31,6 +31,21 @@ abstract class BaseField
         return $this->descriptor()->name;
     }
 
+    public function title()
+    {
+        return isset($this->descriptor()->title) ? $this->descriptor()->title : null;
+    }
+
+    public function description()
+    {
+        return isset($this->descriptor()->description) ? $this->descriptor()->description : null;
+    }
+
+    public function rdfType()
+    {
+        return isset($this->descriptor()->rdfType) ? $this->descriptor()->rdfType : null;
+    }
+
     public function format()
     {
         return isset($this->descriptor()->format) ? $this->descriptor()->format : 'default';

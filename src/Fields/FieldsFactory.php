@@ -38,7 +38,7 @@ class FieldsFactory
     /**
      * get a new field object in the correct type according to the descriptor.
      *
-     * @param object $descriptor
+     * @param object|array $descriptor
      *
      * @return BaseField
      *

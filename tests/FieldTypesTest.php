@@ -227,17 +227,17 @@ class FieldTypesTest extends TestCase
             [
                 'default',
                 ['properties' => ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null],
-                ['properties' => ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null],
+                (object) ['properties' => (object) ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null],
             ],
             [
                 'default',
                 '{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c3"}}',
-                ['properties' => ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null],
+                (object) ['properties' => (object) ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null],
             ],
             [
                 'default',
                 ['coordinates' => [0, 0, 0], 'type' => 'Point'],
-                ['coordinates' => [0, 0, 0], 'type' => 'Point'],
+                (object) ['coordinates' => [0, 0, 0], 'type' => 'Point'],
             ],
             ['default', 'string', self::ERROR],
             ['default', 1, self::ERROR],
@@ -248,12 +248,12 @@ class FieldTypesTest extends TestCase
             [
                 'topojson',
                 ['type' => 'LineString', 'arcs' => [42]],
-                ['type' => 'LineString', 'arcs' => [42]],
+                (object) ['type' => 'LineString', 'arcs' => [42]],
             ],
             [
                 'topojson',
                 '{"type": "LineString", "arcs": [42]}',
-                ['type' => 'LineString', 'arcs' => [42]],
+                (object) ['type' => 'LineString', 'arcs' => [42]],
             ],
             ['topojson', 'string', self::ERROR],
             ['topojson', 1, self::ERROR],
@@ -264,7 +264,7 @@ class FieldTypesTest extends TestCase
             // enum
             [[
                 'format' => 'default', 'constraints' => ['enum' => ['{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c3"}}']],
-            ], '{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c3"}}', ['properties' => ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null]],
+            ], '{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c3"}}', (object) ['properties' => (object) ['Ã' => 'Ã'], 'type' => 'Feature', 'geometry' => null]],
             [[
                 'format' => 'default', 'constraints' => ['enum' => ['{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c3"}}']],
             ], '{"geometry": null, "type": "Feature", "properties": {"\\u00c3": "\\u00c4"}}', self::ERROR],
@@ -387,10 +387,10 @@ class FieldTypesTest extends TestCase
     public function testObject()
     {
         $this->assertFieldTestData('object', [
-            ['default', [], []],
-            ['default', '{}', []],
-            ['default', ['key' => 'value'], ['key' => 'value']],
-            ['default', '{"key": "value"}', ['key' => 'value']],
+            ['default', (object) [], (object) []],
+            ['default', '{}', (object) []],
+            ['default', (object) ['key' => 'value'], (object) ['key' => 'value']],
+            ['default', '{"key": "value"}', (object) ['key' => 'value']],
             ['default', '["key", "value"]', self::ERROR],
             ['default', 'string', self::ERROR],
             ['default', 1, self::ERROR],
@@ -399,7 +399,7 @@ class FieldTypesTest extends TestCase
             // required
             [['format' => 'default', 'constraints' => ['required' => true]], null, self::ERROR],
             // enum
-            [['format' => 'default', 'constraints' => ['enum' => ['{"foo":"bar"}']]], '{"foo":"bar"}', ['foo' => 'bar']],
+            [['format' => 'default', 'constraints' => ['enum' => ['{"foo":"bar"}']]], '{"foo":"bar"}', (object) ['foo' => 'bar']],
             [['format' => 'default', 'constraints' => ['enum' => ['{"foo":"bar"}']]], '{"foox":"bar"}', self::ERROR],
             // minLength / maxLength
             [['format' => 'default', 'constraints' => ['minLength' => 1]], '{}', self::ERROR],
