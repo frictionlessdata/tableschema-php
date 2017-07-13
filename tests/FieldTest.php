@@ -19,18 +19,18 @@ class FieldTest extends TestCase
 
     public function setUp()
     {
-        $this->DESCRIPTOR_WITHOUT_TYPE = (object) [
+        $this->DESCRIPTOR_WITHOUT_TYPE = [
             'name' => 'id',
         ];
-        $this->DESCRIPTOR_MIN = (object) [
+        $this->DESCRIPTOR_MIN = [
             'name' => 'id',
             'type' => 'string',
         ];
-        $this->DESCRIPTOR_MAX = (object) [
+        $this->DESCRIPTOR_MAX = [
             'name' => 'id',
             'type' => 'integer',
             'format' => 'default',
-            'constraints' => (object) ['required' => true],
+            'constraints' => ['required' => true],
         ];
     }
 
@@ -47,7 +47,7 @@ class FieldTest extends TestCase
     public function testDescriptor()
     {
         $this->assertEquals(
-            $this->DESCRIPTOR_MIN,
+            (object) $this->DESCRIPTOR_MIN,
             FieldsFactory::field($this->DESCRIPTOR_MIN)->descriptor()
         );
     }
@@ -113,7 +113,7 @@ class FieldTest extends TestCase
         // missing values are only validated at schema castRow function
         $schema = new Schema((object) [
             'fields' => [
-                (object) ['name' => 'name', 'type' => 'number'],
+                ['name' => 'name', 'type' => 'number'],
             ],
             'missingValues' => ['null'],
         ]);
@@ -150,7 +150,7 @@ class FieldTest extends TestCase
                 (object) [
                     'name' => 'name',
                     'type' => 'string',
-                    'constraints' => (object) ['required' => true],
+                    'constraints' => ['required' => true],
                 ],
             ],
             'missingValues' => ['', 'NA', 'N/A'],

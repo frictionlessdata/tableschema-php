@@ -3,7 +3,6 @@
 namespace frictionlessdata\tableschema\tests;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use frictionlessdata\tableschema\EditableSchema;
 use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
@@ -151,11 +150,15 @@ class SchemaTest extends TestCase
         $descriptors = [
             [
                 'descriptor' => [],
-                'expected_errors' => 'unexpected load error: descriptor must be an object',
+                'expected_errors' => '[] Array value found, but an object is required',
             ],
             [
                 'descriptor' => 'foobar',
                 'expected_errors' => 'error loading descriptor from source "foobar": '.$this->getFileGetContentsErrorMessage('foobar'),
+            ],
+            [
+                'descriptor' => '{"fields": ["name": "id", "type": "integer"]}',
+                'expected_errors' => 'error decoding descriptor "{\"fields\": [\"name\": \"id\", \"type\": \"integer\"]}": invalid json',
             ],
             [
                 'descriptor' => (object) [
@@ -407,7 +410,7 @@ class SchemaTest extends TestCase
 
     public function testEditable()
     {
-        $schema = new EditableSchema();
+        $schema = new Schema();
         // set fields
         $schema->fields([
             'id' => (object) ['type' => 'integer'],
@@ -486,6 +489,16 @@ class SchemaTest extends TestCase
             ],
             'missingValues' => ['', 'null'],
         ], $schema->fullDescriptor());
+    }
+
+    public function testSchemaToEditableSchema()
+    {
+        $schema = new Schema('{"fields": [{"name": "id", "type": "integer"}]}');
+        $schema->field('title', '{"type": "string"}');
+        $this->assertEquals((object) ['fields' => [
+            (object) ['name' => 'id', 'type' => 'integer'],
+            (object) ['name' => 'title', 'type' => 'string'],
+        ]], $schema->descriptor());
     }
 
     public function testSave()
