@@ -47,7 +47,7 @@ class FieldTypesTest extends TestCase
             ['default', '[]', []],
             ['default', ['key', 'value'], ['key', 'value']],
             ['default', '["key", "value"]', ['key', 'value']],
-            ['default', (object)['key' => 'value'], self::ERROR],
+            ['default', (object) ['key' => 'value'], self::ERROR],
             ['default', '{"key": "value"}', self::ERROR],
             ['default', 'string', self::ERROR],
             ['default', 1, self::ERROR],
@@ -331,7 +331,7 @@ class FieldTypesTest extends TestCase
             // minimum / maximum
             [['format' => 'default', 'constraints' => ['minimum' => 2]], 1, self::ERROR],
             [['format' => 'default', 'constraints' => ['maximum' => '0']], 1, self::ERROR],
-            [['format' => 'default', 'constraints' => ['maximum' => "1", 'minimum' => 1]], "1", 1],
+            [['format' => 'default', 'constraints' => ['maximum' => '1', 'minimum' => 1]], '1', 1],
         ]);
     }
 
@@ -379,8 +379,8 @@ class FieldTypesTest extends TestCase
             // minimum / maximum
             [['format' => 'default', 'constraints' => ['minimum' => 2]], 1.4, self::ERROR],
             [['format' => 'default', 'constraints' => ['maximum' => '0']], 1.2, self::ERROR],
-            [['format' => 'default', 'constraints' => ['minimum' => 1.1, 'maximum' => "1.1"]], "1.1", 1.1],
-            [['format' => 'default', 'constraints' => ['minimum' => 1.2, 'maximum' => "1.4"]], "1.2", 1.2],
+            [['format' => 'default', 'constraints' => ['minimum' => 1.1, 'maximum' => '1.1']], '1.1', 1.1],
+            [['format' => 'default', 'constraints' => ['minimum' => 1.2, 'maximum' => '1.4']], '1.2', 1.2],
         ]);
     }
 
@@ -403,16 +403,16 @@ class FieldTypesTest extends TestCase
             [['format' => 'default', 'constraints' => ['enum' => ['{"foo":"bar"}']]], '{"foox":"bar"}', self::ERROR],
             // minLength / maxLength
             [['format' => 'default', 'constraints' => ['minLength' => 1]], '{}', self::ERROR],
-            [['format' => 'default', 'constraints' => ['minLength' => 1]], '{"a":1}', (object)["a"=>1]],
-            [['format' => 'default', 'constraints' => ['minLength' => 1]], '{"a":1, "b":2}', (object)["a"=>1,"b"=>2]],
+            [['format' => 'default', 'constraints' => ['minLength' => 1]], '{"a":1}', (object) ['a' => 1]],
+            [['format' => 'default', 'constraints' => ['minLength' => 1]], '{"a":1, "b":2}', (object) ['a' => 1, 'b' => 2]],
             [['format' => 'default', 'constraints' => ['minLength' => 1]], 'invalid', self::ERROR],
-            [['format' => 'default', 'constraints' => ['maxLength' => 1]], '{}', (object)[]],
-            [['format' => 'default', 'constraints' => ['maxLength' => 1]], '{"a":1}', (object)["a"=>1]],
+            [['format' => 'default', 'constraints' => ['maxLength' => 1]], '{}', (object) []],
+            [['format' => 'default', 'constraints' => ['maxLength' => 1]], '{"a":1}', (object) ['a' => 1]],
             [['format' => 'default', 'constraints' => ['maxLength' => 1]], '{"a":1, "b":2}', self::ERROR],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
                 '{"a":1, "b":2}', self::ERROR, ],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
-                '{"a":1}', (object)["a"=>1], ],
+                '{"a":1}', (object) ['a' => 1], ],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
                 '{}', self::ERROR, ],
         ]);
@@ -443,21 +443,21 @@ class FieldTypesTest extends TestCase
             [['format' => 'default', 'constraints' => ['enum' => ['foobar']]], 'foobar', 'foobar'],
             [['format' => 'default', 'constraints' => ['enum' => ['foobar']]], 'foobarx', self::ERROR],
             // minLength / maxLength
-            [['format' => 'default', 'constraints' => ['minLength' => 1]], "", self::ERROR],
-            [['format' => 'default', 'constraints' => ['minLength' => 1]], "a", "a"],
-            [['format' => 'default', 'constraints' => ['minLength' => 1]], "ab", "ab"],
-            [['format' => 'default', 'constraints' => ['maxLength' => 1]], "", ""],
-            [['format' => 'default', 'constraints' => ['maxLength' => 1]], "a", "a"],
-            [['format' => 'default', 'constraints' => ['maxLength' => 1]], "ab", self::ERROR],
+            [['format' => 'default', 'constraints' => ['minLength' => 1]], '', self::ERROR],
+            [['format' => 'default', 'constraints' => ['minLength' => 1]], 'a', 'a'],
+            [['format' => 'default', 'constraints' => ['minLength' => 1]], 'ab', 'ab'],
+            [['format' => 'default', 'constraints' => ['maxLength' => 1]], '', ''],
+            [['format' => 'default', 'constraints' => ['maxLength' => 1]], 'a', 'a'],
+            [['format' => 'default', 'constraints' => ['maxLength' => 1]], 'ab', self::ERROR],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
-                "ab", self::ERROR, ],
+                'ab', self::ERROR, ],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
-                "a", "a", ],
+                'a', 'a', ],
             [['format' => 'default', 'constraints' => ['minLength' => 1, 'maxLength' => 1]],
-                "", self::ERROR, ],
+                '', self::ERROR, ],
             // pattern
             [['format' => 'default', 'constraints' => ['pattern' => '^[a-z]*$']], 'AAA', self::ERROR],
-            [['format' => 'default', 'constraints' => ['pattern' => '^[a-z]*$']], 'aaa', 'aaa']
+            [['format' => 'default', 'constraints' => ['pattern' => '^[a-z]*$']], 'aaa', 'aaa'],
         ]);
     }
 
@@ -561,13 +561,13 @@ class FieldTypesTest extends TestCase
             list($format, $inputValue, $expectedCastValue, $expectedInferType) = $testLine;
             if (is_array($format)) {
                 $descriptor = $format;
-                $descriptor["type"] = $fieldType;
+                $descriptor['type'] = $fieldType;
             } else {
                 $descriptor = ['type' => $fieldType, 'format' => $format];
             }
             $assertMessage = 'descriptor='.json_encode($descriptor).", input='".json_encode($inputValue)."', expected='".json_encode($expectedCastValue)."'";
-            if (!isset($descriptor["name"])) {
-                $descriptor["name"] = 'unknown';
+            if (!isset($descriptor['name'])) {
+                $descriptor['name'] = 'unknown';
             }
             $field = FieldsFactory::field($descriptor);
             if ($expectedCastValue === self::ERROR) {

@@ -299,7 +299,7 @@ abstract class BaseField
         } elseif (is_array($val)) {
             return count($val);
         } elseif (is_object($val)) {
-            return count((array)$val);
+            return count((array) $val);
         } else {
             throw $this->getValidationException('invalid value for length constraint', $val);
         }
