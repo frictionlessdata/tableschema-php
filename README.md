@@ -26,19 +26,19 @@ Schema class provides helpful methods for working with a table schema and relate
 
 Schema objects can be constructed using any of the following:
 
-* php object
+* php array
 ```php
-$schema = new Schema((object)[
+$schema = new Schema([
     'fields' => [
-        (object)[
+        [
             'name' => 'id', 'title' => 'Identifier', 'type' => 'integer', 
-            'constraints' => (object)[
+            'constraints' => [
                 "required" => true,
                 "minimum" => 1,
                 "maximum" => 500
             ]
         ],
-        (object)['name' => 'name', 'title' => 'Name', 'type' => 'string'],
+        ['name' => 'name', 'title' => 'Name', 'type' => 'string'],
     ],
     'primaryKey' => 'id'
 ]);
@@ -55,7 +55,7 @@ $schema = new Schema("{
 ```
 
 * string containg value supported by [file_get_contents](http://php.net/manual/en/function.file-get-contents.php)
-```
+```php
 $schema = new Schema("https://raw.githubusercontent.com/frictionlessdata/testsuite-extended/ecf1b2504332852cca1351657279901eca6fdbb5/datasets/synthetic/schema.json");
 ```
 
@@ -63,7 +63,7 @@ The schema is loaded, parsed and validated and will raise exceptions in case of 
 
 access the schema data, which is ensured to conform to the specs.
 
-```
+```php
 $schema->missingValues(); // [""]
 $schema->primaryKey();  // ["id"]
 $schema->foreignKeys();  // []
@@ -79,7 +79,8 @@ $field("id")->unique();  // false
 ```
 
 validate function accepts the same arguemnts as the Schema constructor but returns a list of errors instead of raising exceptions
-```
+
+```php
 // validate functions accepts the same arguments as the Schema constructor
 $validationErrors = Schema::validate("http://invalid.schema.json");
 foreach ($validationErrors as $validationError) {
@@ -88,7 +89,8 @@ foreach ($validationErrors as $validationError) {
 ```
 
 validate and cast a row of data according to the schema
-```
+
+```php
 $row = $schema->castRow(["id" => "1", "name" => "First Name"]);
 ```
 
@@ -96,14 +98,57 @@ will raise exception if row fails validation
 
 it returns the row with all native values
 
-```
+```php
 $row  // ["id" => 1, "name" => "First Name"];
 ```
 
 validate the row to get a list of errors
 
-```
+```php
 $schema->validateRow(["id" => "foobar"]);  // ["id is not numeric", "name is required" .. ]
+```
+
+You can also create a new empty schema for editing
+
+```php
+$schema = new Schema();
+```
+
+set fields
+
+```php
+$schema->fields([
+    "id" => (object)["type" => "integer"],
+    "name" => (object)["type" => "string"],
+]);
+```
+
+appropriate field object is created according to the given descriptor
+
+```php
+$schema->field("id");  // IntegerField object
+```
+
+add / update or remove fields
+
+```php
+$schema->field("email", ["type" => "string", "format" => "email"]);
+$schema->field("name", ["type" => "string"]);
+$schema->removeField("name");
+```
+
+set or update other table schema attributes
+
+```php
+$schema->primaryKey(["id"]);
+```
+
+after every change - schema is validated and will raise Exception in case of validation errors
+
+finally, save the schema to a json file
+
+```php
+$schema->save("my-schema.json");
 ```
 
 ### Table
@@ -157,53 +202,6 @@ $table->save("output.csv")  // iterate over all the rows and save the to a csv f
 $table->schema()  // get the Schema object
 $table->read()  // returns all the data as an array
 ```
-
-### EditableSchema
-
-EditableSchema extends the Schema object with editing capabilities
-
-```
-use frictionlessdata\tableschema\EditableSchema;
-use frictionlessdata\tableschema\Fields\FieldsFactory;
-
-$schema = new EditableSchema();
-```
-
-edit fields
-```
-$schema->fields([
-    "id" => (object)["type" => "integer"],
-    "name" => (object)["type" => "string"],
-]);
-```
-
-appropriate field object is created according to the given descriptor
-```
-$schema->field("id");  // IntegerField object
-```
-
-add / update or remove fields
-
-```
-$schema->field("email", (object)["type" => "string", "format" => "email"]);
-$schema->field("name", (object)["type" => "string"]);
-$schema->removeField("name");
-```
-
-set or update other table schema attributes
-```
-$schema->primaryKey(["id"]);
-```
-
-
-after every change - schema is validated and will raise Exception in case of validation errors
-
-finally, save the schema to a json file
-
-```
-$schema->save("my-schema.json");
-```
-
 
 ## Important Notes
 

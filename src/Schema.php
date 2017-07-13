@@ -2,6 +2,8 @@
 
 namespace frictionlessdata\tableschema;
 
+use frictionlessdata\tableschema\Fields\FieldsFactory;
+
 /**
  *  Table Schema representation.
  *  Loads and validates a Table Schema descriptor from a descriptor / path to file / url containing the descriptor.
@@ -18,40 +20,45 @@ class Schema
      * @throws Exceptions\SchemaLoadException
      * @throws Exceptions\SchemaValidationFailedException
      */
-    public function __construct($descriptor)
+    public function __construct($descriptor = null)
     {
-        if (Utils::isJsonString($descriptor)) {
-            // it's a json encoded string
-            try {
-                $this->descriptor = json_decode($descriptor);
-            } catch (\Exception $e) {
-                throw new Exceptions\SchemaLoadException($descriptor, null, $e->getMessage());
-            }
-        } elseif (is_string($descriptor)) {
-            // it's a url or file path
-            $descriptorSource = $descriptor;
-            try {
-                $descriptor = file_get_contents($descriptorSource);
-            } catch (\Exception $e) {
-                throw new Exceptions\SchemaLoadException(null, $descriptorSource, $e->getMessage());
-            }
-            try {
-                $this->descriptor = json_decode($descriptor);
-            } catch (\Exception $e) {
-                throw new Exceptions\SchemaLoadException($descriptor, $descriptorSource, $e->getMessage());
-            }
+        if (is_null($descriptor)) {
+            $this->descriptor = (object) ['fields' => []];
         } else {
-            $this->descriptor = $descriptor;
-        }
-        if (is_array($this->descriptor)) {
+            if (Utils::isJsonString($descriptor)) {
+                // it's a json encoded string
+                try {
+                    $this->descriptor = json_decode($descriptor);
+                } catch (\Exception $e) {
+                    throw new Exceptions\SchemaLoadException($descriptor, null, $e->getMessage());
+                }
+                if (!$this->descriptor) {
+                    throw new Exceptions\SchemaLoadException($descriptor, null, 'invalid json');
+                }
+            } elseif (is_string($descriptor)) {
+                // it's a url or file path
+                $descriptorSource = $descriptor;
+                try {
+                    $descriptor = file_get_contents($descriptorSource);
+                } catch (\Exception $e) {
+                    throw new Exceptions\SchemaLoadException(null, $descriptorSource, $e->getMessage());
+                }
+                try {
+                    $this->descriptor = json_decode($descriptor);
+                } catch (\Exception $e) {
+                    throw new Exceptions\SchemaLoadException($descriptor, $descriptorSource, $e->getMessage());
+                }
+            } else {
+                $this->descriptor = $descriptor;
+            }
+            if (!is_object($this->descriptor) && !is_array($this->descriptor)) {
+                throw new Exceptions\SchemaLoadException($descriptor, null, 'descriptor must be an object or array');
+            }
             $this->descriptor = json_decode(json_encode($this->descriptor));
-        }
-        if (!is_object($this->descriptor())) {
-            throw new Exceptions\SchemaLoadException($descriptor, null, 'descriptor must be an object');
-        }
-        $validationErrors = SchemaValidator::validate($this->descriptor());
-        if (count($validationErrors) > 0) {
-            throw new Exceptions\SchemaValidationFailedException($validationErrors);
+            $validationErrors = SchemaValidator::validate($this->descriptor());
+            if (count($validationErrors) > 0) {
+                throw new Exceptions\SchemaValidationFailedException($validationErrors);
+            }
         }
     }
 
@@ -99,60 +106,102 @@ class Schema
         return $fullDescriptor;
     }
 
-    public function field($name)
+    public function field($name, $field = null)
     {
         $fields = $this->fields();
-        if (array_key_exists($name, $fields)) {
+        if (!is_null($field)) {
+            $fields[$name] = $field;
+
+            return $this->fields($fields);
+        } elseif (array_key_exists($name, $fields)) {
             return $fields[$name];
         } else {
             throw new \Exception("unknown field name: {$name}");
         }
     }
 
+    public function removeField($name)
+    {
+        $fields = $this->fields();
+        unset($fields[$name]);
+
+        return $this->fields($fields);
+    }
+
     /**
-     * @return Fields\BaseField[] array of field name => field object
+     * @return Fields\BaseField[]|Schema array of field name => field object or the schema in case of editing
      */
-    public function fields()
+    public function fields($newFields = null)
     {
-        if (empty($this->fieldsCache)) {
-            foreach ($this->descriptor()->fields as $fieldDescriptor) {
-                if (!array_key_exists('type', $fieldDescriptor)) {
-                    $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
-                } else {
-                    $field = Fields\FieldsFactory::field($fieldDescriptor);
+        if (is_null($newFields)) {
+            if (empty($this->fieldsCache)) {
+                foreach ($this->descriptor()->fields as $fieldDescriptor) {
+                    if (!array_key_exists('type', $fieldDescriptor)) {
+                        $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
+                    } else {
+                        $field = Fields\FieldsFactory::field($fieldDescriptor);
+                    }
+                    $this->fieldsCache[$field->name()] = $field;
                 }
-                $this->fieldsCache[$field->name()] = $field;
             }
+
+            return $this->fieldsCache;
+        } else {
+            $this->descriptor()->fields = [];
+            $this->fieldsCache = [];
+            foreach ($newFields as $name => $field) {
+                $field = FieldsFactory::field($field, $name);
+                $this->fieldsCache[$name] = $field;
+                $this->descriptor()->fields[] = $field->descriptor();
+            }
+
+            return $this->revalidate();
         }
-
-        return $this->fieldsCache;
     }
 
-    public function missingValues()
+    public function missingValues($missingValues = null)
     {
-        return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [''];
-    }
+        if (is_null($missingValues)) {
+            return isset($this->descriptor()->missingValues) ? $this->descriptor()->missingValues : [''];
+        } else {
+            $this->descriptor()->missingValues = $missingValues;
 
-    public function primaryKey()
-    {
-        $primaryKey = isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
-
-        return is_array($primaryKey) ? $primaryKey : [$primaryKey];
-    }
-
-    public function foreignKeys()
-    {
-        $foreignKeys = isset($this->descriptor()->foreignKeys) ? $this->descriptor()->foreignKeys : [];
-        foreach ($foreignKeys as &$foreignKey) {
-            if (!is_array($foreignKey->fields)) {
-                $foreignKey->fields = [$foreignKey->fields];
-            }
-            if (!is_array($foreignKey->reference->fields)) {
-                $foreignKey->reference->fields = [$foreignKey->reference->fields];
-            }
+            return $this->revalidate();
         }
+    }
 
-        return $foreignKeys;
+    public function primaryKey($primaryKey = null)
+    {
+        if (is_null($primaryKey)) {
+            $primaryKey = isset($this->descriptor()->primaryKey) ? $this->descriptor()->primaryKey : [];
+
+            return is_array($primaryKey) ? $primaryKey : [$primaryKey];
+        } else {
+            $this->descriptor()->primaryKey = $primaryKey;
+
+            return $this->revalidate();
+        }
+    }
+
+    public function foreignKeys($foreignKeys = null)
+    {
+        if (is_null($foreignKeys)) {
+            $foreignKeys = isset($this->descriptor()->foreignKeys) ? $this->descriptor()->foreignKeys : [];
+            foreach ($foreignKeys as &$foreignKey) {
+                if (!is_array($foreignKey->fields)) {
+                    $foreignKey->fields = [$foreignKey->fields];
+                }
+                if (!is_array($foreignKey->reference->fields)) {
+                    $foreignKey->reference->fields = [$foreignKey->reference->fields];
+                }
+            }
+
+            return $foreignKeys;
+        } else {
+            $this->descriptor()->foreignKeys = $foreignKeys;
+
+            return $this->revalidate();
+        }
     }
 
     /**
@@ -203,6 +252,16 @@ class Schema
     public function save($filename)
     {
         file_put_contents($filename, json_encode($this->fullDescriptor()));
+    }
+
+    public function revalidate()
+    {
+        $validationErrors = SchemaValidator::validate($this->descriptor());
+        if (count($validationErrors) > 0) {
+            throw new Exceptions\SchemaValidationFailedException($validationErrors);
+        } else {
+            return $this;
+        }
     }
 
     protected $descriptor;

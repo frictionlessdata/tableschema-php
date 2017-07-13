@@ -4,6 +4,7 @@ namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
 use frictionlessdata\tableschema\SchemaValidationError;
+use frictionlessdata\tableschema\Utils;
 
 class FieldsFactory
 {
@@ -43,19 +44,31 @@ class FieldsFactory
      *
      * @throws \Exception
      */
-    public static function field($descriptor)
+    public static function field($descriptor, $name = null)
     {
-        foreach (static::$fieldClasses as $fieldClass) {
-            /** @var BaseField $fieldClass */
-            if ($field = $fieldClass::inferDescriptor($descriptor)) {
-                return $field;
+        if (is_a($descriptor, 'frictionlessdata\\tableschema\\Fields\\BaseField')) {
+            return $descriptor;
+        } else {
+            if (Utils::isJsonString($descriptor)) {
+                $descriptor = json_decode($descriptor);
+            } elseif (is_array($descriptor)) {
+                $descriptor = json_decode(json_encode($descriptor));
             }
+            if (!isset($descriptor->name) && !is_null($name)) {
+                $descriptor->name = $name;
+            }
+            foreach (static::$fieldClasses as $fieldClass) {
+                /** @var BaseField $fieldClass */
+                if ($field = $fieldClass::inferDescriptor($descriptor)) {
+                    return $field;
+                }
+            }
+            throw new FieldValidationException([
+                new SchemaValidationError(
+                    SchemaValidationError::SCHEMA_VIOLATION,
+                    'Could not find a valid field for descriptor: '.json_encode($descriptor)),
+            ]);
         }
-        throw new FieldValidationException([
-            new SchemaValidationError(
-                SchemaValidationError::SCHEMA_VIOLATION,
-                'Could not find a valid field for descriptor: '.json_encode($descriptor)),
-        ]);
     }
 
     /**
