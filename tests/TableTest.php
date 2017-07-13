@@ -26,9 +26,7 @@ class TableTest extends TestCase
 
     public function testBasicUsage()
     {
-        $dataSource = new CsvDataSource($this->fixture('data.csv'));
-        $schema = new Schema($this->fixture('data.json'));
-        $table = new Table($dataSource, $schema);
+        $table = new Table($this->fixture('data.csv'), $this->fixture('data.json'));
         $rows = [];
         foreach ($table as $row) {
             $rows[] = $row;
@@ -101,6 +99,47 @@ class TableTest extends TestCase
         ], 2);
     }
 
+    public function testAutoInferSchemaWhenNullSchema()
+    {
+        $table = new Table($this->fixture('data.csv'));
+        $this->assertTrue(is_a($table->schema(), 'frictionlessdata\\tableschema\\InferSchema'));
+    }
+
+    public function testHeaders()
+    {
+        $table = new Table($this->fixture('data.csv'));
+        $this->assertEquals(['first_name', 'last_name', 'order'], $table->headers());
+        $this->assertEquals([
+            ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
+            ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
+            ['first_name' => 'באך', 'last_name' => 'ביי', 'order' => 3],
+        ], $table->read());
+
+        $table = new Table($this->fixture('data.csv'));
+        $this->assertEquals(['first_name', 'last_name', 'order'], $table->headers(1));
+        $this->assertEquals([
+            ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
+            ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
+            ['first_name' => 'באך', 'last_name' => 'ביי', 'order' => 3],
+        ], $table->read());
+        $this->assertEquals([
+            ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
+            ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
+            ['first_name' => 'באך', 'last_name' => 'ביי', 'order' => 3],
+        ], $table->read());
+    }
+
+    public function testTableSave()
+    {
+        $table = new Table($this->fixture('data.csv'));
+        $table->save('test-table-save-data.csv');
+        $this->assertEquals(
+            "first_name,last_name,order\nFoo,Bar,1\nBaz,Bax,2\nבאך,ביי,3\n",
+            file_get_contents('test-table-save-data.csv')
+        );
+        unlink('test-table-save-data.csv');
+    }
+
     public function testInferSchemaWorksWithMoreRows()
     {
         $this->assertInferSchema(
@@ -117,6 +156,18 @@ class TableTest extends TestCase
             ],
             3
         );
+    }
+
+    public function testSimpleInferSchema()
+    {
+        $table = new Table($this->fixture('data.csv'));
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'first_name', 'type' => 'string'],
+                (object) ['name' => 'last_name', 'type' => 'string'],
+                (object) ['name' => 'order', 'type' => 'integer'],
+            ],
+        ], $table->schema()->descriptor());
     }
 
     public function testInferSchemaEmailFormat()

@@ -2,6 +2,8 @@
 
 namespace frictionlessdata\tableschema;
 
+use frictionlessdata\tableschema\Fields\FieldsFactory;
+
 class EditableSchema extends Schema
 {
     public function __construct($descriptor = null)
@@ -12,9 +14,16 @@ class EditableSchema extends Schema
     public function fields($newFields = null)
     {
         if (!is_null($newFields)) {
-            $this->fieldsCache = $newFields;
             $this->descriptor()->fields = [];
-            foreach ($newFields as $field) {
+            $this->fieldsCache = [];
+            foreach ($newFields as $name => $field) {
+                if (!is_a($field, 'frictionlessdata\\tableschema\\Fields\\BaseField')) {
+                    if (!isset($field->name)) {
+                        $field->name = $name;
+                    }
+                    $field = FieldsFactory::field($field);
+                }
+                $this->fieldsCache[$name] = $field;
                 $this->descriptor()->fields[] = $field->descriptor();
             }
 

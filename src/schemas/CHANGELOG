@@ -1,0 +1,3 @@
+2017-07-06T17:16:11+03:00
+* enum and minimum / maximum values were modified to be limited to specific types
+* foreignKeys.items[].reference.resource - removed uri format constraint

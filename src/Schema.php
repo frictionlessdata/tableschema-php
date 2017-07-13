@@ -43,6 +43,9 @@ class Schema
         } else {
             $this->descriptor = $descriptor;
         }
+        if (is_array($this->descriptor)) {
+            $this->descriptor = json_decode(json_encode($this->descriptor));
+        }
         if (!is_object($this->descriptor())) {
             throw new Exceptions\SchemaLoadException($descriptor, null, 'descriptor must be an object');
         }
@@ -203,5 +206,5 @@ class Schema
     }
 
     protected $descriptor;
-    protected $fieldsCache = null;
+    protected $fieldsCache = [];
 }

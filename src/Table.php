@@ -2,6 +2,7 @@
 
 namespace frictionlessdata\tableschema;
 
+use frictionlessdata\tableschema\DataSources\CsvDataSource;
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
 
 /**
@@ -17,9 +18,20 @@ class Table implements \Iterator
      *
      * @throws Exceptions\DataSourceException
      */
-    public function __construct($dataSource, $schema)
+    public function __construct($dataSource, $schema = null)
     {
+        if (!is_a($dataSource, 'frictionlessdata\\tableschema\\DataSources\\BaseDataSource')) {
+            // TODO: more advanced data source detection
+            $dataSource = new CsvDataSource($dataSource);
+        }
         $this->dataSource = $dataSource;
+        if (!is_a($schema, 'frictionlessdata\\tableschema\\Schema')) {
+            if ($schema) {
+                $schema = new Schema($schema);
+            } else {
+                $schema = new InferSchema();
+            }
+        }
         $this->schema = $schema;
         $this->dataSource->open();
         $this->uniqueFieldValues = [];
@@ -69,6 +81,35 @@ class Table implements \Iterator
         return [];
     }
 
+    public function schema($numPeekRows = 10)
+    {
+        $this->ensureInferredSchema($numPeekRows);
+
+        return $this->schema;
+    }
+
+    public function headers($numPeekRows = 10)
+    {
+        $this->ensureInferredSchema($numPeekRows);
+
+        return array_keys($this->schema->fields());
+    }
+
+    public function read()
+    {
+        $rows = [];
+        foreach ($this as $row) {
+            $rows[] = $row;
+        }
+
+        return $rows;
+    }
+
+    public function save($outputDataSource)
+    {
+        return $this->dataSource->save($outputDataSource);
+    }
+
     /**
      * called on each iteration to get the next row
      * does validation and casting on the row.
@@ -80,17 +121,21 @@ class Table implements \Iterator
      */
     public function current()
     {
-        $row = $this->schema->castRow($this->dataSource->getNextLine());
-        foreach ($this->schema->fields() as $field) {
-            if ($field->unique()) {
-                if (!array_key_exists($field->name(), $this->uniqueFieldValues)) {
-                    $this->uniqueFieldValues[$field->name()] = [];
-                }
-                $value = $row[$field->name()];
-                if (in_array($value, $this->uniqueFieldValues[$field->name()])) {
-                    throw new DataSourceException('field must be unique', $this->currentLine);
-                } else {
-                    $this->uniqueFieldValues[$field->name()][] = $value;
+        if (count($this->castRows) > 0) {
+            $row = array_shift($this->castRows);
+        } else {
+            $row = $this->schema->castRow($this->dataSource->getNextLine());
+            foreach ($this->schema->fields() as $field) {
+                if ($field->unique()) {
+                    if (!array_key_exists($field->name(), $this->uniqueFieldValues)) {
+                        $this->uniqueFieldValues[$field->name()] = [];
+                    }
+                    $value = $row[$field->name()];
+                    if (in_array($value, $this->uniqueFieldValues[$field->name()])) {
+                        throw new DataSourceException('field must be unique', $this->currentLine);
+                    } else {
+                        $this->uniqueFieldValues[$field->name()][] = $value;
+                    }
                 }
             }
         }
@@ -100,7 +145,6 @@ class Table implements \Iterator
 
     // not interesting, standard iterator functions
     // to simplify we prevent rewinding - so you can only iterate once
-    // @codingStandardsIgnoreStart
     public function __destruct()
     {
         $this->dataSource->close();
@@ -110,30 +154,54 @@ class Table implements \Iterator
     {
         if ($this->currentLine == 0) {
             $this->currentLine = 1;
-        } else {
-            throw new \Exception('rewind is not supported');
+        } elseif (count($this->castRows) == 0) {
+            $this->currentLine = 1;
+            $this->dataSource->open();
         }
     }
 
     public function key()
     {
-        return $this->currentLine;
+        return $this->currentLine - count($this->castRows);
     }
 
     public function next()
     {
-        ++$this->currentLine;
+        if (count($this->castRows) == 0) {
+            ++$this->currentLine;
+        }
     }
 
     public function valid()
     {
-        return !$this->dataSource->isEof();
+        return count($this->castRows) > 0 || !$this->dataSource->isEof();
     }
-
-    // @codingStandardsIgnoreEnd
 
     protected $currentLine = 0;
     protected $dataSource;
     protected $schema;
     protected $uniqueFieldValues;
+    protected $castRows = [];
+
+    protected function isInferSchema()
+    {
+        return is_a($this->schema, 'frictionlessdata\\tableschema\\InferSchema');
+    }
+
+    protected function ensureInferredSchema($numPeekRows = 10)
+    {
+        if ($this->isInferSchema() && count($this->schema->fields()) == 0) {
+            // need to fetch some rows first
+            if ($numPeekRows > 0) {
+                $i = 0;
+                foreach ($this as $row) {
+                    if (++$i > $numPeekRows) {
+                        break;
+                    }
+                }
+                // these rows will be returned by next current() call
+                $this->castRows = $this->schema->lock();
+            }
+        }
+    }
 }
