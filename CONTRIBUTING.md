@@ -57,11 +57,8 @@ you need to manually install it, then you can run : `composer style-check` or `c
 [![Packagist](https://img.shields.io/packagist/dm/frictionlessdata/tableschema.svg)](https://packagist.org/packages/frictionlessdata/tableschema)
 [![SemVer](https://img.shields.io/badge/versions-SemVer-brightgreen.svg)](http://semver.org/)
 
-* Publish a release (versioning based on SemVer) on GitHub
-* go to https://packagist.org/packages/frictionlessdata/tableschema
-* Login with GitHub which has permissions
-* click "Update"
-* all releases from GitHub appear as releases on Packagist
+* Packagist is automatically updated by the Packagist GitHub service
+* all releases from GitHub appear as releases on Packagist automatically
 
 
 ## Updating the json schema
