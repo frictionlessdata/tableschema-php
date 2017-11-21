@@ -335,6 +335,16 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
+    public function testBareNumber()
+    {
+        $this->assertFieldTestData('integer', [
+            [['bareNumber' => false], "₪50000", "₪50000"]
+        ]);
+        $this->assertFieldTestData('number', [
+            [['bareNumber' => false], "₪50000", "₪50000"]
+        ]);
+    }
+
     public function testNumber()
     {
         $this->assertFieldTestData('number', [
@@ -358,14 +368,8 @@ class FieldTypesTest extends TestCase
             [['format' => 'default', 'groupChar' => '#', 'decimalChar' => '@'], '10#000#000@50', 10000000.5],
             [['format' => 'default', 'groupChar' => '#', 'decimalChar' => '@'], '10@50', 10.5],
             [['format' => 'default', 'groupChar' => '#', 'decimalChar' => '@'], '1#000', 1000.0],
-            [['format' => 'default', 'groupChar' => ',', 'currency' => true], '10,000.00', 10000.0],
-            [['format' => 'default', 'groupChar' => ',', 'currency' => true], '10,000,000.00', 10000000.0],
-            [['format' => 'default', 'currency' => true], '$10000.00', 10000.0],
-            [['format' => 'default', 'groupChar' => ',', 'currency' => true], '  10,000.00 €', 10000.0],
             [['format' => 'default', 'groupChar' => ' ', 'decimalChar' => ','], '10 000,00', 10000.0],
             [['format' => 'default', 'groupChar' => ' ', 'decimalChar' => ','], '10 000 000,00', 10000000.0],
-            [['format' => 'default', 'groupChar' => ' ', 'decimalChar' => ',', 'currency' => true], '10000,00 ₪', 10000.0],
-            [['format' => 'default', 'groupChar' => ' ', 'decimalChar' => ',', 'currency' => true], '  10 000,00 £', 10000.0],
             [['format' => 'default'], '10,000a.00', self::ERROR],
             [['format' => 'default'], '10+000.00', self::ERROR],
             [['format' => 'default'], '$10:000.00', self::ERROR],

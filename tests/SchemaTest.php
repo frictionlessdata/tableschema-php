@@ -243,7 +243,7 @@ class SchemaTest extends TestCase
             $this->fail();
         } catch (\Exception $e) {
             $this->assertEquals(
-                'Schema failed validation: [fields[0].type] Does not have a value in the enumeration ["string"], [fields[0].type] Does not have a value in the enumeration ["number"], [fields[0].type] Does not have a value in the enumeration ["integer"], [fields[0].type] Does not have a value in the enumeration ["date"], [fields[0].type] Does not have a value in the enumeration ["time"], [fields[0].type] Does not have a value in the enumeration ["datetime"], [fields[0].type] Does not have a value in the enumeration ["year"], [fields[0].type] Does not have a value in the enumeration ["yearmonth"], [fields[0].type] Does not have a value in the enumeration ["boolean"], [fields[0].type] Does not have a value in the enumeration ["object"], [fields[0].type] Does not have a value in the enumeration ["geopoint"], [fields[0].type] Does not have a value in the enumeration ["geojson"], [fields[0].type] Does not have a value in the enumeration ["array"], [fields[0].type] Does not have a value in the enumeration ["duration"], [fields[0].type] Does not have a value in the enumeration ["any"], [fields[0]] Failed to match at least one schema',
+                'Schema failed validation: [fields[0].type] Does not have a value in the enumeration ["string"], [fields[0].type] Does not have a value in the enumeration ["number"], [fields[0].type] Does not have a value in the enumeration ["integer"], [fields[0].type] Does not have a value in the enumeration ["date"], [fields[0].type] Does not have a value in the enumeration ["time"], [fields[0].type] Does not have a value in the enumeration ["datetime"], [fields[0].type] Does not have a value in the enumeration ["year"], [fields[0].type] Does not have a value in the enumeration ["yearmonth"], [fields[0].type] Does not have a value in the enumeration ["boolean"], [fields[0].type] Does not have a value in the enumeration ["object"], [fields[0].type] Does not have a value in the enumeration ["geopoint"], [fields[0].type] Does not have a value in the enumeration ["geojson"], [fields[0].type] Does not have a value in the enumeration ["array"], [fields[0].type] Does not have a value in the enumeration ["duration"], [fields[0].type] Does not have a value in the enumeration ["any"], [fields[0]] Failed to match at least one schema, [foreignKeys[0].fields] Array value found, but a string is required, [foreignKeys[0].reference.resource] The property resource is required, [foreignKeys[0].reference.fields] String value found, but an array is required, [foreignKeys[0]] Failed to match exactly one schema',
                 $e->getMessage()
             );
         }
@@ -393,21 +393,6 @@ class SchemaTest extends TestCase
         ], (new Schema($this->maxDescriptorJson))->foreignKeys());
     }
 
-    public function testForeignKeyFieldsAsString()
-    {
-        $descriptor = json_decode($this->maxDescriptorJson);
-        $descriptor->foreignKeys[0]->fields = 'name';
-        // not sure why the reference fields don't support string
-        $descriptor->foreignKeys[0]->reference->fields = ['id'];
-        $this->assertEquals([(object) [
-            'fields' => ['name'],
-            'reference' => (object) [
-                'resource' => 'data.csv',
-                'fields' => ['id'],
-            ],
-        ]], (new Schema($descriptor))->foreignKeys());
-    }
-
     public function testEditable()
     {
         $schema = new Schema();
@@ -459,7 +444,7 @@ class SchemaTest extends TestCase
             );
         }
         // fields supports a string value, in that case it's considered an array of 1 field
-        $foreignKeys[0]->fields = 'id';
+        $foreignKeys[0]->fields = ['id'];
         // this is equivalent to:
         // $foreignKeys[0]->fields = ['id'];
         $schema->foreignKeys($foreignKeys);

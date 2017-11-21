@@ -13,6 +13,9 @@ class NumberField extends BaseField
      */
     protected function validateCastValue($val)
     {
+        if (isset($this->descriptor()->bareNumber) && $this->descriptor()->bareNumber === false) {
+            return $val;
+        }
         $isPercent = false;
         if (is_string($val)) {
             if (substr($val, -1) == '%') {
@@ -24,15 +27,6 @@ class NumberField extends BaseField
             }
             if (isset($this->descriptor()->decimalChar) && $this->descriptor()->decimalChar != '.') {
                 $val = str_replace($this->descriptor()->decimalChar, '.', $val);
-            }
-            if (isset($this->descriptor()->currency) && $this->descriptor()->currency) {
-                $newval = '';
-                foreach (str_split($val) as $chr) {
-                    if (is_numeric($chr) || $chr == '.' || $chr == '+' || $chr == '-') {
-                        $newval .= $chr;
-                    }
-                }
-                $val = $newval;
             }
         }
         if (!is_numeric($val)) {

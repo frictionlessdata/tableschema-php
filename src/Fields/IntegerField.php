@@ -13,7 +13,9 @@ class IntegerField extends BaseField
      */
     protected function validateCastValue($val)
     {
-        if (!is_numeric($val)) {
+        if (isset($this->descriptor()->bareNumber) && $this->descriptor()->bareNumber === false) {
+            return $val;
+        } elseif (!is_numeric($val)) {
             throw $this->getValidationException('value must be numeric', $val);
         } else {
             $intVal = (int) $val;

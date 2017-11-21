@@ -1,3 +1,11 @@
 2017-07-06T17:16:11+03:00
 * enum and minimum / maximum values were modified to be limited to specific types
 * foreignKeys.items[].reference.resource - removed uri format constraint
+
+
+2017-11-21T21:34:58+02:00
+* name field is not limited with regexp ( it used to be limited with ^([-a-z0-9._/])+$ )
+* added bareNumber attribute to number and integer field types - a boolean field with a default of `true`. If `true` the physical contents of this field must follow the formatting constraints already set out. If `false` the contents of this field may contain leading and/or trailing non-numeric characters (which implementors MUST therefore strip). The purpose of `bareNumber` is to allow publishers to publish numeric data that contains trailing characters such as percentages e.g. `95%` or leading characters such as currencies e.g. `€95` or `EUR 95`. Note that it is entirely up to implementors what, if anything, they do with stripped text.
+* removed currency attribute from number field types
+*
+
