@@ -3,6 +3,7 @@
 namespace frictionlessdata\tableschema\DataSources;
 
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
+use frictionlessdata\tableschema\CsvDialect;
 
 /**
  * handles reading data from a csv source
@@ -11,12 +12,23 @@ use frictionlessdata\tableschema\Exceptions\DataSourceException;
  */
 class CsvDataSource extends BaseDataSource
 {
+    /** @var  CsvDialect */
+    public $csvDialect;
+
+    public function setCsvDialect($csvDialect)
+    {
+        $this->csvDialect = $csvDialect;
+    }
+
     /**
      * @throws DataSourceException
      */
     public function open()
     {
         $this->curRowNum = 0;
+        if (!$this->csvDialect) {
+            throw new \Exception("must set csv dialect");
+        }
         try {
             $this->resource = fopen($this->dataSource, 'r');
         } catch (\Exception $e) {
@@ -24,13 +36,28 @@ class CsvDataSource extends BaseDataSource
         }
         $this->headerRow = $this->getOption('headerRow');
         if ($this->headerRow) {
+            // specifically set header row - will not skip any rows
             $headerRowNum = 0;
             $defaultSkipRows = 0;
         } else {
+            // skip rows according to headerRowNum which is 1 by default
             $defaultSkipRows = $headerRowNum = $this->getOption('headerRowNum', 1);
         }
+        /*
+         * RFC4180:
+         * - The last record in the file may or may not have an ending line break.
+         * - Each line should contain the same number of fields throughout the file.
+         *
+         * Tabular Data requirements
+         * - File encoding must be either UTF-8 (the default) or include encoding property
+         * - If the CSV differs from this or the RFC in any other way regarding dialect
+         *   (e.g. line terminators, quote charactors, field delimiters),
+         *   the Tabular Data Resource MUST contain a dialect property describing its dialect.
+         *   The dialect property MUST follow the CSV Dialect specification.
+         */
         $skipRows = $this->getOption('skipRows', $defaultSkipRows);
         if ($skipRows > 0) {
+            // either specifically set skipRows, or as required for the header row
             foreach (range(1, $skipRows) as $i) {
                 $row = $this->getRow();
                 $this->skippedRows[] = $row;
@@ -39,7 +66,7 @@ class CsvDataSource extends BaseDataSource
                 }
             }
         }
-        if (!$this->headerRow) {
+        if (!$this->headerRow || $this->headerRow == [""]) {
             throw new DataSourceException('Failed to get header row');
         }
     }
@@ -59,13 +86,13 @@ class CsvDataSource extends BaseDataSource
      */
     public function getNextLine()
     {
-        $row = $this->getRow();
+        $row = $this->nextRow;
+        $this->nextRow = null;
         $colNum = 0;
         $obj = [];
         foreach ($this->headerRow as $fieldName) {
             $obj[$fieldName] = $row[$colNum++];
         }
-
         return $obj;
     }
 
@@ -76,10 +103,34 @@ class CsvDataSource extends BaseDataSource
      */
     public function isEof()
     {
-        try {
-            return feof($this->resource);
-        } catch (\Exception $e) {
-            throw new DataSourceException($e->getMessage(), $this->curRowNum);
+        if ($this->nextRow) {
+            return false;
+        } else {
+            try {
+                $eof = feof($this->resource);
+            } catch (\Exception $e) {
+                throw new DataSourceException($e->getMessage(), $this->curRowNum);
+            }
+            if ($eof) {
+                return true;
+            } else {
+                $this->nextRow = $this->getRow();
+                if (!$this->nextRow || $this->nextRow === [""]) {
+                    try {
+                        $eof = feof($this->resource);
+                    } catch (\Exception $e) {
+                        throw new DataSourceException($e->getMessage(), $this->curRowNum);
+                    }
+                    if ($eof) {
+                        // RFC4180: The last record in the file may or may not have an ending line break.
+                        return true;
+                    } else {
+                        throw new DataSourceException("invalid csv file", $this->curRowNum);
+                    }
+                } else {
+                    return false;
+                }
+            }
         }
     }
 
@@ -109,6 +160,7 @@ class CsvDataSource extends BaseDataSource
     protected $headerRow;
     protected $skippedRows;
     protected $curRowNum;
+    protected $nextRow;
 
     /**
      * @return array
@@ -119,9 +171,10 @@ class CsvDataSource extends BaseDataSource
     {
         ++$this->curRowNum;
         try {
-            return fgetcsv($this->resource);
+            $line = fgets($this->resource);
         } catch (\Exception $e) {
             throw new DataSourceException($e->getMessage(), $this->curRowNum);
         }
+        return $this->csvDialect->parseRow($line);
     }
 }

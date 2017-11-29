@@ -14,7 +14,7 @@ class NumberField extends BaseField
     protected function validateCastValue($val)
     {
         if (isset($this->descriptor()->bareNumber) && $this->descriptor()->bareNumber === false) {
-            return $val;
+            return mb_ereg_replace('((^\D*)|(\D*$))', '', $val);
         }
         $isPercent = false;
         if (is_string($val)) {
