@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Table;
 use frictionlessdata\tableschema\SchemaValidationError;
 use frictionlessdata\tableschema\InferSchema;
+use Carbon\Carbon;
 
 class TableTest extends TestCase
 {
@@ -212,6 +213,72 @@ class TableTest extends TestCase
             'age' => 'integer',
             'name' => 'string',
         ], 'data_infer_utf8.csv', 4);
+    }
+
+    public function testCsvDialectLolsv()
+    {
+        $table = new Table($this->fixture('data.lolsv'), null, [
+            "delimiter" => "o",
+            "quoteChar" => 'L',
+            "header" => true,
+            "caseSensitiveHeader" => false
+        ]);
+        $rows = [];
+        foreach ($table as $row) {
+            $rows[] = $row;
+        }
+        $this->assertEquals([
+            ['first_name' => 'Foo', 'last_name' => 'Bar', 'order' => 1],
+            ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
+            ['first_name' => 'באך', 'last_name' => 'ביי', 'order' => 3],
+        ], $rows);
+    }
+
+    public function testCsvDialectDatapackagePipelines()
+    {
+        $datapackage = json_decode(file_get_contents($this->fixture('committees/datapackage.json')));
+        $resource = $datapackage->resources[0];
+        $table = new Table($this->fixture('committees/kns_committee.csv'), $resource->schema, $resource->dialect);
+        $rows = [];
+        foreach ($table as $row) {
+            $rows[] = $row;
+            if (count($rows) == 2) break;
+        }
+        $this->assertEquals([[
+            'CommitteeID' => 97,
+            'Name' => 'ה"ח המדיניות הכלכלית לשנת הכספים 2004',
+            'CategoryID' => null,
+            'CategoryDesc' => null,
+            'KnessetNum' => 16,
+            'CommitteeTypeID' => 73,
+            'CommitteeTypeDesc' => 'ועדה  משותפת',
+            'Email' => null,
+            'StartDate' => Carbon::create(2004, 8, 12, 0, 0, 0),
+            'FinishDate' => null,
+            'AdditionalTypeID' => null,
+            'AdditionalTypeDesc' => null,
+            'ParentCommitteeID' => null,
+            'CommitteeParentName' => null,
+            'IsCurrent' => true,
+            'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57),
+        ], [
+            'CommitteeID' => 314,
+            'Name' => 'המיוחדת לענין לקחי אסון גשר המכביה',
+            'CategoryID' => null,
+            'CategoryDesc' => null,
+            'KnessetNum' => 14,
+            'CommitteeTypeID' => 72,
+            'CommitteeTypeDesc' => 'ועדה מיוחדת',
+            'Email' => null,
+            'StartDate' => Carbon::create(1988, 10, 19, 0, 0, 0),
+            'FinishDate' => null,
+            'AdditionalTypeID' => 992,
+            'AdditionalTypeDesc' => 'מיוחדת',
+            'ParentCommitteeID' => null,
+            'CommitteeParentName' => null,
+            'IsCurrent' => true,
+            'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57)
+        ]], $rows);
     }
 
     protected $fixturesPath;

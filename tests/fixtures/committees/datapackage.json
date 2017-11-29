@@ -1,0 +1,550 @@
+{
+  "bytes": 216380647,
+  "count_of_rows": 2941876,
+  "description": "Knesset committees and committee meetings data from Knesset dataservice API",
+  "hash": "5e3087c6129d7b7da03f0e7ec93d1c48",
+  "name": "knesset_data_committees",
+  "resources": [
+    {
+      "bytes": 160722,
+      "count_of_rows": 702,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "23974f6e86b9996d4930753f073a67f1",
+      "name": "kns_committee",
+      "path": "kns_committee.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e9\u05dd \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "Name",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CategoryID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d4\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d1\u05db\u05dc \u05db\u05e0\u05e1\u05ea, \u05db\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d5\u05ea \u05de\u05d5\u05e7\u05de\u05d5\u05ea \u05de\u05d7\u05d3\u05e9. \u05d4\u05e9\u05d3\u05d4 \u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05db\u05d5\u05dc\u05dc \u05d0\u05ea \u05e8\u05e9\u05d9\u05de\u05ea \u05d4\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d5\u05ea \u05d4\u05e0\u05d5\u05e9\u05d0\u05d9\u05d5\u05ea \u05e9\u05d0\u05dc\u05d9\u05d4\u05df \u05de\u05e9\u05d5\u05d9\u05db\u05d5\u05ea \u05d4\u05d5\u05d5\u05e2\u05d3\u05d5\u05ea. \u05dc\u05de\u05e9\u05dc \u05d4\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05e9\u05dc \u05d5\u05e2\u05d3\u05ea \u05d4\u05e4\u05e0\u05d9\u05dd \u05d5\u05d4\u05d2\u05e0\u05ea \u05d4\u05e1\u05d1\u05d9\u05d1\u05d4 \u05d4\u05d9\u05d0 \"\u05e4\u05e0\u05d9\u05dd\" \u05d5\u05db\u05da \u05d4\u05d9\u05d4 \u05d2\u05dd \u05db\u05d0\u05e9\u05e8 \u05e9\u05dd \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d4\u05d9\u05d4 \u05d5\u05e2\u05d3\u05ea \u05d4\u05e4\u05e0\u05d9\u05dd \u05d5\u05d0\u05d9\u05db\u05d5\u05ea \u05d4\u05e1\u05d1\u05d9\u05d1\u05d4. \u05d2\u05dd \u05d5\u05e2\u05d3\u05d5\u05ea \u05d4\u05de\u05e9\u05e0\u05d4 \u05e9\u05dc \u05db\u05dc \u05d5\u05e2\u05d3\u05d4 \u05de\u05e9\u05d5\u05d9\u05db\u05d5\u05ea \u05dc\u05e7\u05d8\u05d2\u05d5\u05e8\u05d9\u05d4 \u05e9\u05dc\u05d4. \u05de\u05d3\u05d5\u05d1\u05e8 \u05d1\u05e9\u05d9\u05d5\u05da \u05e0\u05d5\u05e9\u05d0\u05d9 \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d5\u05ea.\n",
+            "name": "CategoryDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05db\u05e0\u05e1\u05ea",
+            "name": "KnessetNum",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d5\u05d2 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CommitteeTypeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e1\u05d5\u05d2 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 (\u05e8\u05d0\u05e9\u05d9\u05ea, \u05de\u05d9\u05d5\u05d7\u05d3\u05ea, \u05de\u05e9\u05e0\u05d4, \u05de\u05e9\u05d5\u05ea\u05e4\u05ea, \u05d4\u05db\u05e0\u05e1\u05ea)\n",
+            "name": "CommitteeTypeDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05db\u05ea\u05d5\u05d1\u05ea \u05d4\u05d3\u05d5\u05d0\"\u05dc \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "Email",
+            "type": "string"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05ea\u05d7\u05dc\u05d4",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "StartDate",
+            "type": "datetime"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e1\u05d9\u05d5\u05dd",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "FinishDate",
+            "type": "datetime"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d5\u05d2 \u05de\u05e9\u05e0\u05d4 \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "AdditionalTypeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e1\u05d5\u05d2 \u05de\u05e9\u05e0\u05d4 \u05e9\u05dc \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 (\u05e7\u05d1\u05d5\u05e2\u05d4, \u05de\u05d9\u05d5\u05d7\u05d3\u05ea, \u05d7\u05e7\u05d9\u05e8\u05d4)",
+            "name": "AdditionalTypeDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d5\u05e2\u05d3\u05ea \u05d4\u05d0\u05dd (\u05e8\u05dc\u05d5\u05d5\u05e0\u05d8\u05d9 \u05e8\u05e7 \u05dc\u05d5\u05d5\u05e2\u05d3\u05ea \u05de\u05e9\u05e0\u05d4)",
+            "name": "ParentCommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05d5\u05e2\u05d3\u05ea \u05d4\u05d0\u05dd",
+            "name": "CommitteeParentName",
+            "type": "string"
+          },
+          {
+            "description": "\u05d4\u05d0\u05dd \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05e4\u05e2\u05d9\u05dc\u05d4?",
+            "name": "IsCurrent",
+            "type": "boolean"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e2\u05d3\u05db\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "LastUpdatedDate",
+            "type": "datetime"
+          }
+        ],
+        "primaryKey": [
+          "CommitteeID"
+        ]
+      }
+    },
+    {
+      "bytes": 7762,
+      "count_of_rows": 240,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "4f9424a9cb4c41019d3cfff5325583da",
+      "name": "kns_jointcommittee",
+      "path": "kns_jointcommittee.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e9\u05d5\u05e8\u05d4 \u05d1\u05d8\u05d1\u05dc\u05d4 \u05d6\u05d5",
+            "name": "JointCommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d4\u05de\u05e9\u05d5\u05ea\u05e4\u05ea",
+            "name": "CommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d4\u05de\u05e9\u05ea\u05ea\u05e4\u05ea",
+            "name": "ParticipantCommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e2\u05d3\u05db\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "LastUpdatedDate",
+            "type": "datetime"
+          }
+        ],
+        "primaryKey": [
+          "JointCommitteeID"
+        ]
+      }
+    },
+    {
+      "bytes": 5368,
+      "count_of_rows": 446,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "d3507d768760a5557897971568f206c9",
+      "name": "kns_cmtsitecode",
+      "path": "kns_cmtsitecode.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e9\u05d5\u05e8\u05d4 \u05d1\u05d8\u05d1\u05dc\u05d4 \u05d6\u05d5",
+            "name": "CmtSiteCode",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d1\u05de\u05e2\u05e8\u05db\u05ea \u05e1\u05e0\u05d4\u05d3\u05e8\u05d9\u05df (\u05d4\u05de\u05e9\u05ea\u05e7\u05e3 \u05d1\u05d8\u05d1\u05dc\u05d0\u05d5\u05ea \u05d0\u05dc\u05d5)",
+            "name": "KnsID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4 \u05d1\u05d1\u05e1\u05d9\u05e1 \u05d4\u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e9\u05dc \u05d0\u05ea\u05e8 \u05d4\u05db\u05e0\u05e1\u05ea (\u05de\u05e9\u05de\u05e9 \u05d0\u05ea \u05d7\u05dc\u05e7 \u05de\u05d3\u05e4\u05d9 \u05d4\u05d0\u05ea\u05e8)",
+            "name": "SiteId",
+            "type": "integer"
+          }
+        ],
+        "primaryKey": [
+          "CmtSiteCode"
+        ]
+      }
+    },
+    {
+      "bytes": 9743003,
+      "count_of_rows": 34058,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "8e590fa5de4161105efa280c744e39ad",
+      "name": "kns_committeesession",
+      "path": "kns_committeesession.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e9\u05d5\u05e8\u05d4 \u05d1\u05d8\u05d1\u05dc\u05d4 \u05d6\u05d5",
+            "name": "CommitteeSessionID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "Number",
+            "type": "integer"
+          },
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05db\u05e0\u05e1\u05ea",
+            "name": "KnessetNum",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d5\u05d2 \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "TypeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e1\u05d5\u05d2 \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4 (\u05e4\u05ea\u05d5\u05d7\u05d4, \u05d7\u05e1\u05d5\u05d9\u05d4, \u05e1\u05d9\u05d5\u05e8)",
+            "name": "TypeDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CommitteeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05de\u05d9\u05e7\u05d5\u05dd \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "Location",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05d9\u05e9\u05d9\u05d1\u05d4 \u05d1\u05d0\u05ea\u05e8 \u05d4\u05db\u05e0\u05e1\u05ea",
+            "name": "SessionUrl",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d9\u05e9\u05d5\u05e8 \u05dc\u05e9\u05d9\u05d3\u05d5\u05e8 \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4 \u05d1\u05d0\u05ea\u05e8 \u05d4\u05db\u05e0\u05e1\u05ea",
+            "name": "BroadcastUrl",
+            "type": "string"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05d4\u05ea\u05d7\u05dc\u05d4",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "StartDate",
+            "type": "datetime"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e1\u05d9\u05d5\u05dd",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "FinishDate",
+            "type": "datetime"
+          },
+          {
+            "description": "\u05d4\u05e2\u05e8\u05d4",
+            "name": "Note",
+            "type": "string"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e2\u05d3\u05db\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "LastUpdatedDate",
+            "type": "datetime"
+          }
+        ],
+        "primaryKey": [
+          "CommitteeSessionID"
+        ]
+      }
+    },
+    {
+      "bytes": 6846904,
+      "count_of_rows": 43010,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "011413eecddfa167b1d0caf71ebe7377",
+      "name": "kns_cmtsessionitem",
+      "path": "kns_cmtsessionitem.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05d4\u05e9\u05d5\u05e8\u05d4 \u05d1\u05d8\u05d1\u05dc\u05d4 \u05d6\u05d5",
+            "name": "CmtSessionItemID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05e4\u05e8\u05d9\u05d8 \u05e9\u05e9\u05d5\u05d1\u05e5 \u05dc\u05d9\u05e9\u05d9\u05d1\u05ea \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "ItemID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d9\u05e9\u05d9\u05d1\u05ea \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CommitteeSessionID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05de\u05e1\u05e4\u05e8 \u05e1\u05d9\u05d3\u05d5\u05e8\u05d9 \u05e9\u05dc \u05d4\u05e4\u05e8\u05d9\u05d8 \u05d1\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "Ordinal",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d8\u05d8\u05d5\u05e1 \u05e9\u05dc \u05d4\u05e4\u05e8\u05d9\u05d8 \u05d1\u05d6\u05de\u05df \u05d4\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "StatusID",
+            "type": "string"
+          },
+          {
+            "description": "\u05e9\u05dd \u05d4\u05e4\u05e8\u05d9\u05d8 \u05d1\u05d9\u05e9\u05d9\u05d1\u05d4",
+            "name": "Name",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d5\u05d2 \u05d4\u05e4\u05e8\u05d9\u05d8",
+            "name": "ItemTypeID",
+            "type": "string"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e2\u05d3\u05db\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "LastUpdatedDate",
+            "type": "datetime"
+          }
+        ],
+        "primaryKey": [
+          "CmtSessionItemID"
+        ]
+      }
+    },
+    {
+      "bytes": 5868824,
+      "count_of_rows": 46450,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "fbc511e5c75cbf8409590f6997d466b3",
+      "name": "kns_documentcommitteesession",
+      "path": "kns_documentcommitteesession.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d4\u05de\u05e1\u05de\u05da",
+            "name": "DocumentCommitteeSessionID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05d9\u05e9\u05d9\u05d1\u05ea \u05d4\u05d5\u05d5\u05e2\u05d3\u05d4",
+            "name": "CommitteeSessionID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e1\u05d5\u05d2 \u05d4\u05de\u05e1\u05de\u05da",
+            "name": "GroupTypeID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e1\u05d5\u05d2 \u05d4\u05de\u05e1\u05de\u05da",
+            "name": "GroupTypeDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05e7\u05d5\u05d3 \u05e4\u05d5\u05e8\u05de\u05d8 \u05d4\u05de\u05e1\u05de\u05da",
+            "name": "ApplicationID",
+            "type": "integer"
+          },
+          {
+            "description": "\u05ea\u05d9\u05d0\u05d5\u05e8 \u05e4\u05d5\u05e8\u05de\u05d8 \u05d4\u05de\u05e1\u05de\u05da (Word, PDF, TIFF)",
+            "name": "ApplicationDesc",
+            "type": "string"
+          },
+          {
+            "description": "\u05d4\u05e0\u05ea\u05d9\u05d1 \u05d0\u05dc \u05d4\u05de\u05e1\u05de\u05da",
+            "name": "FilePath",
+            "type": "string"
+          },
+          {
+            "description": "\u05ea\u05d0\u05e8\u05d9\u05da \u05e2\u05d3\u05db\u05d5\u05df \u05d0\u05d7\u05e8\u05d5\u05df",
+            "format": "%Y-%m-%d %H:%M:%S",
+            "name": "LastUpdatedDate",
+            "type": "datetime"
+          }
+        ],
+        "primaryKey": [
+          "DocumentCommitteeSessionID"
+        ]
+      }
+    },
+    {
+      "bytes": 2601542,
+      "count_of_rows": 23006,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "db8c89324126c48084cb532136072cb1",
+      "name": "committee_meeting_protocols_parsed",
+      "path": "committee_meeting_protocols_parsed.csv",
+      "schema": {
+        "fields": [
+          {
+            "description": "primary key from kns_committee table",
+            "name": "kns_committee_id",
+            "type": "integer"
+          },
+          {
+            "description": "primary key from kns_committeesession table",
+            "name": "kns_session_id",
+            "type": "integer"
+          },
+          {
+            "description": "storage object name containing the downloaded protocol",
+            "name": "protocol_object_name",
+            "type": "string"
+          },
+          {
+            "description": "file extension of the downloaded protocol",
+            "name": "protocol_extension",
+            "type": "string"
+          },
+          {
+            "description": "storage object name containing the parsed protocol text",
+            "name": "text_object_name",
+            "type": "string"
+          },
+          {
+            "description": "storage object name containing the parsed protocol csv",
+            "name": "parts_object_name",
+            "type": "string"
+          }
+        ],
+        "primaryKey": [
+          "kns_session_id"
+        ]
+      }
+    },
+    {
+      "bytes": 138976031,
+      "count_of_rows": 1600424,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "eb338cc8abc29d203eeb45cbe7d41997",
+      "name": "committee-meeting-attendees",
+      "path": "committee-meeting-attendees.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "committee_id",
+            "type": "integer"
+          },
+          {
+            "name": "meeting_id",
+            "type": "integer"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "role",
+            "type": "string"
+          },
+          {
+            "name": "additional_information",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "bytes": 52170491,
+      "count_of_rows": 1193540,
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streaming": true,
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "92e8c4a2124a3b07ca876ff20714f475",
+      "name": "committee-meeting-speakers",
+      "path": "committee-meeting-speakers.csv",
+      "schema": {
+        "fields": [
+          {
+            "name": "committee_id",
+            "type": "integer"
+          },
+          {
+            "name": "meeting_id",
+            "type": "integer"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}

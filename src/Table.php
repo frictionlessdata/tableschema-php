@@ -12,17 +12,24 @@ use frictionlessdata\tableschema\Exceptions\DataSourceException;
  */
 class Table implements \Iterator
 {
+    public $csvDialect;
+
     /**
      * @param DataSources\DataSourceInterface $dataSource
      * @param Schema                          $schema
+     * @param object                          $csvDialect
      *
      * @throws Exceptions\DataSourceException
      */
-    public function __construct($dataSource, $schema = null)
+    public function __construct($dataSource, $schema = null, $csvDialect = null)
     {
+        $this->csvDialect = new CsvDialect($csvDialect);
         if (!is_a($dataSource, 'frictionlessdata\\tableschema\\DataSources\\BaseDataSource')) {
             // TODO: more advanced data source detection
             $dataSource = new CsvDataSource($dataSource);
+        }
+        if (is_a($dataSource, 'frictionlessdata\\tableschema\\DataSources\\CsvDataSource')) {
+            $dataSource->setCsvDialect($this->csvDialect);
         }
         $this->dataSource = $dataSource;
         if (!is_a($schema, 'frictionlessdata\\tableschema\\Schema')) {
@@ -44,10 +51,10 @@ class Table implements \Iterator
      *
      * @return array of validation errors
      */
-    public static function validate($dataSource, $schema, $numPeekRows = 10)
+    public static function validate($dataSource, $schema, $numPeekRows = 10, $csvDialect = null)
     {
         try {
-            $table = new static($dataSource, $schema);
+            $table = new static($dataSource, $schema, $csvDialect);
         } catch (Exceptions\DataSourceException $e) {
             return [new SchemaValidationError(SchemaValidationError::LOAD_FAILED, $e->getMessage())];
         }

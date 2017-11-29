@@ -338,10 +338,10 @@ class FieldTypesTest extends TestCase
     public function testBareNumber()
     {
         $this->assertFieldTestData('integer', [
-            [['bareNumber' => false], '₪50000', '₪50000'],
+            [['bareNumber' => false], '₪50000', '50000'],
         ]);
         $this->assertFieldTestData('number', [
-            [['bareNumber' => false], '₪50000', '₪50000'],
+            [['bareNumber' => false], '₪50000', '50000'],
         ]);
     }
 
