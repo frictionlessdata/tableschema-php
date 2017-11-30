@@ -12,7 +12,7 @@ use frictionlessdata\tableschema\CsvDialect;
  */
 class CsvDataSource extends BaseDataSource
 {
-    /** @var  CsvDialect */
+    /** @var CsvDialect */
     public $csvDialect;
 
     public function setCsvDialect($csvDialect)
@@ -27,7 +27,7 @@ class CsvDataSource extends BaseDataSource
     {
         $this->curRowNum = 0;
         if (!$this->csvDialect) {
-            throw new \Exception("must set csv dialect");
+            throw new \Exception('must set csv dialect');
         }
         try {
             $this->resource = fopen($this->dataSource, 'r');
@@ -66,7 +66,7 @@ class CsvDataSource extends BaseDataSource
                 }
             }
         }
-        if (!$this->headerRow || $this->headerRow == [""]) {
+        if (!$this->headerRow || $this->headerRow == ['']) {
             throw new DataSourceException('Failed to get header row');
         }
     }
@@ -93,6 +93,7 @@ class CsvDataSource extends BaseDataSource
         foreach ($this->headerRow as $fieldName) {
             $obj[$fieldName] = $row[$colNum++];
         }
+
         return $obj;
     }
 
@@ -115,7 +116,7 @@ class CsvDataSource extends BaseDataSource
                 return true;
             } else {
                 $this->nextRow = $this->getRow();
-                if (!$this->nextRow || $this->nextRow === [""]) {
+                if (!$this->nextRow || $this->nextRow === ['']) {
                     try {
                         $eof = feof($this->resource);
                     } catch (\Exception $e) {
@@ -125,7 +126,7 @@ class CsvDataSource extends BaseDataSource
                         // RFC4180: The last record in the file may or may not have an ending line break.
                         return true;
                     } else {
-                        throw new DataSourceException("invalid csv file", $this->curRowNum);
+                        throw new DataSourceException('invalid csv file', $this->curRowNum);
                     }
                 } else {
                     return false;
@@ -175,6 +176,7 @@ class CsvDataSource extends BaseDataSource
         } catch (\Exception $e) {
             throw new DataSourceException($e->getMessage(), $this->curRowNum);
         }
+
         return $this->csvDialect->parseRow($line);
     }
 }

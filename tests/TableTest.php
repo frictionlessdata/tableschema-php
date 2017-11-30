@@ -218,10 +218,10 @@ class TableTest extends TestCase
     public function testCsvDialectLolsv()
     {
         $table = new Table($this->fixture('data.lolsv'), null, [
-            "delimiter" => "o",
-            "quoteChar" => 'L',
-            "header" => true,
-            "caseSensitiveHeader" => false
+            'delimiter' => 'o',
+            'quoteChar' => 'L',
+            'header' => true,
+            'caseSensitiveHeader' => false,
         ]);
         $rows = [];
         foreach ($table as $row) {
@@ -242,7 +242,9 @@ class TableTest extends TestCase
         $rows = [];
         foreach ($table as $row) {
             $rows[] = $row;
-            if (count($rows) == 2) break;
+            if (count($rows) == 2) {
+                break;
+            }
         }
         $this->assertEquals([[
             'CommitteeID' => 97,
@@ -277,7 +279,7 @@ class TableTest extends TestCase
             'ParentCommitteeID' => null,
             'CommitteeParentName' => null,
             'IsCurrent' => true,
-            'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57)
+            'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57),
         ]], $rows);
     }
 

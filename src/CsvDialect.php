@@ -1,10 +1,11 @@
 <?php
 
 namespace frictionlessdata\tableschema;
+
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
 
 /**
- * Class for working with Csv Dialect / RFC4180 conforming csv files
+ * Class for working with Csv Dialect / RFC4180 conforming csv files.
  */
 class CsvDialect
 {
@@ -36,48 +37,48 @@ class CsvDialect
     {
         $defaultDialect = [
             // specifies the character sequence which should separate fields (aka columns). Default = ,
-            "delimiter" => ",",
+            'delimiter' => ',',
             // specifies the character sequence which should terminate rows. Default = \r\n
-            "lineTerminator" => "\r\n",
+            'lineTerminator' => "\r\n",
             // specifies a one-character string to use as the quoting character. Default = "
-            "quoteChar" => '"',
+            'quoteChar' => '"',
             // controls the handling of quotes inside fields. If true, two consecutive quotes should be interpreted as one.
             // Default = true
-            "doubleQuote" => true,
+            'doubleQuote' => true,
             // specifies a one-character string to use for escaping (for example, \), mutually exclusive with quoteChar.
             // Not set by default
-            "escapeChar" => null,
+            'escapeChar' => null,
             // specifies the null sequence (for example \N). Not set by default
-            "nullSequence" => null,
+            'nullSequence' => null,
             // specifies how to interpret whitespace which immediately follows a delimiter;
             // if false, it means that whitespace immediately after a delimiter should be treated as part of the following field.
             // Default = true
-            "skipInitialSpace" => true,
+            'skipInitialSpace' => true,
             // indicates whether the file includes a header row. If true the first row in the file is a header row, not data.
             // Default = true
-            "header" => true,
+            'header' => true,
             // indicates that case in the header is meaningful. For example, columns CAT and Cat should not be equated.
             // Default = false
-            "caseSensitiveHeader" => false,
+            'caseSensitiveHeader' => false,
             // a number, in n.n format, e.g., 1.0. If not present, consumers should assume latest schema version.
-            "csvddfVersion" => null,
+            'csvddfVersion' => null,
         ];
         if ($dialect === null) {
             $dialect = [];
         } else {
             $dialect = (array) $dialect;
-        };
+        }
         $this->dialect = array_merge($defaultDialect, $dialect);
-        if (!in_array($this->dialect["lineTerminator"], ["\r\n", "\n\r", "\n", "\r"])) {
+        if (!in_array($this->dialect['lineTerminator'], ["\r\n", "\n\r", "\n", "\r"])) {
             // we rely on PHP stream functions which make it a bit harder to support other line terminators
             // TODO: support custom lineTerminator
-            throw new \Exception("custom lineTerminator is not supported");
+            throw new \Exception('custom lineTerminator is not supported');
         }
-        if (strlen($this->dialect["delimiter"]) != 1) {
-            throw new \Exception("delimiter must be a single char");
+        if (strlen($this->dialect['delimiter']) != 1) {
+            throw new \Exception('delimiter must be a single char');
         }
-        if ($this->dialect["nullSequence"] !== null) {
-            throw new \Exception("custom nullSequence is not supported");
+        if ($this->dialect['nullSequence'] !== null) {
+            throw new \Exception('custom nullSequence is not supported');
         }
     }
 
@@ -100,26 +101,26 @@ class CsvDialect
         $enclosed = null;
         $fields = [];
         $field = -1;
-        $lastCharPos = mb_strlen($line)-1;
-        for ($charPos = 0; $charPos < mb_strlen($line); $charPos++) {
+        $lastCharPos = mb_strlen($line) - 1;
+        for ($charPos = 0; $charPos < mb_strlen($line); ++$charPos) {
             $char = mb_substr($line, $charPos, 1);
             if ($enclosed === null) {
                 // start of a new field
-                if ($char == $this->dialect["delimiter"]) {
+                if ($char == $this->dialect['delimiter']) {
                     if (
                         // delimiter at end of line
                         ($charPos == $lastCharPos)
                         // double delimiters
-                        || ($charPos != $lastCharPos && mb_substr($line, $charPos+1, 1) == $this->dialect["delimiter"])
+                        || ($charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['delimiter'])
                     ) {
-                        $field++;
-                        $fields[$field] = "";
+                        ++$field;
+                        $fields[$field] = '';
                     }
                     continue;
                 } else {
-                    $field++;
-                    $fields[$field] = "";
-                    if ($char == $this->dialect["quoteChar"]) {
+                    ++$field;
+                    $fields[$field] = '';
+                    if ($char == $this->dialect['quoteChar']) {
                         $enclosed = true;
                         continue;
                     } else {
@@ -130,35 +131,35 @@ class CsvDialect
                 }
             } elseif ($enclosed) {
                 // processing an enclosed field
-                if ($this->dialect["doubleQuote"] !== null && $char == $this->dialect["quoteChar"]) {
+                if ($this->dialect['doubleQuote'] !== null && $char == $this->dialect['quoteChar']) {
                     // encountered quote in doubleQuote mode
-                    if ($charPos !== 0 && mb_substr($line, $charPos-1, 1) == $this->dialect["quoteChar"]) {
+                    if ($charPos !== 0 && mb_substr($line, $charPos - 1, 1) == $this->dialect['quoteChar']) {
                         // previous char was also a double quote
                         // the quote was added in previous iteration, nothing to do here
                         continue;
-                    } elseif ($charPos != $lastCharPos && mb_substr($line, $charPos+1, 1) == $this->dialect["quoteChar"]) {
+                    } elseif ($charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['quoteChar']) {
                         // next char is a also a double quote - add a quote to the field
-                        $fields[$field] .= $this->dialect["quoteChar"];
+                        $fields[$field] .= $this->dialect['quoteChar'];
                         continue;
                     }
                 }
-                if ($this->dialect["escapeChar"]) {
+                if ($this->dialect['escapeChar']) {
                     // handle escape chars
-                    if ($char == $this->dialect["escapeChar"]) {
+                    if ($char == $this->dialect['escapeChar']) {
                         // char is the escape char, add the escaped char to the string
                         if ($charPos === $lastCharPos) {
-                            throw new DataSourceException("Encountered escape char at end of line");
+                            throw new DataSourceException('Encountered escape char at end of line');
                         } else {
-                            $fields[$field] .= mb_substr($line, $charPos+1, 1);
+                            $fields[$field] .= mb_substr($line, $charPos + 1, 1);
                         }
                         continue;
-                    } elseif ($charPos != 0 && mb_substr($line, $charPos-1, 1) == $this->dialect["escapeChar"]) {
+                    } elseif ($charPos != 0 && mb_substr($line, $charPos - 1, 1) == $this->dialect['escapeChar']) {
                         // previous char was the escape string
                         // added the char in previous iteration, nothing to do here
                         continue;
                     }
                 }
-                if ($char == $this->dialect["quoteChar"]) {
+                if ($char == $this->dialect['quoteChar']) {
                     // encountered a quote signifying the end of the enclosed field
                     $enclosed = null;
                     continue;
@@ -169,19 +170,19 @@ class CsvDialect
                 }
             } else {
                 // processing a non-enclosed field
-                if ($char == $this->dialect["quoteChar"]) {
+                if ($char == $this->dialect['quoteChar']) {
                     // non enclosed field - cannot have a quotes
-                    throw new \Exception("Invalid csv file - if field is not enclosed with double quotes - then double quotes may not appear inside the field");
-                } elseif ($char == $this->dialect["delimiter"]) {
+                    throw new \Exception('Invalid csv file - if field is not enclosed with double quotes - then double quotes may not appear inside the field');
+                } elseif ($char == $this->dialect['delimiter']) {
                     // end of non-enclosed field + start of new field
                     if (
                         // delimiter at end of line
                         ($charPos == $lastCharPos)
                         // double delimiters
-                        || ($charPos != $lastCharPos && mb_substr($line, $charPos+1, 1) == $this->dialect["delimiter"])
+                        || ($charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['delimiter'])
                     ) {
-                        $field++;
-                        $fields[$field] = "";
+                        ++$field;
+                        $fields[$field] = '';
                     }
                     $enclosed = null;
                     continue;
@@ -192,11 +193,11 @@ class CsvDialect
                 }
             }
         }
-        if (count($fields) > 1 && mb_strlen($fields[count($fields)-1]) == 0) {
-            throw new \Exception("Invalid csv file - line must not end with a comma");
+        if (count($fields) > 1 && mb_strlen($fields[count($fields) - 1]) == 0) {
+            throw new \Exception('Invalid csv file - line must not end with a comma');
         }
-        if ($this->dialect["skipInitialSpace"]) {
-            return array_map(function($field) {
+        if ($this->dialect['skipInitialSpace']) {
+            return array_map(function ($field) {
                 return ltrim($field);
             }, $fields);
         } else {
