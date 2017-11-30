@@ -85,6 +85,13 @@ class Schema
         }
     }
 
+    public static function infer($dataSource, $csvDialect = null, $limit = null)
+    {
+        $table = new Table($dataSource, null, $csvDialect);
+
+        return $table->schema($limit ? $limit : 100);
+    }
+
     /**
      * @return object
      */

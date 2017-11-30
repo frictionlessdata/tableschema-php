@@ -159,6 +159,13 @@ validate the row to get a list of errors
 $schema->validateRow(["id" => "foobar"]);  // ["id is not numeric", "name is required" .. ]
 ```
 
+Infer schema based on source data:
+
+```php
+$schema = Schema::infer("tests/fixtures/data.csv");
+$table->schema()->fields();  // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
+```
+
 You can also create a new empty schema for editing
 
 ```php

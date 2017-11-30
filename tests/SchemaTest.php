@@ -517,6 +517,35 @@ class SchemaTest extends TestCase
         ]], $validator->getErrors());
     }
 
+    public function testSchemaInfer()
+    {
+        $schema = Schema::infer('tests/fixtures/data.csv');
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'first_name', 'type' => 'string'],
+                (object) ['name' => 'last_name', 'type' => 'string'],
+                (object) ['name' => 'order', 'type' => 'integer'],
+            ],
+        ], $schema->descriptor());
+    }
+
+    public function testSchemaInferCsvDialect()
+    {
+        $schema = Schema::infer('tests/fixtures/data.lolsv', [
+            'delimiter' => 'o',
+            'quoteChar' => 'L',
+            'header' => true,
+            'caseSensitiveHeader' => false,
+        ]);
+        $this->assertEquals((object) [
+            'fields' => [
+                (object) ['name' => 'first_name', 'type' => 'string'],
+                (object) ['name' => 'last_name', 'type' => 'string'],
+                (object) ['name' => 'order', 'type' => 'integer'],
+            ],
+        ], $schema->descriptor());
+    }
+
     public function tearDown()
     {
         foreach ($this->tempFiles as $tempFile) {
