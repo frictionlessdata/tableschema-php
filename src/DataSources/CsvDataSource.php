@@ -27,7 +27,7 @@ class CsvDataSource extends BaseDataSource
     {
         $this->curRowNum = 0;
         if (!$this->csvDialect) {
-            throw new \Exception('must set csv dialect');
+            $this->setCsvDialect(new CsvDialect());
         }
         try {
             $this->resource = fopen($this->dataSource, 'r');
@@ -87,6 +87,12 @@ class CsvDataSource extends BaseDataSource
     public function getNextLine()
     {
         $row = $this->nextRow;
+        if ($row === null) {
+            if (!$this->resource) $this->open();
+            if ($this->isEof()) throw new \Exception("EOF");
+            $row = $this->nextRow;
+            if ($row === null) throw new \Exception("cannot get valid row, but isEof returns false");
+        }
         $this->nextRow = null;
         $colNum = 0;
         $obj = [];

@@ -345,12 +345,13 @@ class TableTest extends TestCase
 
     public function testInvalidTabularData()
     {
-        $schema = new Schema('{
-            "fields": [
-              {"name": "id", "type": "integer"},
-              {"name": "email", "type": "string", "format": "email"}
+
+        $schema = new Schema((object) [
+            "fields" => [
+                (object) ["name" => "id", "type" => "integer"],
+                (object) ["name" => "email", "type" => "string", "format" => "email"]
             ]
-        }');
+        ]);
         $dataSource = new CsvDataSource($this->fixture('invalid_tabular_data.csv'));
         $table = new Table($dataSource, $schema);
         try {
@@ -379,6 +380,33 @@ class TableTest extends TestCase
             ['id' => '1', 'email' => 'good@email.and.nice'],
             $table->read(["cast" => false])[0]
         );
+    }
+
+    public function testEmailsTabularData()
+    {
+        $schema = new Schema((object) [
+            "fields" => [
+                (object) ["name" => "id", "type" => "integer"],
+                (object) ["name" => "email", "type" => "string", "format" => "email"]
+            ]
+        ]);
+        $dataSource = new CsvDataSource($this->fixture('valid_emails_tabular_data.csv'));
+        $table = new Table($dataSource, $schema);
+        foreach ($table as $row) {}
+        $dataSource = new CsvDataSource($this->fixture('valid_emails_tabular_data.csv'));
+        $table = new Table($dataSource, $schema);
+        $this->assertEquals(
+            ['id' => '1', 'email' => 'good@email.and.nice'],
+            $table->read(["cast" => false])[0]
+        );
+    }
+
+    public function testIterateWithoutEof()
+    {
+        $dataSource = new CsvDataSource($this->fixture('valid_emails_tabular_data.csv'));
+        $row = $dataSource->getNextLine();
+        $this->assertTrue($row["id"] === '1');
+        $this->assertTrue($row["email"] === 'good@email.and.nice');
     }
 
     protected $fixturesPath;
