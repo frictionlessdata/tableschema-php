@@ -61,6 +61,12 @@ $table = new Table("tests/fixtures/data.csv");
 $table->schema()->fields();  // ["first_name" => StringField, "last_name" => StringField, "order" => IntegerField]
 ```
 
+Optionally, specify a [CSV Dialect](https://frictionlessdata.io/specs/csv-dialect/):
+
+```php
+$table = new Table("tests/fixtures/data.csv", null, ["delimiter" => ";"]);
+```
+
 Additional methods and functionality
 
 ```php
