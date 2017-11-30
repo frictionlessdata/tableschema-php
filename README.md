@@ -67,6 +67,29 @@ Optionally, specify a [CSV Dialect](https://frictionlessdata.io/specs/csv-dialec
 $table = new Table("tests/fixtures/data.csv", null, ["delimiter" => ";"]);
 ```
 
+Table::read method allows to get all data as an array, it also supports options to modify reader behavior
+
+```php
+$table->read()  // returns all the data as an array
+```
+
+read accepts an options parameter, for example:
+
+```php
+$table->read(["cast" => false, "limit": 5])
+```
+
+The following options are available (the values are the default values):
+
+```php
+$table->read([
+    "keyed" => true,  // flag to emit keyed rows
+    "extended" => false,  // flag to emit extended rows
+    "cast" => true,  //flag to disable data casting if false
+    "limit" => null,  // integer limit of rows to return
+]);
+```
+
 Additional methods and functionality
 
 ```php

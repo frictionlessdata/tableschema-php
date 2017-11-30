@@ -90,8 +90,12 @@ class CsvDataSource extends BaseDataSource
         $this->nextRow = null;
         $colNum = 0;
         $obj = [];
+        if (count($row) != count($this->headerRow)) {
+            throw new DataSourceException('Invalid row: '.implode(', ', $row));
+        }
         foreach ($this->headerRow as $fieldName) {
-            $obj[$fieldName] = $row[$colNum++];
+            $obj[$fieldName] = $row[$colNum];
+            ++$colNum;
         }
 
         return $obj;
@@ -168,7 +172,7 @@ class CsvDataSource extends BaseDataSource
      *
      * @throws DataSourceException
      */
-    protected function getRow()
+    protected function getRow($continueRow = null)
     {
         ++$this->curRowNum;
         try {
@@ -177,6 +181,11 @@ class CsvDataSource extends BaseDataSource
             throw new DataSourceException($e->getMessage(), $this->curRowNum);
         }
 
-        return $this->csvDialect->parseRow($line);
+        $row = $this->csvDialect->parseRow($line, $continueRow);
+        if (count($row) > 0 && is_a($row[count($row) - 1], 'frictionlessdata\\tableschema\\ContinueEnclosedField')) {
+            return $this->getRow($row);
+        } else {
+            return $row;
+        }
     }
 }

@@ -102,11 +102,45 @@ class Table implements \Iterator
         return array_keys($this->schema->fields());
     }
 
-    public function read()
+    public function read($options = null)
     {
+        $options = array_merge([
+            'keyed' => true,
+            'extended' => false,
+            'cast' => true,
+            'limit' => null,
+        ], $options ? $options : []);
         $rows = [];
-        foreach ($this as $row) {
-            $rows[] = $row;
+        $rowNum = 0;
+        if ($options['extended']) {
+            $headers = $this->headers($options['limit'] ? $options['limit'] : null);
+        }
+        if (!$options['cast']) {
+            $this->dataSource->open();
+            while (!$this->dataSource->isEof()) {
+                $row = $this->dataSource->getNextLine();
+                if ($options['extended']) {
+                    $rows[] = [$rowNum, $headers, array_values($row)];
+                } else {
+                    $rows[] = $row;
+                }
+                if ($options['limit'] && $options['limit'] > 0 && $rowNum + 1 >= $options['limit']) {
+                    break;
+                }
+                ++$rowNum;
+            }
+        } else {
+            foreach ($this as $row) {
+                if ($options['extended']) {
+                    $rows[] = [$rowNum, $headers, array_values($row)];
+                } else {
+                    $rows[] = $row;
+                }
+                if ($options['limit'] && $options['limit'] > 0 && $rowNum + 1 >= $options['limit']) {
+                    break;
+                }
+                ++$rowNum;
+            }
         }
 
         return $rows;

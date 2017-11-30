@@ -234,17 +234,26 @@ class TableTest extends TestCase
         ], $rows);
     }
 
+    public function testCsvLineBreak()
+    {
+        $table = new Table($this->fixture('data_linebreaks.csv'));
+        $this->assertEquals([
+            ['aaa' => 'test a', 'bbb' => 'test b', 'ccc' => 'test c'],
+        ], $table->read());
+    }
+
     public function testCsvDialectDatapackagePipelines()
     {
         $datapackage = json_decode(file_get_contents($this->fixture('committees/datapackage.json')));
         $resource = $datapackage->resources[0];
         $table = new Table($this->fixture('committees/kns_committee.csv'), $resource->schema, $resource->dialect);
         $rows = [];
+        $rowNum = 0;
         foreach ($table as $row) {
-            $rows[] = $row;
-            if (count($rows) == 2) {
-                break;
+            if (in_array($rowNum, [0, 1, 132])) {
+                $rows[] = $row;
             }
+            ++$rowNum;
         }
         $this->assertEquals([[
             'CommitteeID' => 97,
@@ -280,7 +289,58 @@ class TableTest extends TestCase
             'CommitteeParentName' => null,
             'IsCurrent' => true,
             'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57),
+        ], [
+            'CommitteeID' => 679,
+            'Name' => 'משותפת לכלכלה וחינוך לדיון בחוק הרשות השניה לטלויזיה ורדיו התש"ן-1990',
+            'CategoryID' => 317,
+            'CategoryDesc' => 'ועדה משותפת לכלכלה וחינוך לדיון בחוק הרשות השניה לטלוויזיה ורדיו, התש"ן-1990',
+            'KnessetNum' => 18,
+            'CommitteeTypeID' => 73,
+            'CommitteeTypeDesc' => 'ועדה  משותפת',
+            'Email' => 'vkalkala@knesset.gov.il',
+            'StartDate' => Carbon::create(2009, 6, 30, 0, 0, 0),
+            'FinishDate' => null,
+            'AdditionalTypeID' => 991,
+            'AdditionalTypeDesc' => 'קבועה',
+            'ParentCommitteeID' => null,
+            'CommitteeParentName' => null,
+            'IsCurrent' => true,
+            'LastUpdatedDate' => Carbon::create(2015, 3, 20, 12, 2, 57),
         ]], $rows);
+    }
+
+    public function testReadOptions()
+    {
+        $datapackage = json_decode(file_get_contents($this->fixture('committees/datapackage.json')));
+        $resource = $datapackage->resources[0];
+        $table = new Table($this->fixture('committees/kns_committee.csv'), $resource->schema, $resource->dialect);
+        $this->assertEquals([
+            [
+                0,
+                [
+                    'CommitteeID', 'Name', 'CategoryID', 'CategoryDesc', 'KnessetNum', 'CommitteeTypeID',
+                    'CommitteeTypeDesc', 'Email', 'StartDate', 'FinishDate', 'AdditionalTypeID',
+                    'AdditionalTypeDesc', 'ParentCommitteeID', 'CommitteeParentName', 'IsCurrent', 'LastUpdatedDate',
+                ], [
+                    '97', 'ה"ח המדיניות הכלכלית לשנת הכספים 2004', '', '', '16', '73', 'ועדה  משותפת', '',
+                    '2004-08-12 00:00:00', '', '',
+                    '', '', '', 'True', '2015-03-20 12:02:57',
+                ],
+            ],
+            [
+                1,
+                [
+                    'CommitteeID', 'Name', 'CategoryID', 'CategoryDesc', 'KnessetNum', 'CommitteeTypeID',
+                    'CommitteeTypeDesc', 'Email', 'StartDate', 'FinishDate', 'AdditionalTypeID',
+                    'AdditionalTypeDesc', 'ParentCommitteeID', 'CommitteeParentName', 'IsCurrent', 'LastUpdatedDate',
+                ],
+                [
+                    '314', 'המיוחדת לענין לקחי אסון גשר המכביה', '', '', '14', '72', 'ועדה מיוחדת', '',
+                    '1988-10-19 00:00:00', '', '992',
+                    'מיוחדת', '', '', 'True', '2015-03-20 12:02:57',
+                ],
+            ],
+        ], $table->read(['keyed' => false, 'extended' => true, 'cast' => false, 'limit' => 2]));
     }
 
     protected $fixturesPath;

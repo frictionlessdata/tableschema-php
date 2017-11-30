@@ -82,7 +82,21 @@ class CsvDialect
         }
     }
 
-    public function parseRow($line)
+    /**
+     * Parses the csv row according to the csv dialect.
+     *
+     * Returns an array of fields parsed form the line
+     *
+     * In case of line termination inside an enclosed field, the last field will contain a ContinueEnclosedField object
+     *
+     * @param $line string
+     *
+     * @return array
+     *
+     * @throws DataSourceException
+     * @throws \Exception
+     */
+    public function parseRow($line, $continueLine = null)
     {
         // RFC4180      - Each record is located on a separate line, delimited by a line break (CRLF)
         // Tabular Data - The line terminator character MUST be LF or CRLF
@@ -102,6 +116,15 @@ class CsvDialect
         $fields = [];
         $field = -1;
         $lastCharPos = mb_strlen($line) - 1;
+        if ($continueLine) {
+            if (!is_a($continueLine[count($continueLine) - 1], 'frictionlessdata\\tableschema\\ContinueEnclosedField')) {
+                throw new \Exception('invalid continueLine');
+            }
+            unset($continueLine[count($continueLine) - 1]);
+            $fields = $continueLine;
+            $field = count($fields) - 1;
+            $enclosed = true;
+        }
         for ($charPos = 0; $charPos < mb_strlen($line); ++$charPos) {
             $char = mb_substr($line, $charPos, 1);
             if ($enclosed === null) {
@@ -116,50 +139,40 @@ class CsvDialect
                         ++$field;
                         $fields[$field] = '';
                     }
-                    continue;
                 } else {
                     ++$field;
                     $fields[$field] = '';
                     if ($char == $this->dialect['quoteChar']) {
                         $enclosed = true;
-                        continue;
                     } else {
                         $enclosed = false;
                         $fields[$field] .= $char;
-                        continue;
                     }
                 }
             } elseif ($enclosed) {
                 // processing an enclosed field
-                if ($this->dialect['doubleQuote'] !== null && $char == $this->dialect['quoteChar']) {
-                    // encountered quote in doubleQuote mode
-                    if ($charPos !== 0 && mb_substr($line, $charPos - 1, 1) == $this->dialect['quoteChar']) {
-                        // previous char was also a double quote
-                        // the quote was added in previous iteration, nothing to do here
-                        continue;
-                    } elseif ($charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['quoteChar']) {
-                        // next char is a also a double quote - add a quote to the field
-                        $fields[$field] .= $this->dialect['quoteChar'];
-                        continue;
+                if (
+                    $this->dialect['doubleQuote'] !== null && $char == $this->dialect['quoteChar']
+                    && $charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['quoteChar']
+                ) {
+                    // doubleQuote mode is active, current char is a quote and next char is a quote
+                    $fields[$field] .= $this->dialect['quoteChar'];
+                    // skip a char
+                    ++$charPos;
+                    continue;
+                } elseif (
+                    $this->dialect['escapeChar'] && $char === $this->dialect['escapeChar']
+                ) {
+                    // encountered escape char, add the escaped char to the string
+                    if ($charPos === $lastCharPos) {
+                        throw new DataSourceException('Encountered escape char at end of line');
+                    } else {
+                        $fields[$field] .= mb_substr($line, $charPos + 1, 1);
                     }
-                }
-                if ($this->dialect['escapeChar']) {
-                    // handle escape chars
-                    if ($char == $this->dialect['escapeChar']) {
-                        // char is the escape char, add the escaped char to the string
-                        if ($charPos === $lastCharPos) {
-                            throw new DataSourceException('Encountered escape char at end of line');
-                        } else {
-                            $fields[$field] .= mb_substr($line, $charPos + 1, 1);
-                        }
-                        continue;
-                    } elseif ($charPos != 0 && mb_substr($line, $charPos - 1, 1) == $this->dialect['escapeChar']) {
-                        // previous char was the escape string
-                        // added the char in previous iteration, nothing to do here
-                        continue;
-                    }
-                }
-                if ($char == $this->dialect['quoteChar']) {
+                    // skip a char
+                    ++$charPos;
+                    continue;
+                } elseif ($char == $this->dialect['quoteChar']) {
                     // encountered a quote signifying the end of the enclosed field
                     $enclosed = null;
                     continue;
@@ -193,15 +206,19 @@ class CsvDialect
                 }
             }
         }
-        if (count($fields) > 1 && mb_strlen($fields[count($fields) - 1]) == 0) {
-            throw new \Exception('Invalid csv file - line must not end with a comma');
-        }
         if ($this->dialect['skipInitialSpace']) {
-            return array_map(function ($field) {
+            $fields = array_map(function ($field) {
                 return ltrim($field);
             }, $fields);
-        } else {
-            return $fields;
         }
+        if ($enclosed === true && !is_a($fields[count($fields) - 1], 'frictionlessdata\\tableschema\\ContinueEnclosedField')) {
+            $fields[$field + 1] = new ContinueEnclosedField();
+        }
+
+        return $fields;
     }
+}
+
+class ContinueEnclosedField
+{
 }
