@@ -343,6 +343,44 @@ class TableTest extends TestCase
         ], $table->read(['keyed' => false, 'extended' => true, 'cast' => false, 'limit' => 2]));
     }
 
+    public function testInvalidTabularData()
+    {
+        $schema = new Schema('{
+            "fields": [
+              {"name": "id", "type": "integer"},
+              {"name": "email", "type": "string", "format": "email"}
+            ]
+        }');
+        $dataSource = new CsvDataSource($this->fixture('invalid_tabular_data.csv'));
+        $table = new Table($dataSource, $schema);
+        try {
+            foreach ($table as $row) {
+
+            }
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'email: value is not a valid email ("bad.email")',
+                $e->getMessage()
+            );
+        }
+        $dataSource = new CsvDataSource($this->fixture('invalid_tabular_data.csv'));
+        $table = new Table($dataSource, $schema);
+        try {
+            $table->read();
+            $this->assertTrue(false);
+        } catch (\Exception $e) {
+            $this->assertEquals(
+                'email: value is not a valid email ("bad.email")',
+                $e->getMessage()
+            );
+        }
+        $this->assertEquals(
+            ['id' => '1', 'email' => 'good@email.and.nice'],
+            $table->read(["cast" => false])[0]
+        );
+    }
+
     protected $fixturesPath;
     protected $validSchema;
 
