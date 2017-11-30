@@ -88,10 +88,16 @@ class CsvDataSource extends BaseDataSource
     {
         $row = $this->nextRow;
         if ($row === null) {
-            if (!$this->resource) $this->open();
-            if ($this->isEof()) throw new \Exception("EOF");
+            if (!$this->resource) {
+                $this->open();
+            }
+            if ($this->isEof()) {
+                throw new \Exception('EOF');
+            }
             $row = $this->nextRow;
-            if ($row === null) throw new \Exception("cannot get valid row, but isEof returns false");
+            if ($row === null) {
+                throw new \Exception('cannot get valid row, but isEof returns false');
+            }
         }
         $this->nextRow = null;
         $colNum = 0;
