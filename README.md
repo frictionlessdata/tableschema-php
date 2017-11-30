@@ -238,13 +238,6 @@ $field("id")->description();  // "The ID" (or null if not provided in descriptor
 $field("id")->rdfType();  // "http://schema.org/Thing" (or null if not provided in descriptor)
 ```
 
-## Important Notes
-
-- Table schema is in transition to v1 - but many datapackage in the wild are still pre-v1
-  - At the moment I am developing this library with support only for v1
-  - See [this Gitter discussion](https://gitter.im/frictionlessdata/chat?at=58df75bfad849bcf423e5d80) about this transition
-
-
 ## Contributing
 
 Please read the contribution guidelines: [How to Contribute](CONTRIBUTING.md)
