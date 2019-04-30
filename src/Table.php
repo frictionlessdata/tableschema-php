@@ -148,6 +148,7 @@ class Table implements \Iterator
 
     public function save($outputDataSource)
     {
+        $this->dataSource->open();
         return $this->dataSource->save($outputDataSource);
     }
 
