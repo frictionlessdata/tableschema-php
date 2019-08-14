@@ -9,10 +9,10 @@
         "jmikola/geojson": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8.35",
-        "satooshi/php-coveralls": "^1.0",
+        "phpunit/phpunit": "^7.0.0",
         "composer/composer": "^1.9",
-        "roave/security-advisories": "dev-master"
+        "roave/security-advisories": "dev-master",
+        "php-coveralls/php-coveralls": "^2.0.0"
     },
     "autoload": {
         "psr-4": {
