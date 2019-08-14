@@ -6,36 +6,31 @@ use Carbon\Carbon;
 
 class DateField extends BaseField
 {
+    protected const DEFAULT_PATTERN = '%Y-%m-%d';
+
     protected function validateCastValue($val)
     {
-        switch ($this->format()) {
-            case 'default':
-                try {
-                    list($year, $month, $day) = explode('-', $val);
+        if ($this->format() === 'any') {
+            try {
+                $date = new Carbon($val);
+                $date->setTime(0, 0, 0);
 
-                    return Carbon::create($year, $month, $day, 0, 0, 0, 'UTC');
-                } catch (\Exception $e) {
-                    throw $this->getValidationException($e->getMessage(), $val);
-                }
-            case 'any':
-                try {
-                    $date = new Carbon($val);
-                    $date->setTime(0, 0, 0);
+                return $date;
+            } catch (\Exception $e) {
+                throw $this->getValidationException($e->getMessage(), $val);
+            }
+        } else {
+            $format = $this->format() === 'default' ? self::DEFAULT_PATTERN : $this->format();
+            $date = strptime($val, $format);
 
-                    return $date;
-                } catch (\Exception $e) {
-                    throw $this->getValidationException($e->getMessage(), $val);
-                }
-            default:
-                $date = strptime($val, $this->format());
-                if ($date === false || $date['unparsed'] != '') {
-                    throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$this->format()}''", $val);
-                } else {
-                    return Carbon::create(
-                        (int) $date['tm_year'] + 1900, (int) $date['tm_mon'] + 1, (int) $date['tm_mday'],
-                        0, 0, 0
-                    );
-                }
+            if ($date === false || $date['unparsed'] != '') {
+                throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$format}''", $val);
+            } else {
+                return Carbon::create(
+                    (int)$date['tm_year'] + 1900, (int)$date['tm_mon'] + 1, (int)$date['tm_mday'],
+                    0, 0, 0
+                );
+            }
         }
     }
 

@@ -3,15 +3,16 @@
     "description": "A utility library for working with Table Schema",
     "license": "MIT",
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.1",
         "justinrainbow/json-schema": "^5.2",
-        "nesbot/carbon": "^1.22",
+        "nesbot/carbon": "^2.0.0",
         "jmikola/geojson": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8.35",
         "satooshi/php-coveralls": "^1.0",
-        "psy/psysh": "@stable"
+        "composer/composer": "^1.9",
+        "roave/security-advisories": "dev-master"
     },
     "autoload": {
         "psr-4": {
