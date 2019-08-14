@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class DateField extends BaseField
 {
-    protected const DEFAULT_PATTERN = '%Y-%m-%d';
+    protected const DEFAULT_FORMAT = '%Y-%m-%d';
 
     protected function validateCastValue($val)
     {
@@ -20,7 +20,7 @@ class DateField extends BaseField
                 throw $this->getValidationException($e->getMessage(), $val);
             }
         } else {
-            $format = $this->format() === 'default' ? self::DEFAULT_PATTERN : $this->format();
+            $format = $this->format() === 'default' ? self::DEFAULT_FORMAT : $this->format();
             $date = strptime($val, $format);
 
             if ($date === false || $date['unparsed'] != '') {
