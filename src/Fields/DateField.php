@@ -27,7 +27,7 @@ class DateField extends BaseField
                 throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$format}''", $val);
             } else {
                 return Carbon::create(
-                    (int)$date['tm_year'] + 1900, (int)$date['tm_mon'] + 1, (int)$date['tm_mday'],
+                    (int) $date['tm_year'] + 1900, (int) $date['tm_mon'] + 1, (int) $date['tm_mday'],
                     0, 0, 0
                 );
             }
