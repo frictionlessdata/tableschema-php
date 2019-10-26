@@ -4,4 +4,4 @@ Please replace this line with full information about your pull request. Make sur
 
 ---
 
-Please preserve this line to notify @OriHoch (maintainer of this repository)
+Please preserve this line to notify @OriHoch (lead of this repository)
