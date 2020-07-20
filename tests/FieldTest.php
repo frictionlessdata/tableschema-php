@@ -134,7 +134,19 @@ class FieldTest extends TestCase
             ],
             'missingValues' => ['null'],
         ]);
-        $this->assertEquals(['name' => null], $schema->castRow(['name' => 'null']));
+        $this->assertSame(['name' => null], $schema->castRow(['name' => 'null']));
+    }
+
+    public function testDoNotCastValueNullMissingValues()
+    {
+        // missing values are only validated at schema castRow function
+        $schema = new Schema((object) [
+            'fields' => [
+                ['name' => 'name', 'type' => 'string'],
+            ],
+            'missingValues' => [],
+        ]);
+        $this->assertSame(['name' => ''], $schema->castRow(['name' => '']));
     }
 
     public function testValidateValue()
@@ -334,7 +346,7 @@ class FieldTest extends TestCase
             'missingValues' => $missingValues,
         ]);
         foreach ($missingValues as $val) {
-            $this->assertEquals(['name' => null], $schema->castRow(['name' => $val]));
+            $this->assertSame(['name' => null], $schema->castRow(['name' => $val]));
         }
     }
 }
