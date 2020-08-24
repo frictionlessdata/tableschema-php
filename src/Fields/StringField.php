@@ -3,7 +3,6 @@
 namespace frictionlessdata\tableschema\Fields;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use frictionlessdata\tableschema\SchemaValidationError;
 
 class StringField extends BaseField
 {
