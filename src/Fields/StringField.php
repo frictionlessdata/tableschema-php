@@ -2,6 +2,9 @@
 
 namespace frictionlessdata\tableschema\Fields;
 
+use frictionlessdata\tableschema\Exceptions\FieldValidationException;
+use frictionlessdata\tableschema\SchemaValidationError;
+
 class StringField extends BaseField
 {
     public function inferProperties($val, $lenient = false)
@@ -19,11 +22,14 @@ class StringField extends BaseField
      *
      * @return string
      *
-     * @throws \frictionlessdata\tableschema\Exceptions\FieldValidationException;
+     * @throws FieldValidationException;
      */
     protected function validateCastValue($val)
     {
         try {
+            if (is_object($val)) {
+                throw $this->getValidationException('Could not cast object to string', $val);
+            }
             $val = (string) $val;
         } catch (\Exception $e) {
             $val = json_encode($val);
