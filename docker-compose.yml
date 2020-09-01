@@ -1,7 +1,0 @@
-version: "2"
-services:
-    tschema:
-        build: .
-        volumes:
-            - .:/src
-        command: bash
