@@ -14,7 +14,7 @@ use Carbon\Carbon;
 
 class TableTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->fixturesPath = dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures';
         $this->validSchema = new Schema((object) [

@@ -19,7 +19,7 @@ class SchemaTest extends TestCase
     public $schemaValidSimpleFilename;
     public $schemaInvalidMultipleErrorsFilename;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->simpleDescriptorJson = '{
             "fields": [
@@ -546,7 +546,7 @@ class SchemaTest extends TestCase
         ], $schema->descriptor());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         foreach ($this->tempFiles as $tempFile) {
             if (file_exists($tempFile)) {

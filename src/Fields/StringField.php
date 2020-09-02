@@ -26,11 +26,8 @@ class StringField extends BaseField
     protected function validateCastValue($val)
     {
         try {
-            if (is_object($val)) {
-                throw $this->getValidationException('Could not cast object to string', $val);
-            }
             $val = (string) $val;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $val = json_encode($val);
         }
         switch ($this->format()) {
