@@ -143,7 +143,9 @@ class Schema
         if (is_null($newFields)) {
             if (empty($this->fieldsCache)) {
                 foreach ($this->descriptor()->fields as $fieldDescriptor) {
-                    if (!array_key_exists('type', $fieldDescriptor)) {
+                    if ((is_object($fieldDescriptor) && ! isset($fieldDescriptor->type))
+                        || (is_array($fieldDescriptor) && !array_key_exists('type', $fieldDescriptor))
+                    ) {
                         $field = new $this->DEFAULT_FIELD_CLASS($fieldDescriptor);
                     } else {
                         $field = Fields\FieldsFactory::field($fieldDescriptor);
