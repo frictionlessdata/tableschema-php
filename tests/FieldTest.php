@@ -17,7 +17,7 @@ class FieldTest extends TestCase
     public $DESCRIPTOR_MIN;
     public $DESCRIPTOR_MAX;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->DESCRIPTOR_WITHOUT_TYPE = [
             'name' => 'id',

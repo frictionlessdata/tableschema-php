@@ -3,7 +3,7 @@
     "description": "A utility library for working with Table Schema",
     "license": "MIT",
     "require": {
-        "php": ">=7.1.0 <7.4.0",
+        "php": ">=7.1.0",
         "justinrainbow/json-schema": "^5.2",
         "nesbot/carbon": "^1.22",
         "jmikola/geojson": "^1.0"
