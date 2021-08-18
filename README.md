@@ -8,7 +8,7 @@
 [![Codebase](https://img.shields.io/badge/codebase-github-brightgreen)](https://github.com/frictionlessdata/tableschema-php)
 [![Support](https://img.shields.io/badge/support-discord-brightgreen)](https://discordapp.com/invite/Sewv6av)
 
-A utility library for working with [Table Schema](https://specs.frictionlessdata.io/table-schema/) in php.
+A utility library for working with [Table Schema](https://specs.frictionlessdata.io/table-schema/) in PHP.
 
 
 ## Features summary and Usage guide
