@@ -9,17 +9,17 @@ jobs:
         runs-on: ubuntu-latest
         strategy:
             matrix:
-                php-versions: ['7.1', '7.4']
+                php-version: ['7.1', '7.2', '7.3', '7.4']
 
-        name: frictionlessdata/tableschema-php PHP ${{ matrix.php-versions }} test
+        name: frictionlessdata/tableschema-php PHP ${{ matrix.php-version }} test
 
         steps:
             - uses: actions/checkout@v2
 
-            - name: Setup PHP version ${{ matrix.php-versions }}
+            - name: Setup PHP version ${{ matrix.php-version }}
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: ${{ matrix.php-versions }}
+                  php-version: ${{ matrix.php-version }}
 
             - name: Confirm PHP Version
               run: php -v
@@ -39,8 +39,9 @@ jobs:
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress
 
-            - name: Run Code Style Check for PHP ${{ matrix.php-versions }}
+            - name: Run Code Style Check for PHP ${{ matrix.php-version }}
               run: composer run-script style-check
+              if: php-version != '7.1'
 
-            - name: Run tests for PHP ${{ matrix.php-versions }}
+            - name: Run tests for PHP ${{ matrix.php-version }}
               run: composer run-script test
