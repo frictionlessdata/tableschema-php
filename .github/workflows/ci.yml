@@ -18,7 +18,12 @@ jobs:
             - uses: actions/checkout@v2
 
             - name: Validate composer.json & composer.lock for PHP ${{ matrix.php-versions }}
-              run: composer validate --strict
+              uses: php-actions/composer@v6
+              with:
+                  php_version: ${{ matrix.php-versions }}
+                  php_extensions: zip
+                  version: 2
+                  command: validate --strict
 
             - name: Cache Composer dependencies
               id: composer-cache
