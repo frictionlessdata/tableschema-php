@@ -1,0 +1,25 @@
+name: CI
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-versions: ['7.1', '7.4']
+
+        name: frictionlessdata/tableschema-php PHP ${{ matrix.php-versions }} test
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP with PECL extension
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-versions }}
+
+            - name: Check PHP Version
+              run: php -v
