@@ -41,7 +41,7 @@ jobs:
 
             - name: Run Code Style Check for PHP ${{ matrix.php-version }}
               run: composer run-script style-check
-              if: php-version != '7.1'
+              if: matrix.php-version != '7.1'
 
             - name: Run tests for PHP ${{ matrix.php-version }}
               run: composer run-script test
