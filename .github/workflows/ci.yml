@@ -1,0 +1,55 @@
+name: CI
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+jobs:
+    build:
+        runs-on: ${{ matrix.operating-system }}
+        strategy:
+            matrix:
+                operating-system: [ubuntu-latest]
+                php-versions: ['7.1', '7.4']
+
+        name: frictionlessdata/tableschema-php PHP ${{ matrix.php-versions }} test on ${{ matrix.operating-system }}
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v2
+              with:
+                  path: /tmp/composer-cache
+                  key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+            - uses: php-actions/composer@v6
+              with:
+                  php_version: ${{ matrix.php-versions }}
+                  php_extensions: zip
+                  version: 2
+
+            - name: Validate composer.json & composer.lock for PHP ${{ matrix.php-versions }}
+              uses: php-actions/composer@v6
+              with:
+                  php_version: ${{ matrix.php-versions }}
+                  php_extensions: zip
+                  version: 2
+                  command: validate --strict
+
+            - name: Run Code Style Check for PHP ${{ matrix.php-versions }}
+              uses: php-actions/composer@v6
+              with:
+                  php_version: ${{ matrix.php-versions }}
+                  php_extensions: zip
+                  version: 2
+                  dev: yes
+                  command: style-check
+
+            - name: Run Tests for PHP ${{ matrix.php-versions }}
+              uses: php-actions/composer@v6
+              with:
+                  php_version: ${{ matrix.php-versions }}
+                  php_extensions: zip
+                  dev: yes
+                  command: test
