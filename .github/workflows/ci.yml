@@ -45,3 +45,7 @@ jobs:
 
             - name: Run tests for PHP ${{ matrix.php-version }}
               run: composer run-script test
+
+            - name: Submit test coverage to Coveralls
+              run: vendor/bin/coveralls
+              if: success && matrix.php-version == '7.4'
