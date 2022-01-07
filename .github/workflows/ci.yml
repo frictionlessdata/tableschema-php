@@ -17,39 +17,10 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Cache Composer dependencies
-              uses: actions/cache@v2
-              with:
-                  path: /tmp/composer-cache
-                  key: ${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-
-            - uses: php-actions/composer@v6
-              with:
-                  php_version: ${{ matrix.php-versions }}
-                  php_extensions: zip
-                  version: 2
-
             - name: Validate composer.json & composer.lock for PHP ${{ matrix.php-versions }}
               uses: php-actions/composer@v6
               with:
                   php_version: ${{ matrix.php-versions }}
-                  php_extensions: zip
+                  php_extensions: mbstring
                   version: 2
                   command: validate --strict
-
-            - name: Run Code Style Check for PHP ${{ matrix.php-versions }}
-              uses: php-actions/composer@v6
-              with:
-                  php_version: ${{ matrix.php-versions }}
-                  php_extensions: zip
-                  version: 2
-                  dev: yes
-                  command: style-check
-
-            - name: Run Tests for PHP ${{ matrix.php-versions }}
-              uses: php-actions/composer@v6
-              with:
-                  php_version: ${{ matrix.php-versions }}
-                  php_extensions: zip
-                  dev: yes
-                  command: test
