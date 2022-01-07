@@ -48,4 +48,4 @@ jobs:
 
             - name: Submit test coverage to Coveralls
               run: vendor/bin/coveralls
-              if: success && matrix.php-version == '7.4'
+              if: success() && matrix.php-version == '7.4'
