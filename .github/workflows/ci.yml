@@ -47,5 +47,5 @@ jobs:
               run: composer run-script test
 
             - name: Submit test coverage to Coveralls
-              run: vendor/bin/coveralls
+              run: vendor/bin/php-coveralls
               if: success() && matrix.php-version == '7.4'
