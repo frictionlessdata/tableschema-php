@@ -21,9 +21,9 @@
         }
     },
     "scripts": {
-        "test": "phpunit --bootstrap tests/autoload.php tests/ --coverage-clover coverage-clover.xml",
+        "test": "phpunit --coverage-clover coverage-clover.xml",
         "update-schema": "php update-schema.php",
-        "style-check": "./.install_cs_fixer.sh && ./php-cs-fixer fix --dry-run --verbose --diff",
-        "style-fix": "./.install_cs_fixer.sh && ./php-cs-fixer fix --verbose"
+        "style-check": "./.install-cs-fixer.sh && ./php-cs-fixer fix --dry-run --verbose --diff",
+        "style-fix": "./.install-cs-fixer.sh && ./php-cs-fixer fix --verbose"
     }
 }
