@@ -1,0 +1,53 @@
+name: CI
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                php-version: ['7.1', '7.2', '7.3', '7.4']
+
+        name: frictionlessdata/tableschema-php PHP ${{ matrix.php-version }} test
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup PHP version ${{ matrix.php-version }}
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: ${{ matrix.php-version }}
+
+            - name: Confirm PHP Version
+              run: php -v
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate --strict
+
+            - name: Cache Composer packages
+              id: composer-cache
+              uses: actions/cache@v2
+              with:
+                  path: vendor
+                  key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-php-
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress
+
+            - name: Run Code Style Check for PHP ${{ matrix.php-version }}
+              run: composer run-script style-check
+              if: matrix.php-version != '7.1'
+
+            - name: Run tests for PHP ${{ matrix.php-version }}
+              run: composer run-script test
+              env:
+                  TABLESCHEMA_ENABLE_FRAGILE_TESTS: 1
+
+# TODO Get the coveralls submission to work
+#            - name: Submit test coverage to Coveralls
+#              run: vendor/bin/php-coveralls
+#              if: success() && matrix.php-version == '7.4'
