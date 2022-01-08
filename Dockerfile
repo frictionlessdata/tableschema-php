@@ -1,17 +1,9 @@
 FROM php:7.4-cli
 
-# system dependecies
-RUN apt-get update && apt-get install -y \
-        libfreetype6-dev \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-    && docker-php-ext-install -j$(nproc) iconv \
-    && docker-php-ext-install -j$(nproc) gd
+RUN apt-get update
+
 ## PHP dependencies
-RUN docker-php-ext-install -j$(nproc) \
-        pdo \
-        pdo_mysql \
-    && pecl install xdebug \
+RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 # composer
 RUN curl -sS https://getcomposer.org/installer | php \
