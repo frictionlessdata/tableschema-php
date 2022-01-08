@@ -11,12 +11,26 @@ Flow Framework has a nice guide regarding coding standards:
 
 ## Getting Started
 
-1. Clone the repo
-2. Run the tests
-```
-$ composer install
-$ composer test
-```
+**With Docker:**
+  1. Clone the repo
+  2. Install the Composer dependencies
+     ```bash
+     $ docker-compose run --rm tblschema composer install
+     ```
+  3. Run the tests
+     ```bash
+     $ ./docker-run-tests.sh
+     ```
+**Without Docker:**
+  1. Clone the repo
+  2. Install the Composer dependencies
+     ```bash
+     $ composer install
+     ```
+  3. Run the tests
+     ```bash
+     $ composer test
+     ```
 
 ## Phpunit - for unit tests
 
@@ -31,7 +45,7 @@ Running Phpunit directly: `vendor/bin/phpunit --bootstrap tests/autoload.php tes
 
 [![Coveralls](http://img.shields.io/coveralls/frictionlessdata/tableschema-php.svg?branch=master)](https://coveralls.io/r/frictionlessdata/tableschema-php?branch=master)
 
-when running `composer test` phpunit generates coverage report in coverage-clover.xml - this is then sent to Coveralls via Travis.
+when running `composer test` phpunit generates coverage report in coverage-clover.xml - this is then sent to Coveralls via a Github Action.
 
 
 ## Scrutinizer-ci - for code analysis
@@ -47,10 +61,24 @@ At the moment, the integration with frictionlessdata repo is not working, you ca
 
 ## php-cs-fixer - code style check & autofix
 
-[php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) can be used to check and fix code style
+[php-cs-fixer](https://github.com/FriendsOfPHP/PHP-CS-Fixer) can be used to check and fix code style.
 
-you need to manually install it, then you can run : `composer style-check` or `composer style-fix`
- 
+You need to manually install it, then you can run the following :
+
+* With Docker:
+  ```bash
+  # Check styles
+  $ ./docker-style-check.sh
+  # Automatically fix styles
+  $ ./docker-style-fix.sh
+  ```
+* Without Docker:
+  ```bash
+  # Check styles
+  $ composer style-check
+  # Automaticall fix styles
+  $ composer style-fix
+  ```
 
 ## Publishing to Packagist
 

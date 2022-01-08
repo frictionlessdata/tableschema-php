@@ -1,0 +1,7 @@
+version: "2"
+services:
+    tblschema:
+        build: .
+        volumes:
+            - .:/src
+        command: bash
