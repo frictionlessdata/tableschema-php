@@ -47,7 +47,7 @@ jobs:
               env:
                   TABLESCHEMA_ENABLE_FRAGILE_TESTS: 1
 
-# TODO Get the coveralls submission to work
-#            - name: Submit test coverage to Coveralls
-#              run: vendor/bin/php-coveralls
-#              if: success() && matrix.php-version == '7.4'
+            - name: Submit test coverage to Coveralls
+              uses: coverallsapp/github-action@master
+              with:
+                  github-token: ${{ secrets.GITHUB_TOKEN }}
