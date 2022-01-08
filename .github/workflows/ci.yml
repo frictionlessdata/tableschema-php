@@ -45,7 +45,10 @@ jobs:
 
             - name: Run tests for PHP ${{ matrix.php-version }}
               run: composer run-script test
+              env:
+                  TABLESCHEMA_ENABLE_FRAGILE_TESTS: 1
 
-            - name: Submit test coverage to Coveralls
-              run: vendor/bin/php-coveralls
-              if: success() && matrix.php-version == '7.4'
+# TODO Get the coveralls submission to work
+#            - name: Submit test coverage to Coveralls
+#              run: vendor/bin/php-coveralls
+#              if: success() && matrix.php-version == '7.4'
