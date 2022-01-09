@@ -63,11 +63,8 @@ class FieldsFactory
                     return $field;
                 }
             }
-            throw new FieldValidationException([
-                new SchemaValidationError(
-                    SchemaValidationError::SCHEMA_VIOLATION,
-                    'Could not find a valid field for descriptor: '.json_encode($descriptor)),
-            ]);
+
+            throw new FieldValidationException([new SchemaValidationError(SchemaValidationError::SCHEMA_VIOLATION, 'Could not find a valid field for descriptor: '.json_encode($descriptor))]);
         }
     }
 
@@ -87,10 +84,7 @@ class FieldsFactory
                 return $field;
             }
         }
-        throw new FieldValidationException([
-            new SchemaValidationError(
-                SchemaValidationError::SCHEMA_VIOLATION,
-                'Could not find a valid field for value: '.json_encode($val)),
-        ]);
+
+        throw new FieldValidationException([new SchemaValidationError(SchemaValidationError::SCHEMA_VIOLATION, 'Could not find a valid field for value: '.json_encode($val))]);
     }
 }
