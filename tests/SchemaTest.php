@@ -64,26 +64,26 @@ class SchemaTest extends TestCase
         $this->schemaInvalidMultipleErrorsFilename = dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_invalid_multiple_errors.json';
     }
 
-    public function testInitializeFromJsonString()
+    public function testInitializeFromJsonString(): void
     {
         $schema = new Schema($this->simpleDescriptorJson);
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
         $this->assertEquals('id', $schema->descriptor()->fields[0]->name);
     }
 
-    public function testInitializeFromPhpObject()
+    public function testInitializeFromPhpObject(): void
     {
         $schema = new Schema($this->simpleDescriptor);
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
     }
 
-    public function testInitializeFromPhpArray()
+    public function testInitializeFromPhpArray(): void
     {
         $schema = new Schema(json_decode($this->simpleDescriptorJson, true));
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
     }
 
-    public function testInitializeFromRemoteResource()
+    public function testInitializeFromRemoteResource(): void
     {
         if (getenv('TABLESCHEMA_ENABLE_FRAGILE_TESTS')) {
             $this->assertValidationErrors(
@@ -95,7 +95,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testValidateInvalidResources()
+    public function testValidateInvalidResources(): void
     {
         $this->assertValidationErrors(
             'error loading descriptor from source "--invalid--": '.$this->getFileGetContentsErrorMessage('--invalid--'),
@@ -103,7 +103,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testConstructFromInvalidResource()
+    public function testConstructFromInvalidResource(): void
     {
         try {
             new Schema('--invalid--');
@@ -125,7 +125,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testDifferentValidDescriptorSources()
+    public function testDifferentValidDescriptorSources(): void
     {
         $simpleFile = $this->getTempFile();
         $fullFile = $this->getTempFile();
@@ -145,7 +145,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testInvalidDescriptor()
+    public function testInvalidDescriptor(): void
     {
         $descriptors = [
             [
@@ -209,7 +209,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testValidateRow()
+    public function testValidateRow(): void
     {
         $schema = new Schema((object) [
             'fields' => [
@@ -225,7 +225,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testValidInitialize()
+    public function testValidInitialize(): void
     {
         new Schema($this->minDescriptorJson);
         new Schema($this->maxDescriptorJson);
@@ -236,7 +236,7 @@ class SchemaTest extends TestCase
     //def test_init_invalid():
     //with pytest.raises(exceptions.SchemaValidationError) as exception:
     //Schema('data/schema_invalid_multiple_errors.json')
-    public function testInvalidInitialize()
+    public function testInvalidInitialize(): void
     {
         try {
             new Schema($this->schemaInvalidMultipleErrorsFilename);
@@ -249,13 +249,13 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testDescriptor()
+    public function testDescriptor(): void
     {
         $schema = new Schema($this->simpleDescriptorJson);
         $this->assertEquals($this->simpleDescriptor, $schema->descriptor());
     }
 
-    public function testDescriptorDefaults()
+    public function testDescriptorDefaults(): void
     {
         $schema = new Schema((object) [
             'fields' => [
@@ -272,7 +272,7 @@ class SchemaTest extends TestCase
         ], $schema->fullDescriptor());
     }
 
-    public function testCastRow()
+    public function testCastRow(): void
     {
         $this->assertCastRow(
             ['id' => 1, 'email' => 'test@example.com'],
@@ -291,7 +291,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testCastRowNullValues()
+    public function testCastRowNullValues(): void
     {
         $this->assertCastRow(
             ['id' => 'string', 'height' => null, 'age' => null, 'name' => 'string', 'occupation' => null],
@@ -300,7 +300,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testCastRowTooShort()
+    public function testCastRowTooShort(): void
     {
         // missing values in row are completed with null value from schema (if not required)
         $this->assertCastRow(
@@ -310,7 +310,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testCastRowTooLong()
+    public function testCastRowTooLong(): void
     {
         // additiona values in row are ignored
         $this->assertCastRow(
@@ -320,7 +320,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testCastRowWrongType()
+    public function testCastRowWrongType(): void
     {
         $this->assertCastRowException(
             'height: value must be numeric ("notdecimal")',
@@ -329,7 +329,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testCastRowWrongTypeMultipleErrors()
+    public function testCastRowWrongTypeMultipleErrors(): void
     {
         $this->assertCastRowException(
             'height: value must be numeric ("notdecimal"), age: value must be an integer ("10.6")',
@@ -338,13 +338,13 @@ class SchemaTest extends TestCase
         );
     }
 
-    public function testFields()
+    public function testFields(): void
     {
         $schema = new Schema($this->minDescriptorJson);
         $this->assertEquals(['id', 'height'], array_keys($schema->fields()));
     }
 
-    public function testGetField()
+    public function testGetField(): void
     {
         $schema = new Schema($this->minDescriptorJson);
         $this->assertEquals('id', $schema->field('id')->name());
@@ -357,7 +357,7 @@ class SchemaTest extends TestCase
         }
     }
 
-    public function testHasField()
+    public function testHasField(): void
     {
         $schema = new Schema($this->minDescriptorJson);
         $fields = $schema->fields();
@@ -366,20 +366,20 @@ class SchemaTest extends TestCase
         $this->assertArrayNotHasKey('undefined', $fields);
     }
 
-    public function testPrimaryKey()
+    public function testPrimaryKey(): void
     {
         $this->assertEquals([], (new Schema($this->minDescriptorJson))->primaryKey());
         $this->assertEquals(['id'], (new Schema($this->maxDescriptorJson))->primaryKey());
     }
 
-    public function testPrimaryKeyAsString()
+    public function testPrimaryKeyAsString(): void
     {
         $descriptor = json_decode($this->maxDescriptorJson);
         $descriptor->primaryKey = 'id';
         $this->assertEquals(['id'], (new Schema($descriptor))->primaryKey());
     }
 
-    public function testForeignKeys()
+    public function testForeignKeys(): void
     {
         $this->assertEquals([], (new Schema($this->minDescriptorJson))->foreignKeys());
         $this->assertEquals([
@@ -393,7 +393,7 @@ class SchemaTest extends TestCase
         ], (new Schema($this->maxDescriptorJson))->foreignKeys());
     }
 
-    public function testEditable()
+    public function testEditable(): void
     {
         $schema = new Schema();
         // set fields
@@ -476,7 +476,7 @@ class SchemaTest extends TestCase
         ], $schema->fullDescriptor());
     }
 
-    public function testSchemaToEditableSchema()
+    public function testSchemaToEditableSchema(): void
     {
         $schema = new Schema('{"fields": [{"name": "id", "type": "integer"}]}');
         $schema->field('title', '{"type": "string"}');
@@ -486,7 +486,7 @@ class SchemaTest extends TestCase
         ]], $schema->descriptor());
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $schema = new Schema($this->minDescriptorJson);
         $filename = $this->getTempFile();
@@ -494,7 +494,7 @@ class SchemaTest extends TestCase
         $this->assertEquals($schema->fullDescriptor(), json_decode(file_get_contents($filename)));
     }
 
-    public function testSpecsUriFormat()
+    public function testSpecsUriFormat(): void
     {
         $validator = new \JsonSchema\Validator();
         // we will validate this against a simple schema of an array of uri strings
@@ -517,7 +517,7 @@ class SchemaTest extends TestCase
         ]], $validator->getErrors());
     }
 
-    public function testSchemaInfer()
+    public function testSchemaInfer(): void
     {
         $schema = Schema::infer('tests/fixtures/data.csv');
         $this->assertEquals((object) [
@@ -529,7 +529,7 @@ class SchemaTest extends TestCase
         ], $schema->descriptor());
     }
 
-    public function testSchemaInferCsvDialect()
+    public function testSchemaInferCsvDialect(): void
     {
         $schema = Schema::infer('tests/fixtures/data.lolsv', [
             'delimiter' => 'o',
@@ -557,7 +557,7 @@ class SchemaTest extends TestCase
 
     protected $tempFiles = [];
 
-    protected function assertValidationErrors($expectedValidationErrors, $descriptor)
+    protected function assertValidationErrors($expectedValidationErrors, $descriptor): void
     {
         $this->assertEquals(
             $expectedValidationErrors,
@@ -567,7 +567,7 @@ class SchemaTest extends TestCase
         );
     }
 
-    protected function getFileGetContentsErrorMessage($in)
+    protected function getFileGetContentsErrorMessage($in): string
     {
         try {
             file_get_contents($in);
@@ -577,7 +577,7 @@ class SchemaTest extends TestCase
         throw new \Exception();
     }
 
-    protected function assertCastRow($expectedRow, $descriptor, $inputRow)
+    protected function assertCastRow($expectedRow, $descriptor, $inputRow): Schema
     {
         $schema = new Schema($descriptor);
         $this->assertEquals($expectedRow, $schema->castRow($inputRow));
@@ -585,7 +585,7 @@ class SchemaTest extends TestCase
         return $schema;
     }
 
-    protected function assertCastRowException($expectedError, $descriptor, $inputRow)
+    protected function assertCastRowException($expectedError, $descriptor, $inputRow): void
     {
         try {
             $schema = new Schema($descriptor);

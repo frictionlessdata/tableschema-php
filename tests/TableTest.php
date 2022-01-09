@@ -25,7 +25,7 @@ class TableTest extends TestCase
         ]);
     }
 
-    public function testBasicUsage()
+    public function testBasicUsage(): void
     {
         $table = new Table($this->fixture('data.csv'), $this->fixture('data.json'));
         $rows = [];
@@ -39,7 +39,7 @@ class TableTest extends TestCase
         ], $rows);
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $validationErrors = Table::validate(
             $this->dataSourceFixture('data.csv'),
@@ -48,7 +48,7 @@ class TableTest extends TestCase
         $this->assertEquals('', SchemaValidationError::getErrorMessages($validationErrors));
     }
 
-    public function testLoadingFromInvalidSource()
+    public function testLoadingFromInvalidSource(): void
     {
         $this->assertTableValidation(
             [$this->getFopenErrorMessage('--invalid--')],
@@ -56,14 +56,14 @@ class TableTest extends TestCase
         );
     }
 
-    public function testLoadingMissingHeader()
+    public function testLoadingMissingHeader(): void
     {
         $this->assertTableValidation([
             'Failed to get header row',
         ], $this->fixture('empty_file'));
     }
 
-    public function testInvalidDataInPeekRows()
+    public function testInvalidDataInPeekRows(): void
     {
         $this->assertNativeTableValidation(
             ['row 2 email: value is not a valid email (bad and invalid email)'],
@@ -74,7 +74,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testMismatchBetweenSchemaAndHeaders()
+    public function testMismatchBetweenSchemaAndHeaders(): void
     {
         $dataSource = new CsvDataSource($this->fixture('data.csv'));
         $schema = new Schema((object) ['fields' => [
@@ -91,7 +91,7 @@ class TableTest extends TestCase
         $this->assertEquals([['foo' => null], ['foo' => null], ['foo' => null]], $lines);
     }
 
-    public function testInferSchemaFailsAfterLock()
+    public function testInferSchemaFailsAfterLock(): void
     {
         $this->assertInferSchemaException('id: value must be an integer ("3.5")', [
             ['id' => '1', 'email' => 'test1_example_com'],
@@ -100,13 +100,13 @@ class TableTest extends TestCase
         ], 2);
     }
 
-    public function testAutoInferSchemaWhenNullSchema()
+    public function testAutoInferSchemaWhenNullSchema(): void
     {
         $table = new Table($this->fixture('data.csv'));
         $this->assertTrue(is_a($table->schema(), 'frictionlessdata\\tableschema\\InferSchema'));
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $table = new Table($this->fixture('data.csv'));
         $this->assertEquals(['first_name', 'last_name', 'order'], $table->headers());
@@ -130,7 +130,7 @@ class TableTest extends TestCase
         ], $table->read());
     }
 
-    public function testTableSave()
+    public function testTableSave(): void
     {
         $table = new Table($this->fixture('data.csv'));
         $table->save('test-table-save-data.csv');
@@ -141,7 +141,7 @@ class TableTest extends TestCase
         unlink('test-table-save-data.csv');
     }
 
-    public function testInferSchemaWorksWithMoreRows()
+    public function testInferSchemaWorksWithMoreRows(): void
     {
         $this->assertInferSchema(
             [
@@ -159,7 +159,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testSimpleInferSchema()
+    public function testSimpleInferSchema(): void
     {
         $table = new Table($this->fixture('data.csv'));
         $this->assertEquals((object) [
@@ -171,7 +171,7 @@ class TableTest extends TestCase
         ], $table->schema()->descriptor());
     }
 
-    public function testInferSchemaEmailFormat()
+    public function testInferSchemaEmailFormat(): void
     {
         $inputRows = [
             ['email' => 'valid_email@example.com'],
@@ -188,7 +188,7 @@ class TableTest extends TestCase
         $this->assertInferSchema($inputRows, $inputRows, 1, true);
     }
 
-    public function testInferSchema()
+    public function testInferSchema(): void
     {
         $this->assertInferSchemaTypes([
             'id' => 'integer',
@@ -197,7 +197,7 @@ class TableTest extends TestCase
         ], 'data_infer.csv');
     }
 
-    public function testInferSchemaUtf8()
+    public function testInferSchemaUtf8(): void
     {
         $this->assertInferSchemaTypes([
             'id' => 'integer',
@@ -206,7 +206,7 @@ class TableTest extends TestCase
         ], 'data_infer_utf8.csv');
     }
 
-    public function testInferSchemaRowLimit()
+    public function testInferSchemaRowLimit(): void
     {
         $this->assertInferSchemaTypes([
             'id' => 'integer',
@@ -215,7 +215,7 @@ class TableTest extends TestCase
         ], 'data_infer_utf8.csv', 4);
     }
 
-    public function testCsvDialectLolsv()
+    public function testCsvDialectLolsv(): void
     {
         $table = new Table($this->fixture('data.lolsv'), null, [
             'delimiter' => 'o',
@@ -234,7 +234,7 @@ class TableTest extends TestCase
         ], $rows);
     }
 
-    public function testCsvLineBreak()
+    public function testCsvLineBreak(): void
     {
         $table = new Table($this->fixture('data_linebreaks.csv'));
         $this->assertEquals([
@@ -242,7 +242,7 @@ class TableTest extends TestCase
         ], $table->read());
     }
 
-    public function testCsvDialectDatapackagePipelines()
+    public function testCsvDialectDatapackagePipelines(): void
     {
         $datapackage = json_decode(file_get_contents($this->fixture('committees/datapackage.json')));
         $resource = $datapackage->resources[0];
@@ -309,7 +309,7 @@ class TableTest extends TestCase
         ]], $rows);
     }
 
-    public function testReadOptions()
+    public function testReadOptions(): void
     {
         $datapackage = json_decode(file_get_contents($this->fixture('committees/datapackage.json')));
         $resource = $datapackage->resources[0];
@@ -343,7 +343,7 @@ class TableTest extends TestCase
         ], $table->read(['keyed' => false, 'extended' => true, 'cast' => false, 'limit' => 2]));
     }
 
-    public function testInvalidTabularData()
+    public function testInvalidTabularData(): void
     {
         $schema = new Schema((object) [
             'fields' => [
@@ -380,7 +380,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testEmailsTabularData()
+    public function testEmailsTabularData(): void
     {
         $schema = new Schema((object) [
             'fields' => [
@@ -400,7 +400,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testIterateWithoutEof()
+    public function testIterateWithoutEof(): void
     {
         $dataSource = new CsvDataSource($this->fixture('valid_emails_tabular_data.csv'));
         $row = $dataSource->getNextLine();
@@ -411,22 +411,22 @@ class TableTest extends TestCase
     protected $fixturesPath;
     protected $validSchema;
 
-    protected function fixture($file)
+    protected function fixture($file): string
     {
         return $this->fixturesPath.DIRECTORY_SEPARATOR.$file;
     }
 
-    protected function dataSourceFixture($file)
+    protected function dataSourceFixture($file): CsvDataSource
     {
         return new CsvDataSource($this->fixture($file));
     }
 
-    protected function schemaFixture($file)
+    protected function schemaFixture($file): Schema
     {
         return new Schema($this->fixture($file));
     }
 
-    protected function assertTableValidation($expectedErrors, $csvDataSource, $schemaSource = null, $numPeekLines = 10)
+    protected function assertTableValidation($expectedErrors, $csvDataSource, $schemaSource = null, $numPeekLines = 10): void
     {
         $actualErrors = [];
         $dataSource = new CsvDataSource($csvDataSource);
@@ -441,7 +441,7 @@ class TableTest extends TestCase
         $this->assertEquals($expectedErrors, $actualErrors);
     }
 
-    protected function assertNativeTableValidation($expectedErrors, $data, $schemaSource, $numPeekLines = 10)
+    protected function assertNativeTableValidation($expectedErrors, $data, $schemaSource, $numPeekLines = 10): void
     {
         $actualErrors = [];
         $dataSource = new NativeDataSource($data);
@@ -456,7 +456,7 @@ class TableTest extends TestCase
         $this->assertEquals($expectedErrors, $actualErrors);
     }
 
-    protected function getFopenErrorMessage($in)
+    protected function getFopenErrorMessage($in): string
     {
         try {
             fopen($in, 'r');
@@ -466,7 +466,7 @@ class TableTest extends TestCase
         throw new \Exception();
     }
 
-    protected function assertInferSchema($expectedRows, $inputRows, $lockRowNum, $lenient = false)
+    protected function assertInferSchema($expectedRows, $inputRows, $lockRowNum, $lenient = false): void
     {
         $dataSource = new NativeDataSource($inputRows);
         $schema = new InferSchema(null, $lenient);
@@ -485,7 +485,7 @@ class TableTest extends TestCase
         $this->assertEquals($expectedRows, $lockedRows);
     }
 
-    protected function assertInferSchemaException($expectedException, $inputRows, $lockRowNum)
+    protected function assertInferSchemaException($expectedException, $inputRows, $lockRowNum): void
     {
         $exceptionMessage = null;
         try {
@@ -496,7 +496,7 @@ class TableTest extends TestCase
         }
     }
 
-    protected function assertInferSchemaTypes($expectedTypes, $filename, $numRows = 1)
+    protected function assertInferSchemaTypes($expectedTypes, $filename, $numRows = 1): void
     {
         $schema = $this->getInferSchema($filename, $numRows);
         foreach ($expectedTypes as $fieldName => $expectedType) {
@@ -504,7 +504,7 @@ class TableTest extends TestCase
         }
     }
 
-    protected function getInferSchema($filename, $numRows = 1)
+    protected function getInferSchema($filename, $numRows = 1): InferSchema
     {
         $dataSource = new CsvDataSource(dirname(__FILE__).DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.$filename);
         $schema = new InferSchema();
