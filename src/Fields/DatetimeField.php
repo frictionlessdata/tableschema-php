@@ -25,6 +25,7 @@ class DatetimeField extends BaseField
                         throw $this->getValidationException($e->getMessage(), $val);
                     }
                 }
+                // no break
             case 'any':
                 try {
                     return new Carbon($val);

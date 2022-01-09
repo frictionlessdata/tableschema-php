@@ -25,12 +25,14 @@ class GeopointField extends BaseField
                         return $this->getNativeGeopoint($val);
                     }
                 }
+                // no break
             case 'array':
                 if (!is_array($val) || array_keys($val) != [0, 1]) {
                     throw $this->getValidationException('value must be an array with 2 elements', $val);
                 } else {
                     return $this->getNativeGeopoint($val);
                 }
+                // no break
             case 'object':
                 $val = json_decode(json_encode($val), true);
                 if (!is_array($val) || !array_key_exists('lat', $val) || !array_key_exists('lon', $val)) {
@@ -38,6 +40,7 @@ class GeopointField extends BaseField
                 } else {
                     return $this->getNativeGeopoint([$val['lon'], $val['lat']]);
                 }
+                // no break
             default:
                 throw $this->getValidationException('invalid format', $val);
         }

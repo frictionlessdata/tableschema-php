@@ -20,7 +20,6 @@ $config
         'yoda_style' => false,
         'ordered_imports' => false,
         'visibility_required' => false,
-        'no_break_comment' => false,
     ])
     ->setFinder($finder)
 ;
