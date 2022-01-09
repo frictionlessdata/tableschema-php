@@ -19,7 +19,6 @@ $config
         // TODO Re-enable the follow rules once we have a passing github action
         'yoda_style' => false,
         'ordered_imports' => false,
-        'visibility_required' => false,
     ])
     ->setFinder($finder)
 ;

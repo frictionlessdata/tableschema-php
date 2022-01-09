@@ -4,11 +4,11 @@ namespace frictionlessdata\tableschema;
 
 class SchemaValidationError
 {
-    const LOAD_FAILED = 1;
-    const SCHEMA_VIOLATION = 8;
-    const FIELD_VALIDATION = 21;
-    const ROW_FIELD_VALIDATION = 22;
-    const ROW_VALIDATION = 23;
+    public const LOAD_FAILED = 1;
+    public const SCHEMA_VIOLATION = 8;
+    public const FIELD_VALIDATION = 21;
+    public const ROW_FIELD_VALIDATION = 22;
+    public const ROW_VALIDATION = 23;
 
     public $code;
     public $extraDetails;

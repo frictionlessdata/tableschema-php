@@ -9,7 +9,7 @@ use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class FieldTypesTest extends TestCase
 {
-    const ERROR = '~~ERROR~~';
+    private const ERROR = '~~ERROR~~';
 
     public function testAny()
     {
