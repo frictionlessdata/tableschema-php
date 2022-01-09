@@ -11,7 +11,7 @@ class DatetimeField extends BaseField
         $val = trim($val);
         switch ($this->format()) {
             case 'default':
-                if (substr($val, -1) != 'Z') {
+                if ('Z' != substr($val, -1)) {
                     throw $this->getValidationException('must have trailing Z', $val);
                 } else {
                     try {
@@ -34,7 +34,7 @@ class DatetimeField extends BaseField
                 }
             default:
                 $date = strptime($val, $this->format());
-                if ($date === false || $date['unparsed'] != '') {
+                if (false === $date || '' != $date['unparsed']) {
                     throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$this->format()}''", $val);
                 } else {
                     return Carbon::create(

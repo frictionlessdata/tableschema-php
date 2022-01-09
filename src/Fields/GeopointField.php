@@ -19,7 +19,7 @@ class GeopointField extends BaseField
                     throw $this->getValidationException('value must be a string', $val);
                 } else {
                     $val = explode(',', $val);
-                    if (count($val) != 2) {
+                    if (2 != count($val)) {
                         throw $this->getValidationException('value must be a string with 2 comma-separated elements', $val);
                     } else {
                         return $this->getNativeGeopoint($val);

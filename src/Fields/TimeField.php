@@ -15,7 +15,7 @@ class TimeField extends BaseField
         switch ($this->format()) {
             case 'default':
                 $time = explode(':', $val);
-                if (count($time) != 3) {
+                if (3 != count($time)) {
                     throw $this->getValidationException(null, $val);
                 } else {
                     list($hour, $minute, $second) = $time;
@@ -33,7 +33,7 @@ class TimeField extends BaseField
                 return $this->getNativeTime($dt->hour, $dt->minute, $dt->second);
             default:
                 $date = strptime($val, $this->format());
-                if ($date === false || $date['unparsed'] != '') {
+                if (false === $date || '' != $date['unparsed']) {
                     throw $this->getValidationException(null, $val);
                 } else {
                     return $this->getNativeTime($date['tm_hour'], $date['tm_min'], $date['tm_sec']);

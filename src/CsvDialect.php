@@ -63,7 +63,7 @@ class CsvDialect
             // a number, in n.n format, e.g., 1.0. If not present, consumers should assume latest schema version.
             'csvddfVersion' => null,
         ];
-        if ($dialect === null) {
+        if (null === $dialect) {
             $dialect = [];
         } else {
             $dialect = (array) $dialect;
@@ -74,10 +74,10 @@ class CsvDialect
             // TODO: support custom lineTerminator
             throw new \Exception('custom lineTerminator is not supported');
         }
-        if (strlen($this->dialect['delimiter']) != 1) {
+        if (1 != strlen($this->dialect['delimiter'])) {
             throw new \Exception('delimiter must be a single char');
         }
-        if ($this->dialect['nullSequence'] !== null) {
+        if (null !== $this->dialect['nullSequence']) {
             throw new \Exception('custom nullSequence is not supported');
         }
     }
@@ -127,7 +127,7 @@ class CsvDialect
         }
         for ($charPos = 0; $charPos < mb_strlen($line); ++$charPos) {
             $char = mb_substr($line, $charPos, 1);
-            if ($enclosed === null) {
+            if (null === $enclosed) {
                 // start of a new field
                 if ($char == $this->dialect['delimiter']) {
                     if (
@@ -152,7 +152,7 @@ class CsvDialect
             } elseif ($enclosed) {
                 // processing an enclosed field
                 if (
-                    $this->dialect['doubleQuote'] !== null && $char == $this->dialect['quoteChar']
+                    null !== $this->dialect['doubleQuote'] && $char == $this->dialect['quoteChar']
                     && $charPos != $lastCharPos && mb_substr($line, $charPos + 1, 1) == $this->dialect['quoteChar']
                 ) {
                     // doubleQuote mode is active, current char is a quote and next char is a quote
@@ -211,7 +211,7 @@ class CsvDialect
                 return ltrim($field);
             }, $fields);
         }
-        if ($enclosed === true && !is_a($fields[count($fields) - 1], 'frictionlessdata\\tableschema\\ContinueEnclosedField')) {
+        if (true === $enclosed && !is_a($fields[count($fields) - 1], 'frictionlessdata\\tableschema\\ContinueEnclosedField')) {
             $fields[$field + 1] = new ContinueEnclosedField();
         }
 

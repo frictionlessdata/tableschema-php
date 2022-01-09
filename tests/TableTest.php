@@ -404,8 +404,8 @@ class TableTest extends TestCase
     {
         $dataSource = new CsvDataSource($this->fixture('valid_emails_tabular_data.csv'));
         $row = $dataSource->getNextLine();
-        $this->assertTrue($row['id'] === '1');
-        $this->assertTrue($row['email'] === 'good@email.and.nice');
+        $this->assertTrue('1' === $row['id']);
+        $this->assertTrue('good@email.and.nice' === $row['email']);
     }
 
     protected $fixturesPath;

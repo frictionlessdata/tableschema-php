@@ -574,7 +574,7 @@ class FieldTypesTest extends TestCase
                 $descriptor['name'] = 'unknown';
             }
             $field = FieldsFactory::field($descriptor);
-            if ($expectedCastValue === self::ERROR) {
+            if (self::ERROR === $expectedCastValue) {
                 $this->assertTrue(count($field->validateValue($inputValue)) > 0, $assertMessage);
             } elseif (is_object($expectedCastValue)) {
                 $this->assertEquals($expectedCastValue, $field->castValue($inputValue), $assertMessage);

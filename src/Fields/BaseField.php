@@ -294,7 +294,7 @@ abstract class BaseField
 
     protected function checkPatternConstraint($val, $pattern)
     {
-        return preg_match('/^'.$pattern.'$/', $val) === 1;
+        return 1 === preg_match('/^'.$pattern.'$/', $val);
     }
 
     protected function checkMinimumConstraint($val, $minConstraint)

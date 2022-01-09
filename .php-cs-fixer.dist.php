@@ -16,8 +16,6 @@ $config
     ->setRules([
         '@PSR2' => true,
         '@Symfony' => true,
-        // TODO Re-enable the follow rules once we have a passing github action
-        'yoda_style' => false,
     ])
     ->setFinder($finder)
 ;

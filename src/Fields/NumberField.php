@@ -13,19 +13,19 @@ class NumberField extends BaseField
      */
     protected function validateCastValue($val)
     {
-        if (isset($this->descriptor()->bareNumber) && $this->descriptor()->bareNumber === false) {
+        if (isset($this->descriptor()->bareNumber) && false === $this->descriptor()->bareNumber) {
             return mb_ereg_replace('((^\D*)|(\D*$))', '', $val);
         }
         $isPercent = false;
         if (is_string($val)) {
-            if (substr($val, -1) == '%') {
+            if ('%' == substr($val, -1)) {
                 $val = rtrim($val, '%');
                 $isPercent = true;
             }
             if (isset($this->descriptor()->groupChar)) {
                 $val = str_replace($this->descriptor()->groupChar, '', $val);
             }
-            if (isset($this->descriptor()->decimalChar) && $this->descriptor()->decimalChar != '.') {
+            if (isset($this->descriptor()->decimalChar) && '.' != $this->descriptor()->decimalChar) {
                 $val = str_replace($this->descriptor()->decimalChar, '.', $val);
             }
         }

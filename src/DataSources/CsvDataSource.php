@@ -87,7 +87,7 @@ class CsvDataSource extends BaseDataSource
     public function getNextLine()
     {
         $row = $this->nextRow;
-        if ($row === null) {
+        if (null === $row) {
             if (!$this->resource) {
                 $this->open();
             }
@@ -95,7 +95,7 @@ class CsvDataSource extends BaseDataSource
                 throw new \Exception('EOF');
             }
             $row = $this->nextRow;
-            if ($row === null) {
+            if (null === $row) {
                 throw new \Exception('cannot get valid row, but isEof returns false');
             }
         }

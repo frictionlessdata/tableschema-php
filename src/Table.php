@@ -193,9 +193,9 @@ class Table implements \Iterator
 
     public function rewind()
     {
-        if ($this->currentLine == 0) {
+        if (0 == $this->currentLine) {
             $this->currentLine = 1;
-        } elseif (count($this->castRows) == 0) {
+        } elseif (0 == count($this->castRows)) {
             $this->currentLine = 1;
             $this->dataSource->open();
         }
@@ -208,7 +208,7 @@ class Table implements \Iterator
 
     public function next()
     {
-        if (count($this->castRows) == 0) {
+        if (0 == count($this->castRows)) {
             ++$this->currentLine;
         }
     }
@@ -231,7 +231,7 @@ class Table implements \Iterator
 
     protected function ensureInferredSchema($numPeekRows = 10)
     {
-        if ($this->isInferSchema() && count($this->schema->fields()) == 0) {
+        if ($this->isInferSchema() && 0 == count($this->schema->fields())) {
             // need to fetch some rows first
             if ($numPeekRows > 0) {
                 $i = 0;
