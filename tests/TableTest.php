@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frictionlessdata\tableschema\tests;
 
 use Carbon\Carbon;
