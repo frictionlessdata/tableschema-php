@@ -3,10 +3,10 @@
 namespace frictionlessdata\tableschema\tests;
 
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use PHPUnit\Framework\TestCase;
+use frictionlessdata\tableschema\Fields\FieldsFactory;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
-use frictionlessdata\tableschema\Fields\FieldsFactory;
+use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase
 {

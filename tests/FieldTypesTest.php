@@ -4,8 +4,8 @@ namespace frictionlessdata\tableschema\tests;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Fields\FieldsFactory;
+use PHPUnit\Framework\TestCase;
 
 class FieldTypesTest extends TestCase
 {

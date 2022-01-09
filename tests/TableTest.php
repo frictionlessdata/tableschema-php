@@ -2,15 +2,15 @@
 
 namespace frictionlessdata\tableschema\tests;
 
+use Carbon\Carbon;
 use frictionlessdata\tableschema\DataSources\CsvDataSource;
 use frictionlessdata\tableschema\DataSources\NativeDataSource;
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
-use frictionlessdata\tableschema\Schema;
-use PHPUnit\Framework\TestCase;
-use frictionlessdata\tableschema\Table;
-use frictionlessdata\tableschema\SchemaValidationError;
 use frictionlessdata\tableschema\InferSchema;
-use Carbon\Carbon;
+use frictionlessdata\tableschema\Schema;
+use frictionlessdata\tableschema\SchemaValidationError;
+use frictionlessdata\tableschema\Table;
+use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
 {

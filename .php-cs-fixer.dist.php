@@ -18,7 +18,6 @@ $config
         '@Symfony' => true,
         // TODO Re-enable the follow rules once we have a passing github action
         'yoda_style' => false,
-        'ordered_imports' => false,
     ])
     ->setFinder($finder)
 ;

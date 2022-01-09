@@ -2,8 +2,8 @@
 
 namespace frictionlessdata\tableschema\DataSources;
 
-use frictionlessdata\tableschema\Exceptions\DataSourceException;
 use frictionlessdata\tableschema\CsvDialect;
+use frictionlessdata\tableschema\Exceptions\DataSourceException;
 
 /**
  * handles reading data from a csv source

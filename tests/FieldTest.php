@@ -5,11 +5,11 @@ namespace frictionlessdata\tableschema\tests;
 use frictionlessdata\tableschema\DataSources\NativeDataSource;
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
+use frictionlessdata\tableschema\Fields\FieldsFactory;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
 use frictionlessdata\tableschema\Table;
 use PHPUnit\Framework\TestCase;
-use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class FieldTest extends TestCase
 {
