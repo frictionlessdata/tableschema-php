@@ -14,17 +14,7 @@ $finder
 ;
 $config
     ->setRules([
-        '@PSR2' => true,
         '@Symfony' => true,
-        // TODO Re-enable the follow rules once we have a passing github action
-        'yoda_style' => false,
-        'ordered_imports' => false,
-        'visibility_required' => false,
-        'no_break_comment' => false,
-        'phpdoc_types_order' => false,
-        'single_line_throw' => false,
-        'no_trailing_comma_in_singleline_array' => false,
-        'trim_array_spaces' => false,
     ])
     ->setFinder($finder)
 ;

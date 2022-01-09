@@ -108,7 +108,7 @@ abstract class BaseField
      * try to create a new field object based on the given value.
      *
      * @param mixed       $val
-     * @param null|object $descriptor
+     * @param object|null $descriptor
      * @param bool @lenient
      *
      * @return bool|BaseField
@@ -294,7 +294,7 @@ abstract class BaseField
 
     protected function checkPatternConstraint($val, $pattern)
     {
-        return preg_match('/^'.$pattern.'$/', $val) === 1;
+        return 1 === preg_match('/^'.$pattern.'$/', $val);
     }
 
     protected function checkMinimumConstraint($val, $minConstraint)

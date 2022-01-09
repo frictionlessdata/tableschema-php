@@ -10,7 +10,7 @@ class StringField extends BaseField
     {
         parent::inferProperties($val, $lenient);
         if (!$lenient) {
-            if (is_string($val) && strpos($val, '@') !== false) {
+            if (is_string($val) && false !== strpos($val, '@')) {
                 $this->descriptor->format = 'email';
             }
         }
@@ -32,18 +32,18 @@ class StringField extends BaseField
         }
         switch ($this->format()) {
             case 'email':
-                if (strpos($val, '@') === false) {
+                if (false === strpos($val, '@')) {
                     throw $this->getValidationException('value is not a valid email', $val);
                 }
                 break;
             case 'uri':
-                if (filter_var($val, FILTER_VALIDATE_URL) === false) {
+                if (false === filter_var($val, FILTER_VALIDATE_URL)) {
                     throw $this->getValidationException(null, $val);
                 }
                 break;
             case 'binary':
                 $decoded = base64_decode($val, true);
-                if ($decoded === false) {
+                if (false === $decoded) {
                     throw $this->getValidationException(null, $val);
                 }
                 break;

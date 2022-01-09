@@ -13,11 +13,11 @@ class YearMonthField extends BaseField
         if (!is_array($val)) {
             $val = explode('-', $val);
         }
-        if (count($val) != 2) {
+        if (2 != count($val)) {
             throw $this->getValidationException(null, $val);
         } else {
             list($year, $month) = $val;
-            if ($year == '' || $month == '') {
+            if ('' == $year || '' == $month) {
                 throw $this->getValidationException(null, $val);
             } else {
                 $year = (int) $year;

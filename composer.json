@@ -5,6 +5,7 @@
     "require": {
         "php": ">=7.1.0",
         "ext-mbstring": "*",
+        "ext-json": "*",
         "justinrainbow/json-schema": "^5.2",
         "nesbot/carbon": "^2.0.0",
         "jmikola/geojson": "^1.0"

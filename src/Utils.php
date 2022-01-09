@@ -9,7 +9,7 @@ class Utils
     {
         return
             is_string($json)
-            && (strpos(ltrim($json), '{') === 0)
+            && (0 === strpos(ltrim($json), '{'))
         ;
     }
 }

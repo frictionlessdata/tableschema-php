@@ -7,7 +7,7 @@ use frictionlessdata\tableschema\Exceptions\FieldValidationException;
 class FieldsInferrer
 {
     /**
-     * @param null|array $rows optional initial rows to infer by, each row is an array of field name => field value
+     * @param array|null $rows optional initial rows to infer by, each row is an array of field name => field value
      */
     public function __construct($rows = null, $lenient = false)
     {

@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frictionlessdata\tableschema\tests;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
-use PHPUnit\Framework\TestCase;
 use frictionlessdata\tableschema\Fields\FieldsFactory;
+use PHPUnit\Framework\TestCase;
 
 class FieldTypesTest extends TestCase
 {
-    const ERROR = '~~ERROR~~';
+    private const ERROR = '~~ERROR~~';
 
-    public function testAny()
+    public function testAny(): void
     {
         $this->assertFieldTestData('any', [
             ['default', 1, 1],
@@ -40,7 +42,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testArray()
+    public function testArray(): void
     {
         $this->assertFieldTestData('array', [
             ['default', [], []],
@@ -87,7 +89,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testBoolean()
+    public function testBoolean(): void
     {
         $this->assertFieldTestData('boolean', [
             ['default', true, true],
@@ -122,7 +124,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testDate()
+    public function testDate(): void
     {
         $this->assertFieldTestData('date', [
             ['default', '2019-01-01', Carbon::create(2019, 1, 1, 0, 0, 0)],
@@ -158,7 +160,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testDatetime()
+    public function testDatetime(): void
     {
         $this->assertFieldTestData('datetime', [
             ['default', '2014-01-01T06:00:00Z', Carbon::create(2014, 1, 1, 6, 0, 0, 'UTC')],
@@ -194,7 +196,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testDuration()
+    public function testDuration(): void
     {
         $this->assertFieldTestData('duration', [
             ['default', 'P1Y10M3DT5H11M7S', new CarbonInterval(1, 10, 0, 3, 5, 11, 7)],
@@ -221,7 +223,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testGeojson()
+    public function testGeojson(): void
     {
         $this->assertFieldTestData('geojson', [
             [
@@ -271,7 +273,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testGeopoint()
+    public function testGeopoint(): void
     {
         $this->assertFieldTestData('geopoint', [
             ['default',  [180, 90],  self::ERROR],
@@ -316,7 +318,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testInteger()
+    public function testInteger(): void
     {
         $this->assertFieldTestData('integer', [
             ['default', 1, 1],
@@ -335,7 +337,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testBareNumber()
+    public function testBareNumber(): void
     {
         $this->assertFieldTestData('integer', [
             [['bareNumber' => false], '₪50000', '50000'],
@@ -345,7 +347,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testNumber()
+    public function testNumber(): void
     {
         $this->assertFieldTestData('number', [
             [['format' => 'default'], 1, 1.0],
@@ -388,7 +390,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testObject()
+    public function testObject(): void
     {
         $this->assertFieldTestData('object', [
             ['default', (object) [], (object) []],
@@ -422,7 +424,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testString()
+    public function testString(): void
     {
         $this->assertFieldTestData('string', [
             // format , input value , expected cast value, (optional) expected infer type
@@ -465,7 +467,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testTime()
+    public function testTime(): void
     {
         $this->assertFieldTestData('time', [
             // format , input value , expected cast value, (optional) expected infer type
@@ -507,7 +509,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testYear()
+    public function testYear(): void
     {
         $this->assertFieldTestData('year', [
             // format , input value , expected cast value, (optional) expected infer type
@@ -527,7 +529,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    public function testYearMonth()
+    public function testYearMonth(): void
     {
         $this->assertFieldTestData('yearmonth', [
             // format , input value , expected cast value, (optional) expected infer type
@@ -556,7 +558,7 @@ class FieldTypesTest extends TestCase
         ]);
     }
 
-    protected function assertFieldTestData($fieldType, $testData)
+    protected function assertFieldTestData($fieldType, $testData): void
     {
         foreach ($testData as $testLine) {
             if (!isset($testLine[3])) {
@@ -574,8 +576,8 @@ class FieldTypesTest extends TestCase
                 $descriptor['name'] = 'unknown';
             }
             $field = FieldsFactory::field($descriptor);
-            if ($expectedCastValue === self::ERROR) {
-                $this->assertTrue(count($field->validateValue($inputValue)) > 0, $assertMessage);
+            if (self::ERROR === $expectedCastValue) {
+                $this->assertNotEmpty($field->validateValue($inputValue), $assertMessage);
             } elseif (is_object($expectedCastValue)) {
                 $this->assertEquals($expectedCastValue, $field->castValue($inputValue), $assertMessage);
             } else {

@@ -1,15 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace frictionlessdata\tableschema\tests;
 
 use frictionlessdata\tableschema\DataSources\NativeDataSource;
 use frictionlessdata\tableschema\Exceptions\DataSourceException;
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
+use frictionlessdata\tableschema\Fields\FieldsFactory;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
 use frictionlessdata\tableschema\Table;
 use PHPUnit\Framework\TestCase;
-use frictionlessdata\tableschema\Fields\FieldsFactory;
 
 class FieldTest extends TestCase
 {
@@ -34,7 +36,7 @@ class FieldTest extends TestCase
         ];
     }
 
-    public function testNoValidFieldType()
+    public function testNoValidFieldType(): void
     {
         try {
             FieldsFactory::field($this->DESCRIPTOR_WITHOUT_TYPE);
@@ -44,7 +46,7 @@ class FieldTest extends TestCase
         }
     }
 
-    public function testDescriptor()
+    public function testDescriptor(): void
     {
         $this->assertEquals(
             (object) $this->DESCRIPTOR_MIN,
@@ -52,41 +54,41 @@ class FieldTest extends TestCase
         );
     }
 
-    public function testName()
+    public function testName(): void
     {
         $this->assertEquals('id', FieldsFactory::field($this->DESCRIPTOR_MIN)->name());
     }
 
-    public function testType()
+    public function testType(): void
     {
         $this->assertEquals('string', FieldsFactory::field($this->DESCRIPTOR_MIN)->type());
         $this->assertEquals('integer', FieldsFactory::field($this->DESCRIPTOR_MAX)->type());
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $this->assertEquals('default', FieldsFactory::field($this->DESCRIPTOR_MIN)->format());
         $this->assertEquals('default', FieldsFactory::field($this->DESCRIPTOR_MAX)->format());
     }
 
-    public function testConstraints()
+    public function testConstraints(): void
     {
         $this->assertEquals((object) [], FieldsFactory::field($this->DESCRIPTOR_MIN)->constraints());
         $this->assertEquals((object) ['required' => true], FieldsFactory::field($this->DESCRIPTOR_MAX)->constraints());
     }
 
-    public function testRequired()
+    public function testRequired(): void
     {
         $this->assertEquals(false, FieldsFactory::field($this->DESCRIPTOR_MIN)->required());
         $this->assertEquals(true, FieldsFactory::field($this->DESCRIPTOR_MAX)->required());
     }
 
-    public function testCastValue()
+    public function testCastValue(): void
     {
         $this->assertEquals(1, FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue('1'));
     }
 
-    public function testAdditionalMethods()
+    public function testAdditionalMethods(): void
     {
         $field = FieldsFactory::field(['name' => 'name', 'type' => 'string']);
         $this->assertEquals(null, $field->title());
@@ -103,7 +105,7 @@ class FieldTest extends TestCase
         $this->assertEquals('http://schema.org/Thing', $field->rdfType());
     }
 
-    public function testCastValueConstraintError()
+    public function testCastValueConstraintError(): void
     {
         try {
             FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue(null);
@@ -113,7 +115,7 @@ class FieldTest extends TestCase
         }
     }
 
-    public function testDisableConstraints()
+    public function testDisableConstraints(): void
     {
         $this->assertEquals(
             null,
@@ -125,7 +127,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function testCastValueNullMissingValues()
+    public function testCastValueNullMissingValues(): void
     {
         // missing values are only validated at schema castRow function
         $schema = new Schema((object) [
@@ -137,7 +139,7 @@ class FieldTest extends TestCase
         $this->assertSame(['name' => null], $schema->castRow(['name' => 'null']));
     }
 
-    public function testDoNotCastValueNullMissingValues()
+    public function testDoNotCastValueNullMissingValues(): void
     {
         // missing values are only validated at schema castRow function
         $schema = new Schema((object) [
@@ -149,30 +151,30 @@ class FieldTest extends TestCase
         $this->assertSame(['name' => ''], $schema->castRow(['name' => '']));
     }
 
-    public function testValidateValue()
+    public function testValidateValue(): void
     {
         $this->assertFieldValidateValue('', $this->DESCRIPTOR_MAX, '1');
         $this->assertFieldValidateValue('id: value must be numeric ("string")', $this->DESCRIPTOR_MAX, 'string');
         $this->assertFieldValidateValue('id: field is required (null)', $this->DESCRIPTOR_MAX, null);
     }
 
-    public function testValidateValueDisableConstraints()
+    public function testValidateValueDisableConstraints(): void
     {
         $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MIN)->disableConstraints()->validateValue(''));
         $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->validateValue(null));
     }
 
-    public function testStringMissingValues()
+    public function testStringMissingValues(): void
     {
         $this->assertMissingValues(['type' => 'string'], ['', 'NA', 'N/A']);
     }
 
-    public function testNumberMissingValues()
+    public function testNumberMissingValues(): void
     {
         $this->assertMissingValues(['type' => 'number'], ['', 'NA', 'N/A']);
     }
 
-    public function testValidateValueRequired()
+    public function testValidateValueRequired(): void
     {
         $schema = new Schema((object) [
             'fields' => [
@@ -196,7 +198,7 @@ class FieldTest extends TestCase
         $this->assertSchemaValidateValue('name: field is required (null)', $schema, null);
     }
 
-    public function testValidateValuePattern()
+    public function testValidateValuePattern(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -208,7 +210,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value does not match pattern ("123")', $descriptor, '123');
     }
 
-    public function testValidateValueUnique()
+    public function testValidateValueUnique(): void
     {
         // unique values are only validated at the Table object
         $dataSource = new NativeDataSource([
@@ -242,7 +244,7 @@ class FieldTest extends TestCase
         }
     }
 
-    public function testValidateValueEnum()
+    public function testValidateValueEnum(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -256,7 +258,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, 4);
     }
 
-    public function testValidateValueMinimum()
+    public function testValidateValueMinimum(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -271,7 +273,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, 0);
     }
 
-    public function testValidateValueMaximum()
+    public function testValidateValueMaximum(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -286,7 +288,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, 2);
     }
 
-    public function testValidateValueMinLength()
+    public function testValidateValueMinLength(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -300,7 +302,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value is below minimum length ("a")', $descriptor, 'a');
     }
 
-    public function testValidateValueMaxLength()
+    public function testValidateValueMaxLength(): void
     {
         $descriptor = (object) [
             'name' => 'name',
@@ -314,7 +316,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('name: value is above maximum length ("aaa")', $descriptor, 'aaa');
     }
 
-    protected function assertFieldValidateValue($expectedErrors, $descriptor, $value)
+    protected function assertFieldValidateValue($expectedErrors, $descriptor, $value): void
     {
         $this->assertEquals(
             $expectedErrors,
@@ -327,7 +329,7 @@ class FieldTest extends TestCase
      * @param $schema Schema
      * @param $value
      */
-    protected function assertSchemaValidateValue($expectedErrors, $schema, $value)
+    protected function assertSchemaValidateValue($expectedErrors, $schema, $value): void
     {
         $this->assertEquals(
             $expectedErrors,
@@ -335,7 +337,7 @@ class FieldTest extends TestCase
         );
     }
 
-    protected function assertMissingValues($partialDescriptor, $missingValues)
+    protected function assertMissingValues($partialDescriptor, $missingValues): void
     {
         $descriptor = (object) ['name' => 'name'];
         foreach ($partialDescriptor as $k => $v) {

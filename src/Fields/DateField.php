@@ -10,7 +10,7 @@ class DateField extends BaseField
 
     protected function validateCastValue($val)
     {
-        if ($this->format() === 'any') {
+        if ('any' === $this->format()) {
             try {
                 $date = new Carbon($val);
                 $date->setTime(0, 0, 0);
@@ -20,10 +20,10 @@ class DateField extends BaseField
                 throw $this->getValidationException($e->getMessage(), $val);
             }
         } else {
-            $format = $this->format() === 'default' ? self::DEFAULT_FORMAT : $this->format();
+            $format = 'default' === $this->format() ? self::DEFAULT_FORMAT : $this->format();
             $date = strptime($val, $format);
 
-            if ($date === false || $date['unparsed'] != '') {
+            if (false === $date || '' != $date['unparsed']) {
                 throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$format}''", $val);
             } else {
                 return Carbon::create(

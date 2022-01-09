@@ -36,7 +36,7 @@ class SchemaValidator
     {
         $this->errors = [];
         $this->validateSchema();
-        if (count($this->errors) == 0) {
+        if (0 == count($this->errors)) {
             $this->validateKeys();
         }
 
@@ -98,7 +98,7 @@ class SchemaValidator
                         );
                     }
                 }
-                if ($foreignKey->reference->resource == '') {
+                if ('' == $foreignKey->reference->resource) {
                     // empty resource = reference to self
                     foreach ($foreignKey->reference->fields as $field) {
                         if (!in_array($field, $fieldNames)) {
