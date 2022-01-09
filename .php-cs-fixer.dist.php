@@ -21,7 +21,6 @@ $config
         'ordered_imports' => false,
         'visibility_required' => false,
         'no_break_comment' => false,
-        'phpdoc_types_order' => false,
     ])
     ->setFinder($finder)
 ;

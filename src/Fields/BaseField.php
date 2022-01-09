@@ -108,7 +108,7 @@ abstract class BaseField
      * try to create a new field object based on the given value.
      *
      * @param mixed       $val
-     * @param null|object $descriptor
+     * @param object|null $descriptor
      * @param bool @lenient
      *
      * @return bool|BaseField
