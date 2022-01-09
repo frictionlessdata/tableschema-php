@@ -14,7 +14,6 @@ $finder
 ;
 $config
     ->setRules([
-        '@PSR2' => true,
         '@Symfony' => true,
     ])
     ->setFinder($finder)
