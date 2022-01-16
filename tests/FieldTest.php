@@ -219,6 +219,7 @@ class FieldTest extends TestCase
 
     /**
      * @dataProvider provideDisableConstraintTestData
+     *
      * @param mixed $expectedCastValue
      * @param mixed $valueToCast
      */
@@ -276,6 +277,7 @@ class FieldTest extends TestCase
 
     /**
      * @dataProvider provideValidateValueTestData
+     *
      * @param mixed $value
      */
     public function testValidateValue(string $expectedError, array $fieldDescriptor, $value): void
