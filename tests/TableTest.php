@@ -160,7 +160,8 @@ class TableTest extends TestCase
 "fields": [ {"name": "id"} ],
 "primaryKey": ["id"]
 }
-JSON,
+JSON
+            ,
             [['id' => '']],
         ];
 
@@ -172,7 +173,8 @@ JSON,
     "primaryKey": ["id"],
     "missingValues": ["n/a"]
 }
-JSON,
+JSON
+            ,
             [['id' => 'n/a']],
         ];
 
@@ -183,7 +185,8 @@ JSON,
     "fields": [ {"name": "id"} ],
     "primaryKey": ["id"]
 }
-JSON,
+JSON
+            ,
             [
                 ['id' => 'foo'],
                 ['id' => 'foo'],
@@ -197,7 +200,8 @@ JSON,
     "fields": [ {"name": "id"}, {"name": "age"} ],
     "primaryKey": [ "id", "age" ]
 }
-JSON,
+JSON
+            ,
             [
                 ['id' => 'foo', 'age' => '123'],
                 ['id' => 'foo', 'age' => '234'],
@@ -212,7 +216,8 @@ JSON,
     "fields": [ {"name": "date", "type": "date"} ],
     "primaryKey": [ "date" ]
 }
-JSON,
+JSON
+            ,
             [
                 ['date' => '2022-01-16'],
                 ['date' => '2022-01-10'],
@@ -227,7 +232,8 @@ JSON,
     "fields": [ {"name": "id", "type": "integer"} ],
     "primaryKey": [ "id" ]
 }
-JSON,
+JSON
+            ,
             [
                 ['id' => '123'],
                 ['id' => 234],
