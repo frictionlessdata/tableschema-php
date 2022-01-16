@@ -122,7 +122,8 @@ JSON;
         return [
             [
                 SchemaLoadException::class,
-                'error loading descriptor from source "--invalid--": file_get_contents(--invalid--): Failed to open stream: No such file or directory',
+                // Complete error message is trimmed because different PHP versions produce slightly different messages.
+                'error loading descriptor from source "--invalid--": file_get_contents(--invalid--): ',
                 '--invalid--',
             ],
             [
