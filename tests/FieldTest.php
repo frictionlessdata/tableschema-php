@@ -38,93 +38,217 @@ class FieldTest extends TestCase
 
     public function testNoValidFieldType(): void
     {
-        try {
-            FieldsFactory::field($this->DESCRIPTOR_WITHOUT_TYPE);
-            $this->fail();
-        } catch (FieldValidationException $e) {
-            $this->assertEquals('Could not find a valid field for descriptor: {"name":"id"}', $e->getMessage());
-        }
+        $this->expectException(FieldValidationException::class);
+        $this->expectExceptionMessage('Could not find a valid field for descriptor: {"name":"id"}');
+
+        $fieldDescriptorWithoutType = ['name' => 'id'];
+        FieldsFactory::field($fieldDescriptorWithoutType);
     }
 
     public function testDescriptor(): void
     {
+        $fieldDescriptor = [
+            'name' => 'id',
+            'type' => 'string',
+        ];
+
         $this->assertEquals(
-            (object) $this->DESCRIPTOR_MIN,
-            FieldsFactory::field($this->DESCRIPTOR_MIN)->descriptor()
+            (object) $fieldDescriptor,
+            FieldsFactory::field($fieldDescriptor)->descriptor()
         );
     }
 
     public function testName(): void
     {
-        $this->assertEquals('id', FieldsFactory::field($this->DESCRIPTOR_MIN)->name());
+        $fieldDescriptor = [
+            'name' => 'id',
+            'type' => 'string',
+        ];
+
+        $this->assertSame('id', FieldsFactory::field($fieldDescriptor)->name());
     }
 
-    public function testType(): void
+    /**
+     * @dataProvider provideFieldWithType
+     */
+    public function testType(string $expectedType, array $fieldDescriptor): void
     {
-        $this->assertEquals('string', FieldsFactory::field($this->DESCRIPTOR_MIN)->type());
-        $this->assertEquals('integer', FieldsFactory::field($this->DESCRIPTOR_MAX)->type());
+        $this->assertSame(
+            $expectedType,
+            FieldsFactory::field($fieldDescriptor)->type()
+        );
     }
 
-    public function testFormat(): void
+    public function provideFieldWithType(): array
     {
-        $this->assertEquals('default', FieldsFactory::field($this->DESCRIPTOR_MIN)->format());
-        $this->assertEquals('default', FieldsFactory::field($this->DESCRIPTOR_MAX)->format());
+        return [
+            [
+                'string',
+                ['name' => 'id', 'type' => 'string'],
+            ],
+            [
+                'integer',
+                ['name' => 'id', 'type' => 'integer'],
+            ],
+        ];
     }
 
-    public function testConstraints(): void
+    /**
+     * @dataProvider provideFieldDescriptorFormat
+     */
+    public function testFormat(string $expectedFormat, array $fieldDescriptor): void
     {
-        $this->assertEquals((object) [], FieldsFactory::field($this->DESCRIPTOR_MIN)->constraints());
-        $this->assertEquals((object) ['required' => true], FieldsFactory::field($this->DESCRIPTOR_MAX)->constraints());
+        $this->assertSame(
+            $expectedFormat,
+            FieldsFactory::field($fieldDescriptor)->format()
+        );
     }
 
-    public function testRequired(): void
+    public function provideFieldDescriptorFormat(): array
     {
-        $this->assertEquals(false, FieldsFactory::field($this->DESCRIPTOR_MIN)->required());
-        $this->assertEquals(true, FieldsFactory::field($this->DESCRIPTOR_MAX)->required());
+        return [
+            [
+                'default',
+                ['name' => 'id', 'type' => 'string'],
+            ],
+            [
+                'default',
+                ['name' => 'id', 'type' => 'string', 'format' => 'default'],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideFieldConstraintsTestData
+     */
+    public function testConstraints(\stdClass $expectedConstraint, array $fieldDescriptor): void
+    {
+        $this->assertEquals(
+            $expectedConstraint,
+            FieldsFactory::field($fieldDescriptor)->constraints()
+        );
+    }
+
+    public function provideFieldConstraintsTestData(): array
+    {
+        return [
+            [
+                (object) [],
+                ['name' => 'id', 'type' => 'string'],
+            ],
+            [
+                (object) ['required' => true],
+                [
+                    'name' => 'id',
+                    'type' => 'string',
+                    'constraints' => ['required' => true],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideFieldRequiredTestData
+     */
+    public function testRequired(bool $expectedRequired, array $fieldDescriptor): void
+    {
+        $this->assertSame(
+            $expectedRequired,
+            FieldsFactory::field($fieldDescriptor)->required()
+        );
+    }
+
+    public function provideFieldRequiredTestData(): array
+    {
+        return [
+            [
+                false,
+                ['name' => 'id', 'type' => 'string'],
+            ],
+            [
+                true,
+                [
+                    'name' => 'id',
+                    'type' => 'string',
+                    'constraints' => ['required' => true],
+                ],
+            ],
+        ];
     }
 
     public function testCastValue(): void
     {
-        $this->assertEquals(1, FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue('1'));
+        $fieldDescriptor = [
+            'name' => 'id',
+            'type' => 'integer',
+        ];
+
+        $this->assertEquals(1, FieldsFactory::field($fieldDescriptor)->castValue('1'));
     }
 
     public function testAdditionalMethods(): void
     {
         $field = FieldsFactory::field(['name' => 'name', 'type' => 'string']);
-        $this->assertEquals(null, $field->title());
-        $this->assertEquals(null, $field->description());
-        $this->assertEquals(null, $field->rdfType());
+        $this->assertNull($field->title());
+        $this->assertNull($field->description());
+        $this->assertNull($field->rdfType());
         $field = FieldsFactory::field([
             'name' => 'name', 'type' => 'string',
             'title' => 'Title',
             'description' => 'Description',
-            'rdfType' => 'http://schema.org/Thing',
+            'rdfType' => 'https://schema.org/Thing',
         ]);
-        $this->assertEquals('Title', $field->title());
-        $this->assertEquals('Description', $field->description());
-        $this->assertEquals('http://schema.org/Thing', $field->rdfType());
+        $this->assertSame('Title', $field->title());
+        $this->assertSame('Description', $field->description());
+        $this->assertSame('https://schema.org/Thing', $field->rdfType());
     }
 
     public function testCastValueConstraintError(): void
     {
-        try {
-            FieldsFactory::field($this->DESCRIPTOR_MAX)->castValue(null);
-            $this->fail();
-        } catch (FieldValidationException $e) {
-            $this->assertEquals('id: field is required (null)', $e->getMessage());
-        }
+        $this->expectException(FieldValidationException::class);
+        $this->expectExceptionMessage('id: field is required (null)');
+
+        $fieldDescriptor = [
+            'name' => 'id',
+            'type' => 'integer',
+            'constraints' => ['required' => true],
+        ];
+
+        FieldsFactory::field($fieldDescriptor)->castValue(null);
     }
 
-    public function testDisableConstraints(): void
+    /**
+     * @dataProvider provideDisableConstraintTestData
+     *
+     * @param mixed $expectedCastValue
+     * @param mixed $valueToCast
+     */
+    public function testDisableConstraints($expectedCastValue, $valueToCast, array $fieldDescriptor): void
     {
-        $this->assertEquals(
-            null,
-            FieldsFactory::field($this->DESCRIPTOR_MIN)->disableConstraints()->castValue('')
+        $this->assertSame(
+            $expectedCastValue,
+            FieldsFactory::field($fieldDescriptor)->disableConstraints()->castValue($valueToCast)
         );
-        $this->assertEquals(
-            null,
-            FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->castValue(null)
-        );
+    }
+
+    public function provideDisableConstraintTestData(): array
+    {
+        return [
+            [
+                '',
+                '',
+                ['name' => 'id', 'type' => 'string'],
+            ],
+            [
+                null,
+                null,
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'constraints' => ['required' => true],
+                ],
+            ],
+        ];
     }
 
     public function testCastValueNullMissingValues(): void
@@ -151,27 +275,84 @@ class FieldTest extends TestCase
         $this->assertSame(['name' => ''], $schema->castRow(['name' => '']));
     }
 
-    public function testValidateValue(): void
+    /**
+     * @dataProvider provideValidateValueTestData
+     *
+     * @param mixed $value
+     */
+    public function testValidateValue(string $expectedError, array $fieldDescriptor, $value): void
     {
-        $this->assertFieldValidateValue('', $this->DESCRIPTOR_MAX, '1');
-        $this->assertFieldValidateValue('id: value must be numeric ("string")', $this->DESCRIPTOR_MAX, 'string');
-        $this->assertFieldValidateValue('id: field is required (null)', $this->DESCRIPTOR_MAX, null);
+        $this->assertFieldValidateValue($expectedError, $fieldDescriptor, $value);
     }
 
-    public function testValidateValueDisableConstraints(): void
+    public function provideValidateValueTestData(): array
     {
-        $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MIN)->disableConstraints()->validateValue(''));
-        $this->assertEquals([], FieldsFactory::field($this->DESCRIPTOR_MAX)->disableConstraints()->validateValue(null));
+        return [
+            [
+                '',
+                ['name' => 'id', 'type' => 'integer'],
+                '1',
+            ],
+            [
+                'id: value must be numeric ("string")',
+                ['name' => 'id', 'type' => 'integer'],
+                'string',
+            ],
+            [
+                'id: field is required (null)',
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'constraints' => ['required' => true],
+                ],
+                null,
+            ],
+        ];
     }
 
-    public function testStringMissingValues(): void
+    /**
+     * @dataProvider provideValidateValueDisableConstraintsTestData
+     */
+    public function testValidateValueDisableConstraints(array $fieldDescriptor, $value): void
     {
-        $this->assertMissingValues(['type' => 'string'], ['', 'NA', 'N/A']);
+        $this->assertSame(
+            [],
+            FieldsFactory::field($fieldDescriptor)->disableConstraints()->validateValue($value)
+        );
     }
 
-    public function testNumberMissingValues(): void
+    public function provideValidateValueDisableConstraintsTestData(): array
     {
-        $this->assertMissingValues(['type' => 'number'], ['', 'NA', 'N/A']);
+        return [
+            [
+                ['name' => 'id', 'type' => 'string'],
+                '',
+            ],
+            [
+                [
+                    'name' => 'id',
+                    'type' => 'integer',
+                    'constraints' => ['required' => true],
+                ],
+                null,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider provideMissingDataFieldType
+     */
+    public function testMissingValues(string $fieldType): void
+    {
+        $this->assertMissingValues(['type' => $fieldType], ['', 'NA', 'N/A']);
+    }
+
+    public function provideMissingDataFieldType(): array
+    {
+        return [
+            ['string'],
+            ['number'],
+        ];
     }
 
     public function testValidateValueRequired(): void
@@ -196,18 +377,6 @@ class FieldTest extends TestCase
         $this->assertSchemaValidateValue('', $schema, '-');
         $this->assertSchemaValidateValue('name: field is required (null)', $schema, '');
         $this->assertSchemaValidateValue('name: field is required (null)', $schema, null);
-    }
-
-    public function testValidateValuePattern(): void
-    {
-        $descriptor = (object) [
-            'name' => 'name',
-            'type' => 'string',
-            'constraints' => (object) ['pattern' => '3.*'],
-        ];
-        $this->assertFieldValidateValue('', $descriptor, '3');
-        $this->assertFieldValidateValue('', $descriptor, '321');
-        $this->assertFieldValidateValue('name: value does not match pattern ("123")', $descriptor, '123');
     }
 
     public function testValidateValueUnique(): void
@@ -244,81 +413,82 @@ class FieldTest extends TestCase
         }
     }
 
-    public function testValidateValueEnum(): void
+    /**
+     * @dataProvider provideValidDataForConstraint
+     */
+    public function testValidValueForConstraint(string $type, array $constraintDefinition, $validValue): void
     {
-        $descriptor = (object) [
+        $descriptor = [
             'name' => 'name',
-            'type' => 'integer',
-            'constraints' => (object) ['enum' => ['1', '2', 3]],
+            'type' => $type,
+            'constraints' => (object) $constraintDefinition,
         ];
-        $this->assertFieldValidateValue('', $descriptor, '1');
-        $this->assertFieldValidateValue('', $descriptor, 2);
-        $this->assertFieldValidateValue('', $descriptor, '3');
-        $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, '4');
-        $this->assertFieldValidateValue('name: value not in enum (4)', $descriptor, 4);
+
+        $this->assertFieldValidateValue('', $descriptor, $validValue);
     }
 
-    public function testValidateValueMinimum(): void
+    public function provideValidDataForConstraint(): array
     {
-        $descriptor = (object) [
-            'name' => 'name',
-            'type' => 'integer',
-            'constraints' => (object) ['minimum' => 1],
+        return [
+            ['string', ['pattern' => '3.*'], '3'],
+            ['string', ['pattern' => '3.*'], '321'],
+            ['integer', ['enum' => ['1']], '1'],
+            ['integer', ['enum' => ['2']], 2],
+            ['integer', ['enum' => [3]], '3'],
+            ['integer', ['minimum' => 1], 1],
+            ['integer', ['minimum' => 1], '1'],
+            ['integer', ['minimum' => 1], 2],
+            ['integer', ['minimum' => 1], '2'],
+            ['integer', ['maximum' => 1], 1],
+            ['integer', ['maximum' => 1], '1'],
+            ['integer', ['maximum' => 1], 0],
+            ['integer', ['maximum' => 1], '0'],
+            ['string', ['minLength' => 2], 'ab'],
+            ['string', ['minLength' => 2], 'aaaa'],
+            ['string', ['minLength' => 2], null],
+            ['string', ['maxLength' => 2], 'ab'],
+            ['string', ['maxLength' => 2], 'a'],
+            ['string', ['maxLength' => 2], null],
+            ['string', ['maxLength' => 2], ''],
         ];
-        $this->assertFieldValidateValue('', $descriptor, '2');
-        $this->assertFieldValidateValue('', $descriptor, 2);
-        $this->assertFieldValidateValue('', $descriptor, '1');
-        $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, '0');
-        $this->assertFieldValidateValue('name: value is below minimum (0)', $descriptor, 0);
     }
 
-    public function testValidateValueMaximum(): void
-    {
-        $descriptor = (object) [
+    /**
+     * @dataProvider provideInvalidDataForConstraint
+     */
+    public function testInvalidValueForConstraint(
+        string $expectedError,
+        string $type,
+        array $constraintDefinition,
+        $invalidValue
+    ): void {
+        $descriptor = [
             'name' => 'name',
-            'type' => 'integer',
-            'constraints' => (object) ['maximum' => 1],
+            'type' => $type,
+            'constraints' => (object) $constraintDefinition,
         ];
-        $this->assertFieldValidateValue('', $descriptor, '0');
-        $this->assertFieldValidateValue('', $descriptor, 0);
-        $this->assertFieldValidateValue('', $descriptor, '1');
-        $this->assertFieldValidateValue('', $descriptor, 1);
-        $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, '2');
-        $this->assertFieldValidateValue('name: value is above maximum (2)', $descriptor, 2);
+
+        $this->assertFieldValidateValue($expectedError, $descriptor, $invalidValue);
     }
 
-    public function testValidateValueMinLength(): void
+    public function provideInvalidDataForConstraint(): array
     {
-        $descriptor = (object) [
-            'name' => 'name',
-            'type' => 'string',
-            'constraints' => (object) ['minLength' => 2],
+        return [
+            ['name: value does not match pattern ("123")', 'string', ['pattern' => '3.*'], '123'],
+            ['name: value not in enum (4)', 'integer', ['enum' => ['1', '2', 3]], '4'],
+            ['name: value not in enum (4)', 'integer', ['enum' => ['1', '2', 3]], 4],
+            ['name: value is below minimum (0)', 'integer', ['minimum' => 1], 0],
+            ['name: value is below minimum (0)', 'integer', ['minimum' => 1], '0'],
+            ['name: value is above maximum (2)', 'integer', ['maximum' => 1], 2],
+            ['name: value is above maximum (2)', 'integer', ['maximum' => 1], '2'],
+            ['name: value is below minimum length ("a")', 'string', ['minLength' => 2], 'a'],
+            ['name: value is above maximum length ("aaa")', 'string', ['maxLength' => 2], 'aaa'],
         ];
-        $this->assertFieldValidateValue('', $descriptor, 'ab');
-        $this->assertFieldValidateValue('', $descriptor, 'aaaa');
-        // null value passes (because field is not required)
-        $this->assertFieldValidateValue('', $descriptor, null);
-        $this->assertFieldValidateValue('name: value is below minimum length ("a")', $descriptor, 'a');
     }
 
-    public function testValidateValueMaxLength(): void
+    protected function assertFieldValidateValue(string $expectedErrors, array $descriptor, $value): void
     {
-        $descriptor = (object) [
-            'name' => 'name',
-            'type' => 'string',
-            'constraints' => (object) ['maxLength' => 2],
-        ];
-        $this->assertFieldValidateValue('', $descriptor, 'ab');
-        $this->assertFieldValidateValue('', $descriptor, 'a');
-        $this->assertFieldValidateValue('', $descriptor, null);
-        $this->assertFieldValidateValue('', $descriptor, '');
-        $this->assertFieldValidateValue('name: value is above maximum length ("aaa")', $descriptor, 'aaa');
-    }
-
-    protected function assertFieldValidateValue($expectedErrors, $descriptor, $value): void
-    {
-        $this->assertEquals(
+        $this->assertSame(
             $expectedErrors,
             SchemaValidationError::getErrorMessages(FieldsFactory::field($descriptor)->validateValue($value))
         );
