@@ -168,16 +168,38 @@ class Table implements \Iterator
             $row = $this->schema->castRow($this->dataSource->getNextLine());
             foreach ($this->schema->fields() as $field) {
                 if ($field->unique()) {
-                    if (!array_key_exists($field->name(), $this->uniqueFieldValues)) {
-                        $this->uniqueFieldValues[$field->name()] = [];
-                    }
-                    $value = $row[$field->name()];
-                    if (in_array($value, $this->uniqueFieldValues[$field->name()])) {
+                    $fieldName = $field->name();
+                    $value = $row[$fieldName];
+
+                    if (
+                        array_key_exists($fieldName, $this->uniqueFieldValues)
+                        && in_array($value, $this->uniqueFieldValues[$fieldName], false)
+                    ) {
                         throw new DataSourceException('field must be unique', $this->currentLine);
-                    } else {
-                        $this->uniqueFieldValues[$field->name()][] = $value;
                     }
+
+                    $this->uniqueFieldValues[$fieldName][] = $value;
                 }
+            }
+
+            $pkRowValues = [];
+
+            foreach ($this->schema->primaryKey() as $key) {
+                $value = $row[$key];
+
+                if (null === $value) {
+                    throw new DataSourceException('value for '.$key.' field cannot be null because it is part of the primary key', $this->currentLine);
+                }
+
+                $pkRowValues[$key] = $value;
+            }
+
+            if ([] !== $pkRowValues) {
+                if (in_array($pkRowValues, $this->primaryKeyValues, false)) {
+                    throw new DataSourceException('duplicate row for the primary key '.implode('/', array_keys($pkRowValues)), $this->currentLine);
+                }
+
+                $this->primaryKeyValues[] = $pkRowValues;
             }
         }
 
@@ -222,6 +244,7 @@ class Table implements \Iterator
     protected $dataSource;
     protected $schema;
     protected $uniqueFieldValues;
+    protected $primaryKeyValues = [];
     protected $castRows = [];
 
     protected function isInferSchema()
