@@ -620,7 +620,7 @@ JSON;
 
     protected function assertValidationErrors($expectedValidationErrors, $descriptor): void
     {
-        $this->assertEquals(
+        $this->assertEqualsIgnoringCase(
             $expectedValidationErrors,
             SchemaValidationError::getErrorMessages(
                 Schema::validate($descriptor)
