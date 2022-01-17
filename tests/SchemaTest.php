@@ -199,7 +199,7 @@ JSON;
     {
         return [
             [
-                '[] Array value found, but an object is required',
+                '[] Array value found, but a string or an object is required',
                 [],
             ],
             [

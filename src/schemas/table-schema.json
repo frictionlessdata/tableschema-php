@@ -2,7 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "Table Schema",
   "description": "A Table Schema for this resource, compliant with the [Table Schema](/tableschema/) specification.",
-  "type": "object",
+  "type": [
+    "string",
+    "object"
+  ],
   "required": [
     "fields"
   ],
@@ -180,11 +183,6 @@
                     "type": "boolean",
                     "description": "When `true`, each value for the property `MUST` be unique."
                   },
-                  "pattern": {
-                    "type": "string",
-                    "description": "A regular expression pattern to test each value of the property against, where a truthy response indicates validity.",
-                    "context": "Regular expressions `SHOULD` conform to the [XML Schema regular expression syntax](http://www.w3.org/TR/xmlschema-2/#regexs)."
-                  },
                   "enum": {
                     "oneOf": [
                       {
@@ -300,11 +298,6 @@
                   "unique": {
                     "type": "boolean",
                     "description": "When `true`, each value for the property `MUST` be unique."
-                  },
-                  "pattern": {
-                    "type": "string",
-                    "description": "A regular expression pattern to test each value of the property against, where a truthy response indicates validity.",
-                    "context": "Regular expressions `SHOULD` conform to the [XML Schema regular expression syntax](http://www.w3.org/TR/xmlschema-2/#regexs)."
                   },
                   "enum": {
                     "oneOf": [
@@ -767,11 +760,6 @@
                     "type": "boolean",
                     "description": "When `true`, each value for the property `MUST` be unique."
                   },
-                  "pattern": {
-                    "type": "string",
-                    "description": "A regular expression pattern to test each value of the property against, where a truthy response indicates validity.",
-                    "context": "Regular expressions `SHOULD` conform to the [XML Schema regular expression syntax](http://www.w3.org/TR/xmlschema-2/#regexs)."
-                  },
                   "enum": {
                     "type": "array",
                     "minItems": 1,
@@ -833,6 +821,13 @@
                 "enum": [
                   "boolean"
                 ]
+              },
+              "format": {
+                "description": "There are no format keyword options for `boolean`: only `default` is allowed.",
+                "enum": [
+                  "default"
+                ],
+                "default": "default"
               },
               "trueValues": {
                 "type": "array",
@@ -1549,7 +1544,8 @@
       "description": "Values that when encountered in the source, should be considered as `null`, 'not present', or 'blank' values.",
       "context": "Many datasets arrive with missing data values, either because a value was not collected or it never existed.\nMissing values may be indicated simply by the value being empty in other cases a special value may have been used e.g. `-`, `NaN`, `0`, `-9999` etc.\nThe `missingValues` property provides a way to indicate that these values should be interpreted as equivalent to null.\n\n`missingValues` are strings rather than being the data type of the particular field. This allows for comparison prior to casting and for fields to have missing value which are not of their type, for example a `number` field to have missing values indicated by `-`.\n\nThe default value of `missingValue` for a non-string type field is the empty string `''`. For string type fields there is no default for `missingValue` (for string fields the empty string `''` is a valid value and need not indicate null).",
       "examples": [
-        "{\n  \"missingValues\": [\n    \"-\",\n    \"NaN\",\n    \"\"\n  ]\n}\n"
+        "{\n  \"missingValues\": [\n    \"-\",\n    \"NaN\",\n    \"\"\n  ]\n}\n",
+        "{\n  \"missingValues\": []\n}\n"
       ]
     }
   },
