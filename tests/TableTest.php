@@ -7,6 +7,7 @@ namespace frictionlessdata\tableschema\tests;
 use Carbon\Carbon;
 use frictionlessdata\tableschema\DataSources\CsvDataSource;
 use frictionlessdata\tableschema\DataSources\NativeDataSource;
+use frictionlessdata\tableschema\Exceptions\DataSourceException;
 use frictionlessdata\tableschema\Exceptions\FieldValidationException;
 use frictionlessdata\tableschema\InferSchema;
 use frictionlessdata\tableschema\Schema;
@@ -130,6 +131,115 @@ class TableTest extends TestCase
             ['first_name' => 'Baz', 'last_name' => 'Bax', 'order' => 2],
             ['first_name' => 'באך', 'last_name' => 'ביי', 'order' => 3],
         ], $table->read());
+    }
+
+    /**
+     * @dataProvider provideDuplicatePrimaryKeyTestData
+     *
+     * @param string|array|stdClass $descriptor
+     */
+    public function testEnforcePrimaryKey(string $expectedExceptionMessage, $descriptor, array $duplicateRows): void
+    {
+        $this->expectException(DataSourceException::class);
+        $this->expectExceptionMessage($expectedExceptionMessage);
+
+        $tableData = new NativeDataSource($duplicateRows);
+        $schema = new Schema($descriptor);
+        $table = new Table($tableData, $schema);
+
+        // Traverse all the rows.
+        iterator_to_array($table);
+    }
+
+    public function provideDuplicatePrimaryKeyTestData(): \Generator
+    {
+        yield 'Null value not allowed for field in Primary Key' => [
+            'row 1: value for id field cannot be null because it is part of the primary key',
+            <<<JSON
+{
+"fields": [ {"name": "id"} ],
+"primaryKey": ["id"]
+}
+JSON
+            ,
+            [['id' => '']],
+        ];
+
+        yield 'Missing value not allowed for field in Primary Key' => [
+            'row 1: value for id field cannot be null because it is part of the primary key',
+            <<<JSON
+{
+    "fields": [ {"name": "id"} ],
+    "primaryKey": ["id"],
+    "missingValues": ["n/a"]
+}
+JSON
+            ,
+            [['id' => 'n/a']],
+        ];
+
+        yield 'Duplicate row on single primary key for single field' => [
+            'row 2: duplicate row for the primary key id',
+            <<<JSON
+{
+    "fields": [ {"name": "id"} ],
+    "primaryKey": ["id"]
+}
+JSON
+            ,
+            [
+                ['id' => 'foo'],
+                ['id' => 'foo'],
+            ],
+        ];
+
+        yield 'Duplicate row on primary key for multiple fields' => [
+            'row 3: duplicate row for the primary key id/age',
+            <<<JSON
+{
+    "fields": [ {"name": "id"}, {"name": "age"} ],
+    "primaryKey": [ "id", "age" ]
+}
+JSON
+            ,
+            [
+                ['id' => 'foo', 'age' => '123'],
+                ['id' => 'foo', 'age' => '234'],
+                ['id' => 'foo', 'age' => '123'],
+            ],
+        ];
+
+        yield 'Duplicate row on primary key for datetime object' => [
+            'row 3: duplicate row for the primary key date',
+            <<<JSON
+{
+    "fields": [ {"name": "date", "type": "date"} ],
+    "primaryKey": [ "date" ]
+}
+JSON
+            ,
+            [
+                ['date' => '2022-01-16'],
+                ['date' => '2022-01-10'],
+                ['date' => '2022-01-16'],
+            ],
+        ];
+
+        yield 'Duplicate row on primary key with type-insensitivity' => [
+            'row 3: duplicate row for the primary key id',
+            <<<JSON
+{
+    "fields": [ {"name": "id", "type": "integer"} ],
+    "primaryKey": [ "id" ]
+}
+JSON
+            ,
+            [
+                ['id' => '123'],
+                ['id' => 234],
+                ['id' => 123],
+            ],
+        ];
     }
 
     public function testTableSave(): void
