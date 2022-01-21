@@ -6,12 +6,12 @@
         "php": ">=7.1.0",
         "ext-mbstring": "*",
         "ext-json": "*",
-        "justinrainbow/json-schema": "^5.2",
-        "nesbot/carbon": "^2.0.0",
+        "justinrainbow/json-schema": "^5.2.10",
+        "nesbot/carbon": "^2.23.0",
         "jmikola/geojson": "^1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": ">=7.0",
+        "phpunit/phpunit": ">=7.5",
         "php-coveralls/php-coveralls": "^2.4",
         "psy/psysh": "@stable",
         "roave/security-advisories": "dev-latest"
