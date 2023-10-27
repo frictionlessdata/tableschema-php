@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace frictionlessdata\tableschema\Utility;
 
-use DateTimeImmutable;
-
 final class StrptimeFormatTransformer
 {
     public static function transform(string $strptimeFormat): string
