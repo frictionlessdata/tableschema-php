@@ -3,6 +3,7 @@
 namespace frictionlessdata\tableschema\Fields;
 
 use Carbon\Carbon;
+use frictionlessdata\tableschema\Utility\StrptimeFormatTransformer;
 
 class DateField extends BaseField
 {
@@ -21,13 +22,13 @@ class DateField extends BaseField
             }
         } else {
             $format = 'default' === $this->format() ? self::DEFAULT_FORMAT : $this->format();
-            $date = strptime($val, $format);
+            $date = date_parse_from_format(StrptimeFormatTransformer::transform($format), $val);
 
-            if (false === $date || '' != $date['unparsed']) {
+            if ($date['error_count'] > 0) {
                 throw $this->getValidationException("couldn't parse date/time according to given strptime format '{$format}''", $val);
             } else {
                 return Carbon::create(
-                    (int) $date['tm_year'] + 1900, (int) $date['tm_mon'] + 1, (int) $date['tm_mday'],
+                    (int) $date['year'], (int) $date['month'], (int) $date['day'],
                     0, 0, 0
                 );
             }

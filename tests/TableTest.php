@@ -13,6 +13,7 @@ use frictionlessdata\tableschema\InferSchema;
 use frictionlessdata\tableschema\Schema;
 use frictionlessdata\tableschema\SchemaValidationError;
 use frictionlessdata\tableschema\Table;
+use Generator;
 use PHPUnit\Framework\TestCase;
 
 class TableTest extends TestCase
@@ -151,7 +152,7 @@ class TableTest extends TestCase
         iterator_to_array($table);
     }
 
-    public function provideDuplicatePrimaryKeyTestData(): \Generator
+    public static function provideDuplicatePrimaryKeyTestData(): Generator
     {
         yield 'Null value not allowed for field in Primary Key' => [
             'row 1: value for id field cannot be null because it is part of the primary key',
