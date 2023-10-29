@@ -3,6 +3,7 @@
 namespace frictionlessdata\tableschema\Fields;
 
 use Carbon\Carbon;
+use frictionlessdata\tableschema\Utility\StrptimeFormatTransformer;
 
 /**
  * Class TimeField
@@ -32,11 +33,15 @@ class TimeField extends BaseField
 
                 return $this->getNativeTime($dt->hour, $dt->minute, $dt->second);
             default:
-                $date = strptime($val, $this->format());
-                if (false === $date || '' != $date['unparsed']) {
+                $date = date_parse_from_format(
+                    StrptimeFormatTransformer::transform($this->format()),
+                    $val
+                );
+
+                if ($date['error_count'] > 0) {
                     throw $this->getValidationException(null, $val);
                 } else {
-                    return $this->getNativeTime($date['tm_hour'], $date['tm_min'], $date['tm_sec']);
+                    return $this->getNativeTime($date['hour'], $date['minute'], $date['second']);
                 }
         }
     }

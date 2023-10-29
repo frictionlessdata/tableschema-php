@@ -89,6 +89,17 @@ JSON;
     private const FULL_DESCRIPTOR_FILE_PATH = __DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_valid_full.json';
     private const INVALID_DESCRIPTOR_FILE_PATH = __DIR__.DIRECTORY_SEPARATOR.'fixtures'.DIRECTORY_SEPARATOR.'schema_invalid_multiple_errors.json';
 
+    protected static $tempFiles = [];
+
+    public static function tearDownAfterClass(): void
+    {
+        foreach (self::$tempFiles as $tempFile) {
+            if (file_exists($tempFile)) {
+                unlink($tempFile);
+            }
+        }
+    }
+
     public function testInitializeFromRemoteResource(): void
     {
         if (getenv('TABLESCHEMA_ENABLE_FRAGILE_TESTS')) {
@@ -117,7 +128,7 @@ JSON;
         new Schema($invalidSchema);
     }
 
-    public function provideInvalidSchema(): array
+    public static function provideInvalidSchema(): array
     {
         return [
             [
@@ -145,7 +156,7 @@ JSON;
         $this->assertEquals($expectedDescriptor, $schema->descriptor());
     }
 
-    public function provideValidDescriptorSources(): \Generator
+    public static function provideValidDescriptorSources(): \Generator
     {
         yield 'Simple object descriptor' => [
             json_decode(self::SIMPLE_DESCRIPTOR_JSON, false),
@@ -171,13 +182,13 @@ JSON;
             json_decode(self::FULL_DESCRIPTOR_JSON, false),
             json_decode(self::FULL_DESCRIPTOR_JSON, true),
         ];
-        $simpleDescriptorFilePath = $this->getTempFile();
+        $simpleDescriptorFilePath = self::getTempFile();
         file_put_contents($simpleDescriptorFilePath, self::SIMPLE_DESCRIPTOR_JSON);
         yield 'Simple JSON descriptor from file' => [
             json_decode(self::SIMPLE_DESCRIPTOR_JSON, false),
             $simpleDescriptorFilePath,
         ];
-        $fullDescriptorFilePath = $this->getTempFile();
+        $fullDescriptorFilePath = self::getTempFile();
         file_put_contents($fullDescriptorFilePath, self::FULL_DESCRIPTOR_JSON);
         yield 'Full JSON descriptor from file' => [
             json_decode(self::FULL_DESCRIPTOR_JSON, false),
@@ -195,7 +206,7 @@ JSON;
         $this->assertValidationErrors($expectedErrors, $invalidDescriptor);
     }
 
-    public function provideInvalidDescriptors(): array
+    public static function provideInvalidDescriptors(): array
     {
         return [
             [
@@ -289,7 +300,7 @@ JSON;
         self::assertTrue(true);
     }
 
-    public function provideValidDescriptors(): array
+    public static function provideValidDescriptors(): array
     {
         return [
             [self::MIN_DESCRIPTOR_JSON],
@@ -338,7 +349,7 @@ JSON;
         $this->assertCastRow($expectedRow, $descriptor, $inputRow);
     }
 
-    public function provideRowCastingTestData(): \Generator
+    public static function provideRowCastingTestData(): \Generator
     {
         yield 'Cast integer field' => [
             ['id' => 1, 'email' => 'test@example.com'],
@@ -388,7 +399,7 @@ JSON;
         $schema->castRow($invalidRow);
     }
 
-    public function provideCastExceptionTestData(): array
+    public static function provideCastExceptionTestData(): array
     {
         return [
             'Wrong type in row' => [
@@ -432,7 +443,7 @@ JSON;
         $this->assertEquals($expectedKeys, (new Schema($descriptor))->primaryKey());
     }
 
-    public function providePrimaryKeyTestData(): \Generator
+    public static function providePrimaryKeyTestData(): \Generator
     {
         yield 'PK not defined' => [[], self::MIN_DESCRIPTOR_JSON];
         yield 'PK defined as array' => [['id'], self::MAX_DESCRIPTOR_JSON];
@@ -608,17 +619,6 @@ JSON;
         ], $schema->descriptor());
     }
 
-    public function tearDown(): void
-    {
-        foreach ($this->tempFiles as $tempFile) {
-            if (file_exists($tempFile)) {
-                unlink($tempFile);
-            }
-        }
-    }
-
-    protected $tempFiles = [];
-
     protected function assertValidationErrors($expectedValidationErrors, $descriptor): void
     {
         $this->assertEqualsIgnoringCase(
@@ -648,10 +648,10 @@ JSON;
         }
     }
 
-    protected function getTempFile()
+    protected static function getTempFile()
     {
         $file = tempnam(sys_get_temp_dir(), 'tableschema-php-tests');
-        $this->tempFiles[] = $file;
+        self::$tempFiles[] = $file;
 
         return $file;
     }

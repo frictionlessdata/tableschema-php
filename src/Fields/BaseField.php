@@ -7,6 +7,9 @@ use frictionlessdata\tableschema\SchemaValidationError;
 
 abstract class BaseField
 {
+    /**
+     * @param object $descriptor
+     */
     public function __construct($descriptor = null)
     {
         $this->descriptor = empty($descriptor) ? (object) [] : $descriptor;

@@ -79,7 +79,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideFieldWithType(): array
+    public static function provideFieldWithType(): array
     {
         return [
             [
@@ -104,7 +104,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideFieldDescriptorFormat(): array
+    public static function provideFieldDescriptorFormat(): array
     {
         return [
             [
@@ -129,7 +129,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideFieldConstraintsTestData(): array
+    public static function provideFieldConstraintsTestData(): array
     {
         return [
             [
@@ -158,7 +158,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideFieldRequiredTestData(): array
+    public static function provideFieldRequiredTestData(): array
     {
         return [
             [
@@ -231,7 +231,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideDisableConstraintTestData(): array
+    public static function provideDisableConstraintTestData(): array
     {
         return [
             [
@@ -285,7 +285,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue($expectedError, $fieldDescriptor, $value);
     }
 
-    public function provideValidateValueTestData(): array
+    public static function provideValidateValueTestData(): array
     {
         return [
             [
@@ -321,7 +321,7 @@ class FieldTest extends TestCase
         );
     }
 
-    public function provideValidateValueDisableConstraintsTestData(): array
+    public static function provideValidateValueDisableConstraintsTestData(): array
     {
         return [
             [
@@ -347,7 +347,7 @@ class FieldTest extends TestCase
         $this->assertMissingValues(['type' => $fieldType], ['', 'NA', 'N/A']);
     }
 
-    public function provideMissingDataFieldType(): array
+    public static function provideMissingDataFieldType(): array
     {
         return [
             ['string'],
@@ -427,7 +427,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue('', $descriptor, $validValue);
     }
 
-    public function provideValidDataForConstraint(): array
+    public static function provideValidDataForConstraint(): array
     {
         return [
             ['string', ['pattern' => '3.*'], '3'],
@@ -471,7 +471,7 @@ class FieldTest extends TestCase
         $this->assertFieldValidateValue($expectedError, $descriptor, $invalidValue);
     }
 
-    public function provideInvalidDataForConstraint(): array
+    public static function provideInvalidDataForConstraint(): array
     {
         return [
             ['name: value does not match pattern ("123")', 'string', ['pattern' => '3.*'], '123'],

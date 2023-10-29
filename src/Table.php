@@ -160,6 +160,7 @@ class Table implements \Iterator
      * @throws Exceptions\FieldValidationException
      * @throws Exceptions\DataSourceException
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if (count($this->castRows) > 0) {
@@ -213,6 +214,7 @@ class Table implements \Iterator
         $this->dataSource->close();
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         if (0 == $this->currentLine) {
@@ -223,11 +225,13 @@ class Table implements \Iterator
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->currentLine - count($this->castRows);
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         if (0 == count($this->castRows)) {
@@ -235,6 +239,7 @@ class Table implements \Iterator
         }
     }
 
+    #[\ReturnTypeWillChange]
     public function valid()
     {
         return count($this->castRows) > 0 || !$this->dataSource->isEof();
