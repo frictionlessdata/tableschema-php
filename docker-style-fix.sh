@@ -2,4 +2,4 @@
 
 set -o errexit
 
-docker-compose run --rm tblschema composer style-fix
+docker compose run --rm tblschema composer style-fix

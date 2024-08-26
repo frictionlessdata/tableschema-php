@@ -9,6 +9,16 @@ namespace frictionlessdata\tableschema;
 class SchemaValidator
 {
     /**
+     * @var object
+     */
+    private $descriptor;
+
+    /**
+     * @var array
+     */
+    private $errors;
+
+    /**
      * @param object $descriptor
      *
      * @return SchemaValidationError[]
