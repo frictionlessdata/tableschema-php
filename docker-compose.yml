@@ -4,3 +4,4 @@ services:
         volumes:
             - .:/src
         command: bash
+        network_mode: host
