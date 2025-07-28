@@ -171,6 +171,12 @@ abstract class BaseField
 
             return [];
         } catch (FieldValidationException $e) {
+            foreach ($e->validationErrors as $ve) {
+                // Replace the cast-value for the violation, with the original value.
+                // This so the error message contains the original representation of the invalid value.
+                $ve->extraDetails['value'] = $val;
+            }
+
             return $e->validationErrors;
         }
     }

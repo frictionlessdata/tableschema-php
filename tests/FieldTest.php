@@ -475,12 +475,12 @@ class FieldTest extends TestCase
     {
         return [
             ['name: value does not match pattern ("123")', 'string', ['pattern' => '3.*'], '123'],
-            ['name: value not in enum (4)', 'integer', ['enum' => ['1', '2', 3]], '4'],
+            ['name: value not in enum ("4")', 'integer', ['enum' => ['1', '2', 3]], '4'],
             ['name: value not in enum (4)', 'integer', ['enum' => ['1', '2', 3]], 4],
             ['name: value is below minimum (0)', 'integer', ['minimum' => 1], 0],
-            ['name: value is below minimum (0)', 'integer', ['minimum' => 1], '0'],
+            ['name: value is below minimum ("0")', 'integer', ['minimum' => 1], '0'],
             ['name: value is above maximum (2)', 'integer', ['maximum' => 1], 2],
-            ['name: value is above maximum (2)', 'integer', ['maximum' => 1], '2'],
+            ['name: value is above maximum ("2")', 'integer', ['maximum' => 1], '2'],
             ['name: value is below minimum length ("a")', 'string', ['minLength' => 2], 'a'],
             ['name: value is above maximum length ("aaa")', 'string', ['maxLength' => 2], 'aaa'],
         ];
