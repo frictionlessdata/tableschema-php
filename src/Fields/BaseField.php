@@ -151,17 +151,25 @@ abstract class BaseField
             }
 
             return null;
-        } else {
-            $val = $this->validateCastValue($val);
-            if (!$this->constraintsDisabled) {
-                $validationErrors = $this->checkConstraints($val);
-                if (count($validationErrors) > 0) {
-                    throw new FieldValidationException($validationErrors);
-                }
-            }
-
-            return $val;
         }
+
+        $castVal = $this->validateCastValue($val);
+
+        if (!$this->constraintsDisabled) {
+            $validationErrors = $this->checkConstraints($castVal);
+
+            if (count($validationErrors) > 0) {
+                foreach ($validationErrors as $i => $schemaError) {
+                    \assert($schemaError instanceof SchemaValidationError);
+                    $schemaError->extraDetails['value'] = $val;
+                    $validationErrors[$i] = $schemaError;
+                }
+
+                throw new FieldValidationException($validationErrors);
+            }
+        }
+
+        return $castVal;
     }
 
     public function validateValue($val)
@@ -171,12 +179,6 @@ abstract class BaseField
 
             return [];
         } catch (FieldValidationException $e) {
-            foreach ($e->validationErrors as $ve) {
-                // Replace the cast-value for the violation, with the original value.
-                // This so the error message contains the original representation of the invalid value.
-                $ve->extraDetails['value'] = $val;
-            }
-
             return $e->validationErrors;
         }
     }
