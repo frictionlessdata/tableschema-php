@@ -11,12 +11,12 @@ class SchemaValidator
     /**
      * @var object
      */
-    private $descriptor;
+    protected $descriptor;
 
     /**
      * @var array
      */
-    private $errors;
+    protected $errors;
 
     /**
      * @param object $descriptor

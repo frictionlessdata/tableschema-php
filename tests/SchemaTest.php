@@ -584,9 +584,14 @@ JSON;
             'pointer' => '/0',
             // it considers file names to be invalid uris
             'message' => 'Invalid URL format',
-            'constraint' => 'format',
-            'context' => 1,
-            'format' => 'uri',
+            // Constraint errors are arrays since justinrainbow/json-schema:^6
+            'constraint' => [
+                'name' => 'urlFormat',
+                'params' => [
+                    'format' => 'uri'
+                ],
+            ],
+            'context' => 1
         ]], $validator->getErrors());
     }
 
