@@ -13,6 +13,10 @@ class TimeField extends BaseField
 {
     protected function validateCastValue($val)
     {
+        if (!is_string($val) && !$val instanceof \DateTimeInterface) {
+            throw $this->getValidationException('must be string or datetime', $val);
+        }
+
         switch ($this->format()) {
             case 'default':
                 $time = explode(':', $val);

@@ -579,7 +579,14 @@ class FieldTypesTest extends TestCase
             if (self::ERROR === $expectedCastValue) {
                 $this->assertNotEmpty($field->validateValue($inputValue), $assertMessage);
             } elseif (is_object($expectedCastValue)) {
-                $this->assertEquals($expectedCastValue, $field->castValue($inputValue), $assertMessage);
+                $castValue = $field->castValue($inputValue);
+                if ($expectedCastValue instanceof CarbonInterval && $castValue instanceof CarbonInterval) {
+                    // Carbon 3.x changed internal CarbonInterval properties (e.g. originalInput),
+                    // breaking whole-object comparison. Compare the ISO 8601 spec instead.
+                    $this->assertEquals($expectedCastValue->spec(), $castValue->spec(), $assertMessage);
+                } else {
+                    $this->assertEquals($expectedCastValue, $castValue, $assertMessage);
+                }
             } else {
                 $this->assertSame($expectedCastValue, $field->castValue($inputValue), $assertMessage);
             }

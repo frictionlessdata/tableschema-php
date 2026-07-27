@@ -11,6 +11,10 @@ class DateField extends BaseField
 
     protected function validateCastValue($val)
     {
+        if (!is_string($val) && !$val instanceof \DateTimeInterface) {
+            throw $this->getValidationException('must be string or datetime', $val);
+        }
+
         if ('any' === $this->format()) {
             try {
                 $date = new Carbon($val);

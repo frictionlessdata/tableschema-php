@@ -9,6 +9,10 @@ class DatetimeField extends BaseField
 {
     protected function validateCastValue($val)
     {
+        if (!is_string($val) && !$val instanceof \DateTimeInterface) {
+            throw $this->getValidationException('must be string or datetime', $val);
+        }
+
         $val = trim($val);
         switch ($this->format()) {
             case 'default':
